@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+  
+  
+<mapper namespace="mybatis.DeusMapper">
+  <select id="selectMemberHistInfo" resultType="MemberHistInfo">
+    select * from member_hist_info where tbl_id = #{tblId}
+  </select>
+  
+  <select id="selectAllMemberHistInfo" resultType="MemberHistInfo">
+    select * from member_hist_info
+  </select>
+  
+  <insert id="insertMemberHistInfo" useGeneratedKeys="true"
+    keyProperty="tblId">
+    insert into &quot;public&quot;.&quot;member_hist_info&quot;
+     (&quot;member_id&quot;, &quot;start_date&quot;, &quot;name&quot;, &quot;enter_date&quot;, &quot;enter_old&quot;, 
+     &quot;status&quot;, &quot;retirement_date&quot;, &quot;retirement_type&quot;, &quot;sex&quot;, 
+     &quot;flesh_or_not&quot;, &quot;department&quot;, &quot;position&quot;) values
+       (#{memberId,jdbcType=VARCHAR},#{startDate,jdbcType=DATE},#{name,jdbcType=VARCHAR},#{enterDate,jdbcType=DATE},
+       #{enterOld,jdbcType=INTEGER},#{status,jdbcType=INTEGER},#{retirementDate,jdbcType=DATE},
+       #{retirementType,jdbcType=INTEGER},#{sex,jdbcType=INTEGER},#{fleshOrNot,jdbcType=INTEGER},
+       #{department,jdbcType=INTEGER},#{position,jdbcType=INTEGER})
+  </insert>
+  
+  <insert id="insertManyMemberHistInfo" useGeneratedKeys="true"
+    keyProperty="tblId">
+    insert into &quot;public&quot;.&quot;member_hist_info&quot;
+     (&quot;member_id&quot;, &quot;start_date&quot;, &quot;name&quot;, &quot;enter_date&quot;, &quot;enter_old&quot;, 
+     &quot;status&quot;, &quot;retirement_date&quot;, &quot;retirement_type&quot;, &quot;sex&quot;, 
+     &quot;flesh_or_not&quot;, &quot;department&quot;, &quot;position&quot;) values
+    <foreach item="item" collection="list" separator=",">
+       (#{item.memberId,jdbcType=VARCHAR},#{item.startDate,jdbcType=DATE},#{item.name,jdbcType=VARCHAR},
+       #{item.enterDate,jdbcType=DATE},#{item.enterOld,jdbcType=INTEGER},#{item.status,jdbcType=INTEGER},
+       #{item.retirementDate,jdbcType=DATE},#{item.retirementType,jdbcType=INTEGER},
+       #{item.sex,jdbcType=INTEGER},#{item.fleshOrNot,jdbcType=INTEGER},
+       #{item.department,jdbcType=INTEGER},#{item.position,jdbcType=INTEGER})
+    </foreach>
+  </insert>
+
+</mapper>

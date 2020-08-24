@@ -101,6 +101,23 @@ public class GeneHikiai {
 					pro.tankin =  MakePoasonRandom.getPoisson(
 							(double)MakePoasonRandom.senkeiNormalToInto(list.get(i).takai, 40, 40));
 					prolist.add(pro);
+
+//				    // 増減周期
+//				    public int syuuki;
+					GeneSyuha syuha= new GeneSyuha();
+					pro.syuuki = syuha.makeSyukiRandom(random);
+//
+//				    // 増減範囲
+//				    public double range;
+					pro.range = random.nextDouble();
+//
+//				    // 増減刻み幅比率
+//				    public double kizamihiritu;
+					pro.kizamihiritu =  random.nextDouble();
+
+					// 周期の位相
+					pro.syukiisou = random.nextDouble();
+
 					System.out.println(j + ":" + pro.name + ":" + pro.nannkagetugo + "月後:" + pro.nannin + "人:" + pro.tankin );
 				}
 

@@ -21,16 +21,29 @@ public class Project {
     // のびる可能性
     public Integer nobirukamo;
 
-    // 最初の人数
+    // 最初の最大人数
     public Integer nannin;
-
 
     // プロジェクト単位の長さど
     public double nagai;
 
-
     // 一人当たりの単金
     public int tankin;
+
+    // 増減周期
+    public int syuuki;
+
+    // 増減範囲
+    public double range;
+
+    // 増減刻み幅比率
+    public double kizamihiritu;
+
+    // 周期位相
+    public double syukiisou;
+
+
+
 
 
 }

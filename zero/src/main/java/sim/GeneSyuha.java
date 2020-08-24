@@ -5,6 +5,14 @@ import java.util.Random;
 public class GeneSyuha {
 
 
+	// プロジェクト周期
+	// 最小
+	public static int PRO_SYUKI_MIN = 6;
+	// 最大
+	public static int PRO_SYUKI_MAX = 120;
+
+
+
 	public static void main(String[] args) {
 
 		System.out.println((5/2)*2);
@@ -21,15 +29,16 @@ public class GeneSyuha {
 	}
 
 
-	public int makeSyukiRandom(Random random, int min, int max) {
+	public int makeSyukiRandom(Random random) {
 		double ran = random.nextDouble();
-
-		double logmin = Math.log(min);
-		double logmax = Math.log(max);
+		double logmin = Math.log(PRO_SYUKI_MIN);
+		double logmax = Math.log(PRO_SYUKI_MAX);
 		double logtarget = logmin + ran * (logmax - logmin);
 
 		return (int)Math.round(Math.exp(logtarget));
 
 	}
+
+
 
 }

@@ -26,7 +26,7 @@ public class GeneHikiai {
 //
 //		// 提案時期 1
 //		public int jiki;
-//
+//tanosi
 //		// 名前
 //		public String name;
 //

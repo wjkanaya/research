@@ -1,5 +1,6 @@
 package sim;
 
+
 public class Project {
 
 	// 提案時期 1
@@ -22,7 +23,7 @@ public class Project {
     public Integer nobirukamo;
 
     // 最初の最大人数
-    public Integer nannin;
+    public int nannin;
 
     // プロジェクト単位の長さど
     public double nagai;
@@ -36,14 +37,10 @@ public class Project {
     // 増減範囲
     public double range;
 
-    // 増減刻み幅比率
+    // 刻み幅比率
     public double kizamihiritu;
-
     // 周期位相
     public double syukiisou;
-
-
-
 
 
 }

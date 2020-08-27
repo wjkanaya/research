@@ -17,15 +17,26 @@ public class GeneSyuha {
 
 		System.out.println((5/2)*2);
 	}
-	public int nowNinzu(Random random,int jiki, int syuki,int maxnumin,double isouRan,int kizamiHaba){
-		double ran = random.nextDouble();
-		int kezuruMax =(int)Math.round(ran*(maxnumin-1));
+
+	/**
+	 *
+	 */
+	public int nowNinzu(int jiki, int syuki,int maxnumin,double isouRan,double kizamihiritu,double zougenRan){
+
+		int kezuruMax =(int)Math.round(zougenRan*(maxnumin-1));
+
+        int kizamihaba = (int)Math.ceil((kezuruMax / 2) * kizamihiritu);
+
+        if (kizamihaba == 0) {
+        	kizamihaba = 1;
+        }
+
 
 		double result = kezuruMax *((Math.sin(2*Math.PI*(jiki/syuki)+ 2*Math.PI * isouRan)) + 1)/2;
 		// 階段状に増減する場合を考慮
 		// int型同士の商の性質を利用
 
-		return (((int) Math.round(result))/kizamiHaba)* kizamiHaba;
+		return (((int) Math.round(result))/kizamihaba)* kizamihaba;
 	}
 
 

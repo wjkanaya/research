@@ -11,6 +11,8 @@ public class GeneHikiai {
 	// お客さんの数
 	public static int KYAKKU_SU = 10000;
 
+	// 直近人数数
+
 	public List<Kyaku> list = null;
 
 	public static void main(String[] args) {
@@ -39,9 +41,8 @@ public class GeneHikiai {
 //
 //	    // のびる可能性
 //	    public Integer nobirukamo;
-//
-//	    // 最初の人数
-//	    public Integer nannin;
+
+
 //
 //	    // 一人当たりの単金
 //	    public int tankin;
@@ -57,7 +58,7 @@ public class GeneHikiai {
 	}
 
 	// 引き合いデータ作成
-	private  List<Project> makeHikiai(Random random, int j) {
+	private  List<Project> makeHikiai(Random random, int jiki) {
 		if (list == null) {
 
 
@@ -92,7 +93,7 @@ public class GeneHikiai {
 				if (nannin > 0) {
 					//　来客
 					Project pro = new Project();
-					pro.jiki = j;
+					pro.jiki = jiki;
 					pro.nannkagetugo = MakePoasonRandom.getPoisson(
 							(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 12));
 					pro.name = list.get(i).name;
@@ -110,15 +111,18 @@ public class GeneHikiai {
 //				    // 増減範囲
 //				    public double range;
 					pro.range = random.nextDouble();
-//
-//				    // 増減刻み幅比率
+
+//				    // 刻み幅比率
 //				    public double kizamihiritu;
 					pro.kizamihiritu =  random.nextDouble();
 
 					// 周期の位相
 					pro.syukiisou = random.nextDouble();
+//					double ran = random.nextDouble();
+					int n1 = syuha.nowNinzu(jiki, pro.syuuki, pro.nannin, pro.syukiisou, pro.kizamihiritu , pro.range);
+					//public int nowNinzu(int jiki, int syuki,int maxnumin,double isouRan,int kizamiHaba,double kizamiRan){
 
-					System.out.println(j + ":" + pro.name + ":" + pro.nannkagetugo + "月後:" + pro.nannin + "人:" + pro.tankin );
+					System.out.println(jiki + ":" + pro.name + ":" + pro.nannkagetugo + "月後:" + n1 + "人:" + pro.tankin );
 				}
 
 			}

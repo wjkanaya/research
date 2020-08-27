@@ -1,7 +1,13 @@
 package sim;
 
+import java.util.Set;
+
+import deus_proto.Member;
 
 public class Project {
+
+	// 状態0引き合い、1、実行中、2プロジェクト終了
+	public int status;
 
 	// 提案時期 1
 	public int jiki;
@@ -41,6 +47,11 @@ public class Project {
     public double kizamihiritu;
     // 周期位相
     public double syukiisou;
+
+    //
+    public Set<Member> memberSet;
+
+
 
 
 }

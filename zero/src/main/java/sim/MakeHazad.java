@@ -13,6 +13,20 @@ public class MakeHazad {
     // メンバーp
 	public static final double MEM_P = 0.9;
 
+
+    // プロジェクト内で何かがおこる。
+	public void  makeStress(Project pro) {
+		// プロジェクト内で何かがおこる。
+		// プロジェクトによるストレス。
+		// プロジェクトによる成長。
+		// お客さんの好感度の変化。
+
+
+	}
+
+
+
+
     // プロジェクトが終わる
 	public double culcProHzard(Project pro,Member mem) {
         // expのなかはトータルで-2から2ぐらいが望ましい

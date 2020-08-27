@@ -16,7 +16,7 @@ public class GeneHikiai {
 	public List<Kyaku> list = null;
 
 	public static void main(String[] args) {
-		 Random random = new Random();
+		 Random random = new Random(1234);
 
 
 //		// TODO 自動生成されたメソッド・スタブ
@@ -51,7 +51,7 @@ public class GeneHikiai {
 
 		GeneHikiai gen = new GeneHikiai();
 
-		for (int j=0;j < 10;j++) {
+		for (int j=0;j < 1;j++) {
 			gen.makeHikiai(random, j);
 		}
 
@@ -88,18 +88,18 @@ public class GeneHikiai {
 		List<Project> prolist = new ArrayList<Project>();
 		for (int i=0; i<KYAKKU_SU;i++) {
 			if  (random.nextDouble() < 0.0015) {
-				int nannin = MakePoasonRandom.getPoisson(
-						(double)MakePoasonRandom.senkeiNormalToInto(list.get(i).ooi, 1, 5));
+				int nannin = MakePoasonRandom.getPoisson(random,
+						(double)MakePoasonRandom.senkeiNormalToInto(list.get(i).ooi, 1, 15));
 				if (nannin > 0) {
 					//　来客
 					Project pro = new Project();
 					pro.jiki = jiki;
-					pro.nannkagetugo = MakePoasonRandom.getPoisson(
+					pro.nannkagetugo = MakePoasonRandom.getPoisson(random,
 							(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 12));
 					pro.name = list.get(i).name;
 					pro.kyaku= list.get(i);
 					pro.nannin = nannin;
-					pro.tankin =  MakePoasonRandom.getPoisson(
+					pro.tankin =  MakePoasonRandom.getPoisson(random,
 							(double)MakePoasonRandom.senkeiNormalToInto(list.get(i).takai, 40, 40));
 					prolist.add(pro);
 
@@ -120,9 +120,10 @@ public class GeneHikiai {
 					pro.syukiisou = random.nextDouble();
 //					double ran = random.nextDouble();
 					int n1 = syuha.nowNinzu(jiki, pro.syuuki, pro.nannin, pro.syukiisou, pro.kizamihiritu , pro.range);
+					int n2 = syuha.nowNinzu(jiki+6, pro.syuuki, pro.nannin, pro.syukiisou, pro.kizamihiritu , pro.range);
 					//public int nowNinzu(int jiki, int syuki,int maxnumin,double isouRan,int kizamiHaba,double kizamiRan){
 
-					System.out.println(jiki + ":" + pro.name + ":" + pro.nannkagetugo + "月後:" + n1 + "人:" + pro.tankin );
+					System.out.println(jiki + ":" + pro.name + ":" + pro.nannkagetugo + "月後:" + n1 + "人(半年後"+ n2 +"):" + pro.tankin );
 				}
 
 			}

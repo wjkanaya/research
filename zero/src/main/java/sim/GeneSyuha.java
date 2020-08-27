@@ -31,12 +31,14 @@ public class GeneSyuha {
         	kizamihaba = 1;
         }
 
+       // System.out.println("j" + jiki +"s" + syuki +" "+ 2*(((double)jiki)/syuki)+ "PI");
 
-		double result = kezuruMax *((Math.sin(2*Math.PI*(jiki/syuki)+ 2*Math.PI * isouRan)) + 1)/2;
+		double result = kezuruMax *((Math.sin(2*Math.PI*(((double)jiki)/syuki)+ 2*Math.PI * isouRan)) + 1)/2;
+//		 System.out.println("r=" + result);
 		// 階段状に増減する場合を考慮
 		// int型同士の商の性質を利用
 
-		return (((int) Math.round(result))/kizamihaba)* kizamihaba;
+		return maxnumin - (((int) Math.round(result))/kizamihaba)* kizamihaba;
 	}
 
 

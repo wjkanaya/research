@@ -33,6 +33,13 @@ public class GeneFreshMembers {
 				  member.retire = 0;
 				  member.yameritu = random.nextGaussian() ;
 				  member.nouryoku = random.nextGaussian() ;
+
+				  member.eikyoudo = MakePoasonRandom.senkeiNormalToInto( random.nextGaussian(), 0,1);
+				  // 楽しさに影響の受けやすさ [0-1] 正規分布
+
+				  member.seityoudo = MakePoasonRandom.senkeiNormalToInto( random.nextGaussian(), 0,1);
+				  // 成長しやすさ [0-1] 正規分布
+
 				  member.entT = j; // 入社時期
 				  System.out.println(member.name + "君が入社しました");
 				  doukiSet.add(member);

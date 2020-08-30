@@ -37,4 +37,5 @@ public class Kyaku {
     public int torinin = 0; // 取引人月
 
 
+
 }

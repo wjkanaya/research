@@ -40,6 +40,7 @@ public class MakeHazad {
 
 
 		  double yammeritu =h * Math.exp (mem.yameritu* 0.0000001
+				  - 0.000001 * mem.omosiroido // 仕事面白いと思っていたらやめない
 				  + 0.000001  * (
 						  2* (((double)sennpaicnt)/ allcnt-0.5)
 						  )

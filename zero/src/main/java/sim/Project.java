@@ -1,5 +1,6 @@
 package sim;
 
+import java.util.Iterator;
 import java.util.Set;
 
 import deus_proto.Member;
@@ -48,9 +49,34 @@ public class Project {
     // 周期位相
     public double syukiisou;
 
-    //
+    // 参画中メンバーセット
     public Set<Member> memberSet;
 
+    // 参画予定メンバーセット
+    public Set<Member> memberYoteiSet;
+
+    // 退プロ予定メンバーセット
+    public Set<Member> memberTaiProYoteiSet;
+
+
+    public void doOneMonKeika() {
+    	// 客の
+
+        //-public double sinraido =0; // 信頼度
+    	// 取引人月
+    	int memberCount = memberSet.size();
+
+    	// 取引人月
+    	kyaku.torinin =+ memberCount;
+    	for (Iterator<Member> itr = memberSet.iterator(); itr.hasNext();){
+    		Member m = itr.next();
+    		// 仕事楽しい度変化
+    		m.omosiroido += m.eikyoudo * kyaku.tanosi;
+    		// 能力向上
+    		m.nouryokukoujyoudo += m.seityoudo + kyaku.sodatu;
+    	}
+
+    }
 
 
 

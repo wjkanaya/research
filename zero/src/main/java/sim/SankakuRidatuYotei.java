@@ -2,7 +2,7 @@ package sim;
 
 import deus_proto.Member;
 
-public class SankakuYotei {
+public class SankakuRidatuYotei {
 
 
 	public Member mem;
@@ -10,6 +10,7 @@ public class SankakuYotei {
 	public Project pro;
 
 	public int itukara;
+
 
 
 }

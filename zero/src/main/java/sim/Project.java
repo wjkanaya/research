@@ -52,11 +52,11 @@ public class Project {
     // 参画中メンバーセット
     public Set<Member> memberSet;
 
-    // 参画予定メンバーセット
-    public Set<Member> memberYoteiSet;
-
-    // 退プロ予定メンバーセット
-    public Set<Member> memberTaiProYoteiSet;
+//    // 参画予定メンバーセット
+//    public Set<Member> memberYoteiSet;
+//
+//    // 退プロ予定メンバーセット
+//    public Set<Member> memberTaiProYoteiSet;
 
 
     public void doOneMonKeika() {

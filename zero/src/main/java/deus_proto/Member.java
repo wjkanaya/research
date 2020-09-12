@@ -21,4 +21,16 @@ public class Member {
 	public double nouryokukoujyoudo; // 能力向上度
 
 	public int retire;
+
+	   public boolean equals(Object anObject) {
+	        if (this == anObject) {
+	            return true;
+	        }
+	        if (anObject instanceof Member) {
+	        	Member m = (Member)anObject;
+	            return m.memberId.equals(this.memberId);
+	        }
+	        return false;
+	    }
+
 }

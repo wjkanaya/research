@@ -1,5 +1,7 @@
 package sim;
 
+import java.util.Iterator;
+
 import deus_proto.Member;
 
 public class MakeHazad {
@@ -19,18 +21,45 @@ public class MakeHazad {
 		// プロジェクト内で何かがおこる。
 		// プロジェクトによるストレス。
 		// プロジェクトによる成長。
-		// お客さんの好感度の変化。
+		for (Iterator<Member> memitr = pro.memberSet.iterator();memitr.hasNext();) {
+			Member mem = memitr.next();
 
+			// やめやすさに関連する
+			mem.omosiroido = mem.eikyoudo * pro.kyaku.tanosi;
+
+			//  仕事
+			mem.nouryokukoujyoudo = mem.seityoudo * pro.kyaku.sodatu;
+
+		}
+
+		// お客さんの好感度の変化。
+        // TODDO
 
 	}
+	
 
 
 
 
     // プロジェクトが終わる
-	public double culcProHzard(Project pro,Member mem) {
+	public double culcprohzard(Project pro) {
+
+		// 参画人数
+		int memberNum = pro.memberSet.size();
+
+		double nouryoku = 0;
+
+		for (Iterator<Member> memitr =pro.memberSet.iterator();memitr.hasNext();) {
+			Member mem = memitr.next();
+			nouryoku += mem.nouryokukoujyoudo;
+		}
+
+		// 能力平均
+		double nouryokuHeikin = nouryoku / memberNum;
+
+
         // expのなかはトータルで-2から2ぐらいが望ましい
-		double h = PRO_LAMBDA*Math.exp((1/3)*(-0.2*pro.kyaku.nagai-0.5*pro.nagai-0.3*mem.nouryoku));
+		double h = PRO_LAMBDA*Math.exp((1/3)*(-0.2*pro.kyaku.nagai-0.5*pro.nagai-0.3 * nouryokuHeikin));
 
 		return  h;
 	}

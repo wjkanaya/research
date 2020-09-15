@@ -11,7 +11,7 @@ public class Member {
 	//
 	public double eikyoudo; // 楽しさに影響の受けやすさ [0-1] 正規分布
 
-	public double nouryoku;    //もともとの能力
+	public double kisonouryoku;    //もともとの能力
 
 	public double seityoudo; // 成長しやすさ [0-1] 正規分布
 
@@ -22,15 +22,15 @@ public class Member {
 
 	public int retire;
 
-	   public boolean equals(Object anObject) {
-	        if (this == anObject) {
-	            return true;
-	        }
-	        if (anObject instanceof Member) {
-	        	Member m = (Member)anObject;
-	            return m.memberId.equals(this.memberId);
-	        }
-	        return false;
-	    }
+	public boolean equals(Object anObject) {
+		if (this == anObject) {
+			return true;
+		}
+		if (anObject instanceof Member) {
+			Member m = (Member)anObject;
+			return m.memberId.equals(this.memberId);
+		}
+		return false;
+	}
 
 }

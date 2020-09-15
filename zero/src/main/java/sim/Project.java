@@ -58,6 +58,17 @@ public class Project {
 //    // 退プロ予定メンバーセット
 //    public Set<Member> memberTaiProYoteiSet;
 
+	public boolean equals(Object anObject) {
+		if (this == anObject) {
+			return true;
+		}
+		if (anObject instanceof Project) {
+			Project p = (Project)anObject;
+			return p.name.equals(this.name);
+		}
+		return false;
+	}
+
 
     public void doOneMonKeika() {
     	// 客の

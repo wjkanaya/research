@@ -54,6 +54,20 @@ public class SankakuRidatuYoteiKanri {
     	 syoteiSakujyo(yotei);
     }
 
+	// 参画内定リストに即登録
+    public void snyoteiHimozukiNow( Member mem, Project pro, int itukara) {
+    	syoteiHimozuki( mem, pro, itukara);
+
+    	 for (SankakuRidatuYotei yotei: getSYotei(pro) ) {
+
+    		 if (yotei.mem.equals(mem) && yotei.pro.equals(pro) && yotei.itukara == itukara) {
+    			 snyoteiHimozuki(yotei) ;
+    		 }
+    	 }
+    }
+
+
+
     // 参画予定リストを取得
     public List<SankakuRidatuYotei> getSYotei(Project pro) {
 
@@ -115,6 +129,18 @@ public class SankakuRidatuYoteiKanri {
     	lnlist.add(yotei);
 
     	lyoteiSakujyo(yotei);
+    }
+
+	// 離脱内定リストに即登録
+    public void lnyoteiHimozukiNow( Member mem, Project pro, int itukara) {
+    	lyoteiHimozuki( mem, pro, itukara);
+
+    	 for (SankakuRidatuYotei yotei: getLYotei(pro) ) {
+
+    		 if (yotei.mem.equals(mem) && yotei.pro.equals(pro) && yotei.itukara == itukara) {
+    			 lnyoteiHimozuki(yotei) ;
+    		 }
+    	 }
     }
 
     // 離脱予定リストを取得

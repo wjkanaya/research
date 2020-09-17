@@ -7,6 +7,12 @@ import deus_proto.Member;
 
 public class Project {
 
+	public int getItukara(int nowJiki) {
+
+		return jiki + nannkagetugo - nowJiki;
+
+	}
+
 	// 状態0引き合い、1、実行中、2プロジェクト終了
 	public int status;
 

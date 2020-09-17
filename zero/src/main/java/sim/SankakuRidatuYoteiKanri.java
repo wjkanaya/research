@@ -8,6 +8,12 @@ import deus_proto.Member;
 
 public class SankakuRidatuYoteiKanri {
 
+	AkiPool akiPool = null;
+
+	public SankakuRidatuYoteiKanri(AkiPool akiPool) {
+		this.akiPool = akiPool;
+
+	}
 
 	// 参画予定リスト
 	List<SankakuRidatuYotei> slist = new LinkedList<SankakuRidatuYotei>();
@@ -51,7 +57,9 @@ public class SankakuRidatuYoteiKanri {
 
     	snlist.add(yotei);
 
-    	 syoteiSakujyo(yotei);
+    	syoteiSakujyo(yotei);
+
+    	 
     }
 
 	// 参画内定リストに即登録
@@ -129,6 +137,9 @@ public class SankakuRidatuYoteiKanri {
     	lnlist.add(yotei);
 
     	lyoteiSakujyo(yotei);
+    	
+    	akiPool.setAkiMember(yotei.mem, yotei.itukara);
+    	
     }
 
 	// 離脱内定リストに即登録

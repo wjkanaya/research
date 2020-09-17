@@ -1,11 +1,8 @@
 package sim;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -20,13 +17,16 @@ public class DoProcess {
 		List<Set<Member>> memberList = new ArrayList<Set<Member>>();
 
 		// 空き要員リスト
-		List<Member> akiList = new LinkedList<Member>();
+		AkiPool akiPool = new AkiPool();
 
 		// 参画予定管理クラス
-		SankakuRidatuYoteiKanri yoteikanri = new SankakuRidatuYoteiKanri();
+		SankakuRidatuYoteiKanri yoteikanri = new SankakuRidatuYoteiKanri(akiPool);
 
 		// 営業中プロジェクトリスト
 		Set<Project> eigyoutyuProList = new HashSet<Project>();
+
+		//引き合プロジェクトプール
+		ProPool proPool = new ProPool();
 
 		// 取引あり顧客リスト
 		Set<Kyaku> toriKyakuList = new HashSet<Kyaku>();
@@ -59,7 +59,7 @@ public class DoProcess {
 
 			for (Iterator<Member> itr = memberSet.iterator(); itr.hasNext();) {
 				Member m  = itr.next();
-				akiList.add(m);
+				akiPool.setAkiMember(m, 0);
 
 			}
 
@@ -108,97 +108,21 @@ public class DoProcess {
 			GeneHikiai gen = new GeneHikiai();
 			List<Project> proList = gen.makeHikiai(random, jiki);
 
-
-			// 時期ごとに分けたプロジェクト
-			LinkedList<Set<Project>> sankouList = new LinkedList<Set<Project>>();
-
-			// 始まりの時期を確認
-			Collections.sort(
-					proList,
-					new Comparator<Project>() {
-						public int compare(Project obj1, Project obj2) {
-							return (obj1.jiki + obj1.nannkagetugo) - (obj2.jiki + obj2.nannkagetugo);
-						}
-					}
-					);
-
-
-
-			int nowSankouIdx = 0;
-
-			for (Project pro : proList) {
-
-
-				if (pro.nannkagetugo > nowSankouIdx) {
-					int sa = pro.nannkagetugo - nowSankouIdx;
-					for (int i = 0; i < sa; i++) {
-						if (sankouList.size() < (nowSankouIdx + 1)) {
-							Set<Project> setPro = new HashSet<Project>();
-							sankouList.add(setPro);
-						}
-						nowSankouIdx++;
-					}
-				}
-
-
-				if (sankouList.size() < (nowSankouIdx + 1)) {
-					Set<Project> setPro = new HashSet<Project>();
-					sankouList.add(setPro);
-				}
-				sankouList.get(nowSankouIdx).add(pro);
-
-
-
-				//	int n1 = syuha.nowNinzu(jiki, pro.syuuki, pro.nannin, pro.syukiisou, pro.kizamihiritu , pro.range);
-				//		int n2 = syuha.nowNinzu(jiki+6, pro.syuuki, pro.nannin, pro.syukiisou, pro.kizamihiritu , pro.range);
-
-				//	System.out.println(jiki + ":" + pro.name + ":" + pro.nannkagetugo + "月後:" + n1 + "人(半年後"+ n2 +"):" + pro.tankin );
-
-			}
-
+			proPool.setProjectList(proList, jiki);
 
 
 			// 直近のプロジェクトから一番売上が上がるプロジェクトを充てる
 			// 12か月後一番トータルで儲かるのはどこ？
-
-
-			List<Project> yuusenJunList = new ArrayList<Project>();
-
-			for (Set<Project> proSet :sankouList){
-				System.out.println("---");
-				for (Iterator<Project> itr = proSet.iterator();itr.hasNext();) {
-					Project pro = itr.next();
-					int n1 = syuha.nowNinzu(jiki + pro.nannkagetugo, pro.syuuki, pro.nannin, pro.syukiisou, pro.kizamihiritu , pro.range);
-					int n2 = syuha.nowNinzu(jiki + pro.nannkagetugo+6, pro.syuuki, pro.nannin, pro.syukiisou, pro.kizamihiritu , pro.range);
-
-					System.out.println(jiki + ":" + pro.name + ":" + pro.nannkagetugo + "月後:" + n1 + "人(半年後"+ n2 +"):" +
-							pro.tankin +":" + (12 - pro.nannkagetugo) *  pro.tankin);
-					yuusenJunList.add(pro);
-
-				}
-				System.out.println("---!");
-
-			}
-
-			// 儲かる順でソート
-			Collections.sort(
-					yuusenJunList,
-					new Comparator<Project>() {
-						public int compare(Project obj1, Project obj2) {
-							return (12 - obj2.nannkagetugo)  *  obj2.tankin -
-									(12 - obj1.nannkagetugo)  *  obj1.tankin;
-						}
-					}
-					);
+			List<Project> yuusenJunList = proPool.moukaruJun(jiki, 12);
 
 			System.out.println("-儲かる順--");
 			for (Project pro : yuusenJunList) {
-				int n1 = syuha.nowNinzu(jiki, pro.syuuki, pro.nannin, pro.syukiisou, pro.kizamihiritu , pro.range);
-				int n2 = syuha.nowNinzu(jiki+6, pro.syuuki, pro.nannin, pro.syukiisou, pro.kizamihiritu , pro.range);
+				int n1 = syuha.nowNinzu(jiki+ pro.nannkagetugo, pro.syuuki, pro.nannin, pro.syukiisou, pro.kizamihiritu , pro.range);
+				int n2 = syuha.nowNinzu(jiki+ pro.nannkagetugo+6, pro.syuuki, pro.nannin, pro.syukiisou, pro.kizamihiritu , pro.range);
 
 
-				System.out.println(jiki + ":" + pro.name + ":" + pro.nannkagetugo + "月後:" + n1 + "人(半年後"+ n2 +"):" +
-						pro.tankin +":" + (12 - pro.nannkagetugo) *  pro.tankin);
+				System.out.println(jiki + ":" + pro.name + ":" + pro.getItukara(jiki) + "月後:" + n1 + "人(半年後"+ n2 +"):" +
+						pro.tankin +":" + (12 - pro.getItukara(jiki)) *  pro.tankin);
 
 			}
 
@@ -206,7 +130,9 @@ public class DoProcess {
 			for (Project pro : yuusenJunList) {
 
 				// 開始時期人数
-				int kaisijikiN = syuha.nowNinzu(jiki, pro.syuuki, pro.nannin, pro.syukiisou, pro.kizamihiritu , pro.range);
+				int kaisijikiN = syuha.nowNinzu(jiki+ pro.nannkagetugo, pro.syuuki, pro.nannin, pro.syukiisou, pro.kizamihiritu , pro.range);
+
+				List<Member> akiList = akiPool.getList(pro.getItukara(jiki));
 
 				for (int i = akiList.size() -1 ; i >= 0; i--) {
 					if (kaisijikiN == 0) {

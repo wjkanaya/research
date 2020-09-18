@@ -2,7 +2,7 @@ package deus_proto;
 
 public class Member {
 	public int entT; // 入社時期
-	public int retT; // 退社時期
+	public int retT = -1; // 退社時期
     public String memberId;
 	public String name;
 	public int sex;
@@ -14,6 +14,12 @@ public class Member {
 	public double kisonouryoku;    //もともとの能力
 
 	public double seityoudo; // 成長しやすさ [0-1] 正規分布
+
+	// 楽しくなかったらプロジェクトを辞めたい
+	public double tanosisajyuusi;
+
+	// 成長しないならプロジェクトを辞めたい
+	public double seityousitai;
 
 	// 動的に変化する値
 	public double omosiroido;// 仕事楽しい度

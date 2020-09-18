@@ -59,7 +59,7 @@ public class SankakuRidatuYoteiKanri {
 
     	syoteiSakujyo(yotei);
 
-    	 
+
     }
 
 	// 参画内定リストに即登録
@@ -133,23 +133,26 @@ public class SankakuRidatuYoteiKanri {
 
 
 	// 離脱内定リストに登録
-    public void lnyoteiHimozuki(SankakuRidatuYotei yotei) {
+    public void lnyoteiHimozuki(SankakuRidatuYotei yotei, boolean taishokuFlg) {
     	lnlist.add(yotei);
 
     	lyoteiSakujyo(yotei);
-    	
-    	akiPool.setAkiMember(yotei.mem, yotei.itukara);
-    	
+
+    	if (!taishokuFlg) {
+    		akiPool.setAkiMember(yotei.mem, yotei.itukara);
+    	}
     }
 
+
+
 	// 離脱内定リストに即登録
-    public void lnyoteiHimozukiNow( Member mem, Project pro, int itukara) {
+    public void lnyoteiHimozukiNow( Member mem, Project pro, int itukara, boolean taishokuFlg) {
     	lyoteiHimozuki( mem, pro, itukara);
 
     	 for (SankakuRidatuYotei yotei: getLYotei(pro) ) {
 
     		 if (yotei.mem.equals(mem) && yotei.pro.equals(pro) && yotei.itukara == itukara) {
-    			 lnyoteiHimozuki(yotei) ;
+    			 lnyoteiHimozuki(yotei, taishokuFlg) ;
     		 }
     	 }
     }

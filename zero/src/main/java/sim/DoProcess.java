@@ -1,6 +1,5 @@
 package sim;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -14,7 +13,8 @@ public class DoProcess {
 	public static void main(String[] args) {
 
 		// 社員リスト
-		List<Set<Member>> memberList = new ArrayList<Set<Member>>();
+		//List<Set<Member>> memberList = new ArrayList<Set<Member>>();
+		MemberKanri memKanri = new MemberKanri();
 
 		// 空き要員リスト
 		AkiPool akiPool = new AkiPool();
@@ -22,14 +22,18 @@ public class DoProcess {
 		// 参画予定管理クラス
 		SankakuRidatuYoteiKanri yoteikanri = new SankakuRidatuYoteiKanri(akiPool);
 
-		// 営業中プロジェクトリスト
-		Set<Project> eigyoutyuProList = new HashSet<Project>();
 
 		//引き合プロジェクトプール
 		ProPool proPool = new ProPool();
 
+		// 営業管理
+		EigyouKanri eigyouKanri = new EigyouKanri();
+
 		// 取引あり顧客リスト
 		Set<Kyaku> toriKyakuList = new HashSet<Kyaku>();
+
+		// ハザード計算
+		MakeHazad mh = new MakeHazad();
 
 
 		// TODO 自動生成されたメソッド・スタブ
@@ -54,7 +58,7 @@ public class DoProcess {
 			namecnt = gene.getFreshMembers(memberSet,random, freshnum, namecnt, jiki);
 
 			// 社員リストに格納しよう。
-			memberList.add(memberSet);
+			memKanri.memberList.add(memberSet);
 			// 空き社員リストに格納しよう。
 
 			for (Iterator<Member> itr = memberSet.iterator(); itr.hasNext();) {
@@ -63,12 +67,12 @@ public class DoProcess {
 
 			}
 
-			MakeHazad mh = new MakeHazad();
+
 
 
 			// プロジェクトが終わるか確認しよう
 
-			for (Iterator<Project> itr = eigyoutyuProList.iterator();itr.hasNext();){
+			for (Iterator<Project> itr = eigyouKanri.eigyoutyuProList.iterator();itr.hasNext();){
 				Project pro = itr.next();
 
 				// 参画中
@@ -77,30 +81,38 @@ public class DoProcess {
 					double proh =  mh.culcprohzard(pro);
 					if (random.nextDouble() < proh) { // プロジェクト終了する確率
 						int ituowaru =  MakePoasonRandom.getPoisson(random,
-									(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 12));
+								(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 12));
 						System.out.println("プロジェクト終了!! ：" + pro.name + ":" + ituowaru);
 
 						for (Iterator<Member> mitr = pro.memberSet.iterator(); mitr.hasNext();) {
 							Member mem = mitr.next();
 
 
-							yoteikanri.lnyoteiHimozukiNow(mem,pro,ituowaru);
+							yoteikanri.lnyoteiHimozukiNow(mem,pro,ituowaru, false);
 						}
 					}
 				}
 			}
 
-			// プロジェクトの人数の増減を確認しよう
-			// 増減は後で
-			//			for (Iterator<Project> itr = eigyoutyuProList.iterator();itr.hasNext();){
-//				Project pro = itr.next();
-//
-//				if (pro.memberSet.size() > 0) {
-//					int n1 = syuha.nowNinzu(jiki + pro.nannkagetugo, pro.syuuki, pro.nannin, pro.syukiisou, pro.kizamihiritu , pro.range);
-//
-//
-//				}
-//			}
+			// 個人的にプロジェクト辞めたい
+			for (Iterator<Project> itr = eigyouKanri.eigyoutyuProList.iterator();itr.hasNext();){
+				Project pro = itr.next();
+
+				// 参画中
+				if (pro.memberSet.size() > 0) {
+					for (Iterator<Member> memitr = pro.memberSet.iterator();itr.hasNext();){
+						Member mem = memitr.next();
+						double h = mh.culcTaiProhazard(mem, pro);
+
+						if (random.nextDouble() < h) { // プロジェクト終了する確率
+							int ituowaru =  MakePoasonRandom.getPoisson(random,
+									(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 3));
+							System.out.println(mem.name + "プロジェクト終了!! ：" + pro.name + ":" + ituowaru);
+							yoteikanri.lnyoteiHimozukiNow(mem,pro,ituowaru, false);
+						}
+					}
+				}
+			}
 
 
 			// とりあえず引き合い情報を確認しよう
@@ -143,9 +155,9 @@ public class DoProcess {
 					System.out.println(pro.nannkagetugo+"か月後に"+ akiList.get(i).name+ "を"+ pro.name + "に参画予定");
 					yoteikanri.snyoteiHimozukiNow(akiList.get(i), pro, pro.nannkagetugo);
 
-					// 営業中リスト
-					if (!eigyoutyuProList.contains(pro)) {
-						eigyoutyuProList.add(pro);
+		            // 営業中リスト
+					if (!eigyouKanri.eigyoutyuProList.contains(pro)) {
+						eigyouKanri.eigyoutyuProList.add(pro);
 
 					}
 					// 取引あり顧客リスト
@@ -167,52 +179,10 @@ public class DoProcess {
 
 			// 一か月経過
 
-			//
-			int max = memberList.size();
-			int allcnt = 0;
-			for (int k = 0; k < max;k++) {
-				for (Iterator<Member> memberItr = memberList.get(k).iterator(); memberItr.hasNext();) {
-					Member mem = memberItr.next();
-					if (mem.retire == 0) {
-						allcnt++;
-					}
-				}
-			}
-
-
-
-
-			int sennpaicnt = 0;
-			for (int i = 0; i < memberList.size(); i++) {
-				int doukicont = 0; // 同期の人数
-
-				for (Iterator<Member> memberItr = memberList.get(i).iterator(); memberItr.hasNext();) {
-
-
-					Member mem = memberItr.next();
-
-					if (mem.retire == 0) {
-						doukicont ++;
-						int keika = jiki - mem.entT;
-						if (keika > 0) {
-							double yammeritu = mh.culcMemHzard(allcnt, sennpaicnt, mem, keika);
-
-							if (random.nextDouble() < yammeritu) { // やめる確率
-								System.out.println(mem.name + "君がやめました ");
-								mem.retire = 1;
-								mem.retT = jiki; // 退社時期
-
-							}
-
-						}
-					}
-				}
-				sennpaicnt += doukicont;
-
-			}
-
-
-
+			memKanri.inc(random, jiki, eigyouKanri, yoteikanri, mh);
+			akiPool.inc();
+			yoteikanri.inc();
+			proPool.inc();
 
 		}
 

@@ -11,6 +11,10 @@ public class MakeHazad {
 
     // メンバーラムダ
 	public static final double MEM_LAMBDA = 150;
+
+	// メンバー✖プロジェクトラムダ
+	public static final double PRO_MEM_LAMBDA = 0.1;
+
     //S(t) = e−(λt)p = 5年と6月　5*12+6 で 0.5 0.25
     // メンバーp
 	public static final double MEM_P = 0.9;
@@ -25,10 +29,10 @@ public class MakeHazad {
 			Member mem = memitr.next();
 
 			// やめやすさに関連する
-			mem.omosiroido = mem.eikyoudo * pro.kyaku.tanosi;
+			mem.omosiroido += mem.eikyoudo * pro.kyaku.tanosi;
 
 			//  仕事
-			mem.nouryokukoujyoudo = mem.seityoudo * pro.kyaku.sodatu;
+			mem.nouryokukoujyoudo += mem.seityoudo * pro.kyaku.sodatu;
 
 		}
 
@@ -36,8 +40,16 @@ public class MakeHazad {
         // TODDO
 
 	}
-	
 
+	// メンバーがプロジェクトから抜けたい
+	public double culcTaiProhazard(Member mem, Project pro) {
+
+
+		double h = PRO_MEM_LAMBDA * Math.exp(- mem.tanosisajyuusi * mem.eikyoudo * pro.kyaku.tanosi
+				                                 - mem.seityousitai * pro.kyaku.sodatu);
+		return h;
+
+	}
 
 
 
@@ -58,11 +70,13 @@ public class MakeHazad {
 		double nouryokuHeikin = nouryoku / memberNum;
 
 
-        // expのなかはトータルで-2から2ぐらいが望ましい
-		double h = PRO_LAMBDA*Math.exp((1/3)*(-0.2*pro.kyaku.nagai-0.5*pro.nagai-0.3 * nouryokuHeikin));
+		double h = PRO_LAMBDA*Math.exp((1/3)*(-0.2*pro.kyaku.nagai-0.5*pro.nagai-0.05 * nouryokuHeikin));
 
 		return  h;
 	}
+
+
+
 
 	public double culcMemHzard(int allcnt, int sennpaicnt, Member mem, int keika) {
 		double h = (MEM_P/(Math.pow(MEM_LAMBDA, MEM_P))) * Math.pow(keika,MEM_P-1); //ハザード値

@@ -32,7 +32,14 @@ public class GeneFreshMembers {
 				  member.memberId = String.format("%04d", namecnt);
 				  member.retire = 0;
 				  member.yameritu = random.nextGaussian() ;
-				  member.nouryoku = random.nextGaussian() ;
+				  member.kisonouryoku = random.nextGaussian() ;
+
+				  // 楽しくなかったらプロジェクトを辞めたい
+				  member.tanosisajyuusi = MakePoasonRandom.senkeiNormalToInto( random.nextGaussian(), 0,1);
+
+				  // 成長できなかったらプロジェクトを辞めたい
+				  member.seityousitai = MakePoasonRandom.senkeiNormalToInto( random.nextGaussian(), 0,1);
+
 
 				  member.eikyoudo = MakePoasonRandom.senkeiNormalToInto( random.nextGaussian(), 0,1);
 				  // 楽しさに影響の受けやすさ [0-1] 正規分布

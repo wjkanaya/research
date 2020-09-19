@@ -22,7 +22,6 @@ public class DoProcess {
 		// 参画予定管理クラス
 		SankakuRidatuYoteiKanri yoteikanri = new SankakuRidatuYoteiKanri(akiPool);
 
-
 		//引き合プロジェクトプール
 		ProPool proPool = new ProPool();
 
@@ -42,6 +41,9 @@ public class DoProcess {
 
 		// 新人の人数
 		int freshnum = 5;
+
+		int jinkenhi = 50;
+
 		Random random = new Random(1234);
 
 
@@ -51,19 +53,23 @@ public class DoProcess {
 
 		int nenUri = 0; // 年間売上
 
-		while (jiki <= 240){
-			System.out.println("時期：" + jiki);
+		while (jiki <= 450){
+			System.out.println("時期：" + jiki + "人数:" + memKanri.getAllCnt());
 
 			int jikiUri = 0;
-
 
 			// 売上を確認しよう。
 			for (Project pro : eigyouKanri.eigyoutyuProList) {
 				if (pro.memberSet.size() > 0) {
 					int proUriSum = 0;
 					for (Member mem :pro.memberSet) {
-						System.out.println(mem.name + "売上:" + pro.tankin);
-						proUriSum += pro.tankin;
+
+						int uri = pro.tankin;
+						if (jiki -mem.entT <= 12) {
+							uri = pro.tankin / 2;
+						}
+						System.out.println(mem.name + "売上:" + uri);
+						proUriSum += uri;
 					}
 					System.out.println(pro.name + "売上:" + proUriSum);
 					jikiUri += proUriSum;
@@ -76,12 +82,19 @@ public class DoProcess {
 			if (jiki % 12 == 0) {
 
 				System.out.println(jiki / 12 + "年度売上:" + nenUri);
+
+				int rieki  = nenUri - (int)Math.ceil(memKanri.getAllCnt() * 1.1) * jinkenhi * 12;
+				System.out.println(jiki / 12 + "利益:" + rieki);
+
+
+				freshnum = (int)Math.floor( rieki * 0.97 / (jinkenhi  * 12));
+
+				if (freshnum == 0) {
+					freshnum = 1;
+				}
+
 				nenUri = 0;
 			}
-
-
-
-
 
 			Set<Member> memberSet = new HashSet<Member>();
 			GeneFreshMembers gene = new GeneFreshMembers();
@@ -97,7 +110,6 @@ public class DoProcess {
 			for (Iterator<Member> itr = memberSet.iterator(); itr.hasNext();) {
 				Member m  = itr.next();
 				akiPool.setAkiMember(m, 0);
-
 			}
 
 			// プロジェクトが終わるか確認しよう
@@ -212,9 +224,7 @@ public class DoProcess {
 
 			}
 
-
 			// 一か月経過
-
 			memKanri.inc(random, jiki, eigyouKanri, yoteikanri, mh);
 			akiPool.inc();
 			yoteikanri.inc();

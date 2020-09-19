@@ -11,8 +11,25 @@ import deus_proto.Member;
 public class MemberKanri {
 
 	public List<Set<Member>> memberList = new ArrayList<Set<Member>>();
-	
-	
+
+
+	public int getAllCnt() {
+		// 全体数計算
+		int max = this.memberList.size();
+		int allcnt = 0;
+		for (int k = 0; k < max;k++) {
+			for (Iterator<Member> memberItr = this.memberList.get(k).iterator(); memberItr.hasNext();) {
+				Member mem = memberItr.next();
+				if (mem.retire == 0) {
+					allcnt++;
+				}
+			}
+		}
+
+		return allcnt;
+	}
+
+
 
 	public void inc(Random random,int jiki,EigyouKanri eigyouKanri,SankakuRidatuYoteiKanri yoteikanri,MakeHazad mh) {
 
@@ -28,16 +45,7 @@ public class MemberKanri {
 		}
 
 		// 全体数計算
-		int max = this.memberList.size();
-		int allcnt = 0;
-		for (int k = 0; k < max;k++) {
-			for (Iterator<Member> memberItr = this.memberList.get(k).iterator(); memberItr.hasNext();) {
-				Member mem = memberItr.next();
-				if (mem.retire == 0) {
-					allcnt++;
-				}
-			}
-		}
+		int allcnt = getAllCnt();
 
 		int sennpaicnt = 0;
 		for (int i = 0; i < this.memberList.size(); i++) {

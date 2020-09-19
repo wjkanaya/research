@@ -13,7 +13,7 @@ public class MakeHazad {
 	public static final double MEM_LAMBDA = 150;
 
 	// メンバー✖プロジェクトラムダ
-	public static final double PRO_MEM_LAMBDA = 0.1;
+	public static final double PRO_MEM_LAMBDA = 0.01;
 
     //S(t) = e−(λt)p = 5年と6月　5*12+6 で 0.5 0.25
     // メンバーp

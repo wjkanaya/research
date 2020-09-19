@@ -1,5 +1,6 @@
 package sim;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -56,7 +57,7 @@ public class Project {
     public double syukiisou;
 
     // 参画中メンバーセット
-    public Set<Member> memberSet;
+    public Set<Member> memberSet = new HashSet<Member>();
 
 //    // 参画予定メンバーセット
 //    public Set<Member> memberYoteiSet;

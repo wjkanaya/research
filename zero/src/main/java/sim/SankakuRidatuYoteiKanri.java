@@ -185,13 +185,26 @@ public class SankakuRidatuYoteiKanri {
         return l;
     }
 
+    public boolean containLNYotei(Project pro, Member mem) {
+
+    	boolean result = false;
+    	for (SankakuRidatuYotei yo : lnlist) {
+    		if (yo.pro.equals(pro) && yo.mem.equals(mem)){
+    			result = true;
+    			break;
+    		}
+    	}
+    	return result;
+    }
+
+
     public void inc() {
 
     	// 参画予定リスト
 //    	List<SankakuRidatuYotei> slist = new LinkedList<SankakuRidatuYotei>();
         // お流れ
-    	for (int i = slist.size() -1  ;i <= 0;i--) {
-    		if (slist.get(i).itukara == 1) {
+    	for (int i = slist.size() -1  ;i >= 0;i--) {
+    		if (slist.get(i).itukara == 0) {
     			slist.remove(i);
     		} else {
     			slist.get(i).itukara -= 1;
@@ -201,10 +214,13 @@ public class SankakuRidatuYoteiKanri {
     	// 参画内定リスト
     	// 参画確定
     	//    	List<SankakuRidatuYotei> snlist = new LinkedList<SankakuRidatuYotei>();
-    	for (int i = snlist.size() -1  ;i <= 0;i--) {
-    		if (snlist.get(i).itukara == 1) {
+    	for (int i = snlist.size() -1  ;i >= 0;i--) {
+    		if (snlist.get(i).itukara == 0) {
     			SankakuRidatuYotei yotei =snlist.remove(i);
     			yotei.pro.memberSet.add(yotei.mem); //
+
+
+    			System.out.println(yotei.mem.name + "君が"+ yotei.pro.name + "に参画しました。");
 
     		} else {
     			snlist.get(i).itukara -= 1;
@@ -219,8 +235,8 @@ public class SankakuRidatuYoteiKanri {
     	// 離脱予定リスト
     	// お流れ
     	//  	List<SankakuRidatuYotei> llist = new LinkedList<SankakuRidatuYotei>();
-    	for (int i = llist.size() -1  ;i <= 0;i--) {
-    		if (llist.get(i).itukara == 1) {
+    	for (int i = llist.size() -1  ;i >= 0;i--) {
+    		if (llist.get(i).itukara == 0) {
     			llist.remove(i);
     		} else {
     			llist.get(i).itukara -= 1;
@@ -232,10 +248,12 @@ public class SankakuRidatuYoteiKanri {
 
     	// 離脱内定リスト
     	// 	List<SankakuRidatuYotei> lnlist = new LinkedList<SankakuRidatuYotei>();
-    	for (int i = lnlist.size() -1  ;i <= 0;i--) {
-    		if (lnlist.get(i).itukara == 1) {
+    	for (int i = lnlist.size() -1  ;i >= 0;i--) {
+    		if (lnlist.get(i).itukara == 0) {
     			SankakuRidatuYotei yotei =lnlist.remove(i);
     			yotei.pro.memberSet.remove(yotei.mem);
+
+    			System.out.println(yotei.mem.name + "君が"+ yotei.pro.name + "から離脱しました。");
 
 
     		} else {

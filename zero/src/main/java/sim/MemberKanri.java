@@ -11,6 +11,8 @@ import deus_proto.Member;
 public class MemberKanri {
 
 	public List<Set<Member>> memberList = new ArrayList<Set<Member>>();
+	
+	
 
 	public void inc(Random random,int jiki,EigyouKanri eigyouKanri,SankakuRidatuYoteiKanri yoteikanri,MakeHazad mh) {
 
@@ -56,13 +58,18 @@ public class MemberKanri {
 							System.out.println(mem.name + "君がやめます。 ");
 							// mem.retire = 1;
 							Project pro = eigyouKanri.getMemberProject(mem);
+
 							int ituowaru =  MakePoasonRandom.getPoisson(random,
 									(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 3));
-							System.out.println(mem.name + "プロジェクト終了!! ：" + pro.name + ":" + ituowaru);
+
+							if (pro != null) {
+								System.out.println(mem.name + "プロジェクト終了!! ：" + pro.name + ":" + ituowaru);
+								yoteikanri.lnyoteiHimozukiNow(mem,pro,ituowaru, false);
+							}
 
 							mem.retT = jiki + ituowaru; // 退社時期
 
-							yoteikanri.lnyoteiHimozukiNow(mem,pro,ituowaru, false);
+
 
 						}
 					}

@@ -44,16 +44,49 @@ public class DoProcess {
 		int freshnum = 5;
 		Random random = new Random(1234);
 
-		// -- 一番最初
-		// とりあえず新人を雇おう
+
 
 		int jiki = 0;
 		GeneSyuha syuha= new GeneSyuha();
 
-		while (jiki <= 0){
+		int nenUri = 0; // 年間売上
+
+		while (jiki <= 240){
+			System.out.println("時期：" + jiki);
+
+			int jikiUri = 0;
+
+
+			// 売上を確認しよう。
+			for (Project pro : eigyouKanri.eigyoutyuProList) {
+				if (pro.memberSet.size() > 0) {
+					int proUriSum = 0;
+					for (Member mem :pro.memberSet) {
+						System.out.println(mem.name + "売上:" + pro.tankin);
+						proUriSum += pro.tankin;
+					}
+					System.out.println(pro.name + "売上:" + proUriSum);
+					jikiUri += proUriSum;
+				}
+			}
+			System.out.println("時期:" + jiki + " 売上:" + jikiUri);
+
+			nenUri += jikiUri;
+
+			if (jiki % 12 == 0) {
+
+				System.out.println(jiki / 12 + "年度売上:" + nenUri);
+				nenUri = 0;
+			}
+
+
+
+
 
 			Set<Member> memberSet = new HashSet<Member>();
 			GeneFreshMembers gene = new GeneFreshMembers();
+			// -- 一番最初
+			// とりあえず新人を雇おう
 
 			namecnt = gene.getFreshMembers(memberSet,random, freshnum, namecnt, jiki);
 
@@ -67,9 +100,6 @@ public class DoProcess {
 
 			}
 
-
-
-
 			// プロジェクトが終わるか確認しよう
 
 			for (Iterator<Project> itr = eigyouKanri.eigyoutyuProList.iterator();itr.hasNext();){
@@ -82,13 +112,14 @@ public class DoProcess {
 					if (random.nextDouble() < proh) { // プロジェクト終了する確率
 						int ituowaru =  MakePoasonRandom.getPoisson(random,
 								(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 12));
-						System.out.println("プロジェクト終了!! ：" + pro.name + ":" + ituowaru);
+						System.out.println("プロジェクト終了!! ：" + pro.name + ":時期=" + (jiki + ituowaru));
 
 						for (Iterator<Member> mitr = pro.memberSet.iterator(); mitr.hasNext();) {
 							Member mem = mitr.next();
 
-
-							yoteikanri.lnyoteiHimozukiNow(mem,pro,ituowaru, false);
+							if (!yoteikanri.containLNYotei(pro, mem)){
+								yoteikanri.lnyoteiHimozukiNow(mem,pro,ituowaru, false);
+							}
 						}
 					}
 				}
@@ -100,15 +131,18 @@ public class DoProcess {
 
 				// 参画中
 				if (pro.memberSet.size() > 0) {
-					for (Iterator<Member> memitr = pro.memberSet.iterator();itr.hasNext();){
-						Member mem = memitr.next();
-						double h = mh.culcTaiProhazard(mem, pro);
+					for (Iterator<Member> memitr = pro.memberSet.iterator();memitr.hasNext();){
 
-						if (random.nextDouble() < h) { // プロジェクト終了する確率
-							int ituowaru =  MakePoasonRandom.getPoisson(random,
-									(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 3));
-							System.out.println(mem.name + "プロジェクト終了!! ：" + pro.name + ":" + ituowaru);
-							yoteikanri.lnyoteiHimozukiNow(mem,pro,ituowaru, false);
+						Member mem = memitr.next();
+
+						if (!yoteikanri.containLNYotei(pro, mem)){
+							double h = mh.culcTaiProhazard(mem, pro);
+							if (random.nextDouble() < h) { // プロジェクト終了する確率
+								int ituowaru =  MakePoasonRandom.getPoisson(random,
+										(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 3));
+								System.out.println(mem.name + "プロジェクトやめたい!! ：" + pro.name + ":" + (jiki + ituowaru) + "に終了");
+								yoteikanri.lnyoteiHimozukiNow(mem,pro,ituowaru, false);
+							}
 						}
 					}
 				}
@@ -125,16 +159,17 @@ public class DoProcess {
 
 			// 直近のプロジェクトから一番売上が上がるプロジェクトを充てる
 			// 12か月後一番トータルで儲かるのはどこ？
-			List<Project> yuusenJunList = proPool.moukaruJun(jiki, 12);
+			List<Project> yuusenJunList = proPool.moukaruJun(jiki, 6);
 
 			System.out.println("-儲かる順--");
-			for (Project pro : yuusenJunList) {
-				int n1 = syuha.nowNinzu(jiki+ pro.nannkagetugo, pro.syuuki, pro.nannin, pro.syukiisou, pro.kizamihiritu , pro.range);
-				int n2 = syuha.nowNinzu(jiki+ pro.nannkagetugo+6, pro.syuuki, pro.nannin, pro.syukiisou, pro.kizamihiritu , pro.range);
+			for (int i = 0; i < 5 ; i++) {
+				Project pro = yuusenJunList.get(i);
+				int n1 = syuha.nowNinzu(pro.jiki+ pro.nannkagetugo, pro.syuuki, pro.nannin, pro.syukiisou, pro.kizamihiritu , pro.range);
+				int n2 = syuha.nowNinzu(pro.jiki+ pro.nannkagetugo+6, pro.syuuki, pro.nannin, pro.syukiisou, pro.kizamihiritu , pro.range);
 
 
 				System.out.println(jiki + ":" + pro.name + ":" + pro.getItukara(jiki) + "月後:" + n1 + "人(半年後"+ n2 +"):" +
-						pro.tankin +":" + (12 - pro.getItukara(jiki)) *  pro.tankin);
+						pro.tankin +":" + (6 - pro.getItukara(jiki)) *  pro.tankin);
 
 			}
 
@@ -142,20 +177,20 @@ public class DoProcess {
 			for (Project pro : yuusenJunList) {
 
 				// 開始時期人数
-				int kaisijikiN = syuha.nowNinzu(jiki+ pro.nannkagetugo, pro.syuuki, pro.nannin, pro.syukiisou, pro.kizamihiritu , pro.range);
+				int kaisijikiN = syuha.nowNinzu(pro.jiki+ jiki+ pro.nannkagetugo, pro.syuuki, pro.nannin, pro.syukiisou, pro.kizamihiritu , pro.range);
 
 				List<Member> akiList = akiPool.getList(pro.getItukara(jiki));
 
-				for (int i = akiList.size() -1 ; i >= 0; i--) {
+				for (int i = 0 ; i < akiList.size(); i++) {
 					if (kaisijikiN == 0) {
 						break;
 					}
 
 					// 参画内定
-					System.out.println(pro.nannkagetugo+"か月後に"+ akiList.get(i).name+ "を"+ pro.name + "に参画予定");
+					System.out.println(pro.jiki + pro.nannkagetugo +"に"+ akiList.get(i).name+ "を"+ pro.name + "に参画予定");
 					yoteikanri.snyoteiHimozukiNow(akiList.get(i), pro, pro.nannkagetugo);
 
-		            // 営業中リスト
+					// 営業中リスト
 					if (!eigyouKanri.eigyoutyuProList.contains(pro)) {
 						eigyouKanri.eigyoutyuProList.add(pro);
 
@@ -167,7 +202,8 @@ public class DoProcess {
 					}
 
 					// 空き要員から減らす。
-					akiList.remove(i);
+					//akiList.remove(i);
+					akiPool.delete(akiList.get(i));
 
 
 					// 開始時期人数を減らす
@@ -184,6 +220,7 @@ public class DoProcess {
 			yoteikanri.inc();
 			proPool.inc();
 
+			jiki++;
 		}
 
 

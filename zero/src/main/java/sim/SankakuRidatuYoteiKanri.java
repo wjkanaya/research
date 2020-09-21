@@ -134,6 +134,21 @@ public class SankakuRidatuYoteiKanri {
 
 	// 離脱内定リストに登録
     public void lnyoteiHimozuki(SankakuRidatuYotei yotei, boolean taishokuFlg) {
+
+    	for (int i = 0; i < lnlist.size(); i++) {
+    		if (lnlist.get(i).mem.equals(yotei.mem) && lnlist.get(i).pro.equals(yotei.pro)) {
+    			if (yotei.itukara < lnlist.get(i).itukara) {
+    			// 先行して登録
+    				lnlist.get(i).itukara = yotei.itukara;
+
+
+    			}
+
+
+    			return;
+    		}
+    	}
+
     	lnlist.add(yotei);
 
     	lyoteiSakujyo(yotei);

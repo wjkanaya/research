@@ -1,5 +1,6 @@
 package sim;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -42,7 +43,7 @@ public class DoProcess {
 		// 新人の人数
 		int freshnum = 5;
 
-		int jinkenhi = 50;
+		int jinkenhi = 52;
 
 		Random random = new Random(1234);
 
@@ -53,7 +54,7 @@ public class DoProcess {
 
 		int nenUri = 0; // 年間売上
 
-		while (jiki <= 450){
+		while (jiki <= 360){
 			System.out.println("時期：" + jiki + "人数:" + memKanri.getAllCnt());
 
 			int jikiUri = 0;
@@ -125,7 +126,7 @@ public class DoProcess {
 						int ituowaru =  MakePoasonRandom.getPoisson(random,
 								(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 12));
 						System.out.println("プロジェクト終了!! ：" + pro.name + ":時期=" + (jiki + ituowaru));
-
+						pro.endJiki = jiki + ituowaru;
 						for (Iterator<Member> mitr = pro.memberSet.iterator(); mitr.hasNext();) {
 							Member mem = mitr.next();
 
@@ -136,6 +137,22 @@ public class DoProcess {
 					}
 				}
 			}
+
+
+
+			// プロジェクトの人数増減
+			List<Transaction> list = eigyouKanri.getTransaction(jiki);
+			List<Transaction> addList = new ArrayList<Transaction>();
+			for (Transaction tran :list) {
+				if (tran.genFlg) {
+					Util.gensyoMember(random, yoteikanri, tran);
+				} else {
+					addList.add(tran);
+
+				}
+			}
+			proPool.setProjectList(addList, jiki);
+
 
 			// 個人的にプロジェクト辞めたい
 			for (Iterator<Project> itr = eigyouKanri.eigyoutyuProList.iterator();itr.hasNext();){
@@ -164,43 +181,42 @@ public class DoProcess {
 			// とりあえず引き合い情報を確認しよう
 
 			GeneHikiai gen = new GeneHikiai();
-			List<Project> proList = gen.makeHikiai(random, jiki);
+			List<Transaction> proList = gen.makeHikiai(random, jiki);
 
 			proPool.setProjectList(proList, jiki);
 
 
 			// 直近のプロジェクトから一番売上が上がるプロジェクトを充てる
 			// 12か月後一番トータルで儲かるのはどこ？
-			List<Project> yuusenJunList = proPool.moukaruJun(jiki, 6);
+			List<Transaction> yuusenJunList = proPool.moukaruJun(jiki, 6);
 
 			System.out.println("-儲かる順--");
 			for (int i = 0; i < 5 ; i++) {
-				Project pro = yuusenJunList.get(i);
-				int n1 = syuha.nowNinzu(pro.jiki+ pro.nannkagetugo, pro.syuuki, pro.nannin, pro.syukiisou, pro.kizamihiritu , pro.range);
-				int n2 = syuha.nowNinzu(pro.jiki+ pro.nannkagetugo+6, pro.syuuki, pro.nannin, pro.syukiisou, pro.kizamihiritu , pro.range);
+				Transaction tran = yuusenJunList.get(i);
+				Project pro = tran.pro;
+				int n1 = tran.nannin;
 
-
-				System.out.println(jiki + ":" + pro.name + ":" + pro.getItukara(jiki) + "月後:" + n1 + "人(半年後"+ n2 +"):" +
-						pro.tankin +":" + (6 - pro.getItukara(jiki)) *  pro.tankin);
-
+				System.out.println(jiki + ":" + pro.name + ":" + tran.getItukara(jiki) + "月後:" + n1 + "人:" +
+						pro.tankin +":" + (6 - tran.getItukara(jiki)) *  pro.tankin);
 			}
 
 			// 一番儲かる順に空き要員を入れる
-			for (Project pro : yuusenJunList) {
+			for (Transaction tran : yuusenJunList) {
+
+				Project pro = tran.pro;
 
 				// 開始時期人数
-				int kaisijikiN = syuha.nowNinzu(pro.jiki+ jiki+ pro.nannkagetugo, pro.syuuki, pro.nannin, pro.syukiisou, pro.kizamihiritu , pro.range);
-
-				List<Member> akiList = akiPool.getList(pro.getItukara(jiki));
+				List<Member> akiList = akiPool.getList(tran.getItukara(jiki));
 
 				for (int i = 0 ; i < akiList.size(); i++) {
-					if (kaisijikiN == 0) {
+					if (tran.nannin - tran.juutounin == 0) {
 						break;
 					}
 
 					// 参画内定
-					System.out.println(pro.jiki + pro.nannkagetugo +"に"+ akiList.get(i).name+ "を"+ pro.name + "に参画予定");
-					yoteikanri.snyoteiHimozukiNow(akiList.get(i), pro, pro.nannkagetugo);
+					System.out.println(tran.jiki + tran.nannkagetugo +"に"+ akiList.get(i).name+ "を"+ pro.name + "に参画予定");
+					yoteikanri.snyoteiHimozukiNow(akiList.get(i), pro, tran.nannkagetugo);
+					tran.juutounin += 1;
 
 					// 営業中リスト
 					if (!eigyouKanri.eigyoutyuProList.contains(pro)) {
@@ -218,8 +234,6 @@ public class DoProcess {
 					akiPool.delete(akiList.get(i));
 
 
-					// 開始時期人数を減らす
-					kaisijikiN--;
 				}
 
 			}

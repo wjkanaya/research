@@ -8,20 +8,29 @@ import deus_proto.Member;
 
 public class Project {
 
-	public int getItukara(int nowJiki) {
+//	public int getItukara(int nowJiki) {
+//
+//		return jiki + nannkagetugo - nowJiki;
+//
+//	}
 
-		return jiki + nannkagetugo - nowJiki;
 
-	}
+
 
 	// 状態0引き合い、1、実行中、2プロジェクト終了
 	public int status;
 
-	// 提案時期 1
-	public int jiki;
 
-	//  提案時期  + 開始時期
-	public int nannkagetugo;
+	public int nexEigyouJiki;
+
+	// 終了時期
+	public int endJiki = -1;
+
+//	// 提案時期 1
+//	public int jiki;
+//
+//	//  提案時期  + 開始時期
+//	public int nannkagetugo;
 
 
 	// 名前
@@ -30,14 +39,14 @@ public class Project {
 	// 客コード
 	public Kyaku kyaku;
 
-    // 期間
-    public int itumade;
+//    // 期間
+//    public int itumade;
+//
+//    // のびる可能性
+//    public Integer nobirukamo;
 
-    // のびる可能性
-    public Integer nobirukamo;
-
-    // 最初の最大人数
-    public int nannin;
+    // 最大人数
+    public int maxnannin;
 
     // プロジェクト単位の長さど
     public double nagai;
@@ -59,12 +68,6 @@ public class Project {
     // 参画中メンバーセット
     public Set<Member> memberSet = new HashSet<Member>();
 
-//    // 参画予定メンバーセット
-//    public Set<Member> memberYoteiSet;
-//
-//    // 退プロ予定メンバーセット
-//    public Set<Member> memberTaiProYoteiSet;
-
 	public boolean equals(Object anObject) {
 		if (this == anObject) {
 			return true;
@@ -75,7 +78,6 @@ public class Project {
 		}
 		return false;
 	}
-
 
     public void doOneMonKeika() {
     	// 客の

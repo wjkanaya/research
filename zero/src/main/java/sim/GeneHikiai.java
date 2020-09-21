@@ -17,6 +17,10 @@ public class GeneHikiai {
 
 	public List<Kyaku> list = null;
 
+	// 半年
+	public static int NINZU_RANGE = 6;
+
+
 	public static void main(String[] args) {
 		 Random random = new Random(1234);
 
@@ -49,7 +53,7 @@ public class GeneHikiai {
 //	    // 一人当たりの単金
 //	    public int tankin;
 
-		List<Project> prolist = new ArrayList<Project>();
+//		List<Project> prolist = new ArrayList<Project>();
 
 
 		GeneHikiai gen = new GeneHikiai();
@@ -61,10 +65,10 @@ public class GeneHikiai {
 	}
 
 	// 引き合いデータ作成
-	public  List<Project> makeHikiai(Random random, int jiki) {
+	public  List<Transaction> makeHikiai(Random random, int jiki) {
 		makeKyaku(random); // 客を生成する
 
-		List<Project> prolist = new ArrayList<Project>();
+		List<Transaction> prolist = new ArrayList<Transaction>();
 		for (int i=0; i<list.size();i++) {
 			if  ((list.get(i).torinin ==0  &&  random.nextDouble() < SIKIITI) ||
 					(list.get(i).torinin >0  &&  random.nextDouble() < SIKIITI*50) ) {
@@ -72,16 +76,27 @@ public class GeneHikiai {
 						(double)MakePoasonRandom.senkeiNormalToInto(list.get(i).ooi, 1, 15));
 				if (nannin > 0) {
 					//　来客
+
+					Transaction tran = new Transaction();
+
 					Project pro = new Project();
-					pro.jiki = jiki;
-					pro.nannkagetugo = MakePoasonRandom.getPoisson(random,
+
+					tran.pro = pro;
+
+					tran.jiki = jiki;
+
+
+					tran.nannkagetugo = MakePoasonRandom.getPoisson(random,
 							(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 12));
 					pro.name = list.get(i).name;
+
+					pro.nexEigyouJiki = tran.jiki + tran.nannkagetugo +1;
+
 					pro.kyaku= list.get(i);
-					pro.nannin = nannin;
+					pro.maxnannin = nannin;
 					pro.tankin =  MakePoasonRandom.getPoisson(random,
-							(double)MakePoasonRandom.senkeiNormalToInto(list.get(i).takai, 40, 40));
-					prolist.add(pro);
+							(double)MakePoasonRandom.senkeiNormalToInto(list.get(i).takai, 40, 60));
+					prolist.add(tran);
 
 //				    // 増減周期
 //				    public int syuuki;
@@ -99,6 +114,23 @@ public class GeneHikiai {
 					// 周期の位相
 					pro.syukiisou = random.nextDouble();
 //					double ran = random.nextDouble();
+
+
+					int minnum = pro.maxnannin;
+
+					for (int j= 0; j < NINZU_RANGE; j++) {
+
+						int n = syuha.nowNinzu(tran.jiki+tran.nannkagetugo + j, pro.syuuki, pro.maxnannin, pro.syukiisou, pro.kizamihiritu , pro.range);
+
+						if (n < minnum) {
+							minnum = n;
+						}
+
+					}
+
+					tran.nannin = minnum;
+
+
 					//int n1 = syuha.nowNinzu(jiki, pro.syuuki, pro.nannin, pro.syukiisou, pro.kizamihiritu , pro.range);
 					//int n2 = syuha.nowNinzu(jiki+6, pro.syuuki, pro.nannin, pro.syukiisou, pro.kizamihiritu , pro.range);
 					//public int nowNinzu(int jiki, int syuki,int maxnumin,double isouRan,int kizamiHaba,double kizamiRan){

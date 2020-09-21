@@ -10,21 +10,21 @@ import java.util.Set;
 
 public class ProPool {
 
-	List<Set<Project>> proList = new LinkedList<Set<Project>>();
+	List<Set<Transaction>> proList = new LinkedList<Set<Transaction>>();
 
 
-	public void setProjectList(List<Project> proList, int nowJiki) {
+	public void setProjectList(List<Transaction> proList, int nowJiki) {
 
-		for (Project pro :proList) {
+		for (Transaction pro :proList) {
 			setProject(pro, nowJiki);
 		}
 
 	}
 
-	public void setProject(Project pro, int nowJiki) {
+	public void setProject(Transaction pro, int nowJiki) {
 
 		while (proList.size() < pro.getItukara(nowJiki) + 1) {
-			proList.add(new HashSet<Project>());
+			proList.add(new HashSet<Transaction>());
 		}
 
 		proList.get(pro.getItukara(nowJiki)).add(pro);
@@ -36,11 +36,11 @@ public class ProPool {
 	}
 
 
-	public List<Project> moukaruJun(int nowJiki, int span) {
+	public List<Transaction> moukaruJun(int nowJiki, int span) {
 
-		List<Project> list = new ArrayList<Project>();
+		List<Transaction> list = new ArrayList<Transaction>();
 
-		for (Set<Project> set :proList) {
+		for (Set<Transaction> set :proList) {
 			list.addAll(set);
 		}
 
@@ -50,10 +50,10 @@ public class ProPool {
 		// 儲かる順でソート
 		Collections.sort(
 				list,
-				new Comparator<Project>() {
-					public int compare(Project obj1, Project obj2) {
-						return (spanFinal - obj2.getItukara(nowJikiFinal))  *  obj2.tankin -
-								(spanFinal - obj1.getItukara(nowJikiFinal))  *  obj1.tankin;
+				new Comparator<Transaction>() {
+					public int compare(Transaction obj1, Transaction obj2) {
+						return (spanFinal - obj2.getItukara(nowJikiFinal))  *  obj2.pro.tankin -
+								(spanFinal - obj1.getItukara(nowJikiFinal))  *  obj1.pro.tankin;
 					}
 				}
 				);

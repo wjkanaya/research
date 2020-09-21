@@ -67,5 +67,11 @@ public class Util {
 	}
 
 
+	public static String getGeneProName(Random random,String kyakuName, int jiki) {
+
+		return kyakuName +"_" + jiki + "_" + random.nextInt(10);
+	}
+
+
 
 }

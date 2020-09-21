@@ -71,7 +71,7 @@ public class GeneHikiai {
 		List<Transaction> prolist = new ArrayList<Transaction>();
 		for (int i=0; i<list.size();i++) {
 			if  ((list.get(i).torinin ==0  &&  random.nextDouble() < SIKIITI) ||
-					(list.get(i).torinin >0  &&  random.nextDouble() < SIKIITI*50) ) {
+					(list.get(i).torinin >0  &&  random.nextDouble() < SIKIITI*50 * (1 + list.get(i).torinin/12) ) ) {
 				int nannin = MakePoasonRandom.getPoisson(random,
 						(double)MakePoasonRandom.senkeiNormalToInto(list.get(i).ooi, 1, 15));
 				if (nannin > 0) {
@@ -88,8 +88,7 @@ public class GeneHikiai {
 
 					tran.nannkagetugo = MakePoasonRandom.getPoisson(random,
 							(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 12));
-					pro.name = list.get(i).name;
-
+					pro.name = Util.getGeneProName(random, list.get(i).name, jiki);
 					pro.nexEigyouJiki = tran.jiki + tran.nannkagetugo +1;
 
 					pro.kyaku= list.get(i);

@@ -248,7 +248,7 @@ public class DoProcess {
 		}
 
 
-
+		Util.makeMemberHIstInfo(jiki,memKanri.getList());
 	}
 
 }

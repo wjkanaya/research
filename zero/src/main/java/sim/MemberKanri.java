@@ -30,6 +30,14 @@ public class MemberKanri {
 	}
 
 
+	public List<Member> getList() {
+		List<Member> list = new ArrayList<Member>();
+		for (Set<Member> set : memberList) {
+			list.addAll(set);
+		}
+		return list;
+	}
+
 
 	public void inc(Random random,int jiki,EigyouKanri eigyouKanri,SankakuRidatuYoteiKanri yoteikanri,MakeHazad mh) {
 

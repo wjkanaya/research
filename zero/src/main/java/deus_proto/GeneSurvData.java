@@ -1,7 +1,5 @@
 package deus_proto;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
@@ -9,30 +7,17 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
 import mybaits.vo.MemberHistInfo;
+import sim.Util;
 
 public class GeneSurvData {
 
 	public static void main(String[] args) {
 		// TODO 自動生成されたメソッド・スタブ
 
-		String resource = "mybatis-config.xml";
-		InputStream inputStream = null;
-		try {
-			inputStream = Resources.getResourceAsStream(resource);
-		} catch (IOException e) {
-			// TODO 自動生成された catch ブロック
-			e.printStackTrace();
-		}
-
-        SqlSession session = null;
-        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
-        session = sqlSessionFactory.openSession();
+		SqlSession session = Util.getSqlSession();
         List<MemberHistInfo> result = null;
 
         // 社員数
@@ -96,12 +81,14 @@ public class GeneSurvData {
         	Entry<Integer,Integer[]> ent = memberItr.next();
         	double nowS = 1 -((double)ent.getValue()[0])/wa;
         	S *= nowS;
-        	System.out.println(ent.getKey() + "," + ent.getValue()[0] + "," 
+        	System.out.println(ent.getKey() + "," + ent.getValue()[0] + ","
         	+ ent.getValue()[1] + "," +String.format("%.3f", S) );
         	wa -= ent.getValue()[1];
         }
 
 	}
+
+
 
 	private static int dateMonthSa(Date from, Date to) {
 

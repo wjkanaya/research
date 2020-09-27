@@ -19,6 +19,48 @@
     from &quot;member_hist_info&quot; where status = &apos;0&apos; group by year order by year
   </select>
 
+  <insert id="insertMemberHistInfo" useGeneratedKeys="true"
+    keyProperty="tblId">
+    insert into &quot;public&quot;.&quot;member_hist_info&quot;
+     (&quot;project_id&quot;, &quot;project_name&quot;, &quot;start_date&quot;, &quot;name&quot;, &quot;enter_date&quot;, &quot;enter_old&quot;,
+     &quot;status&quot;, &quot;retirement_date&quot;, &quot;retirement_type&quot;, &quot;sex&quot;,
+     &quot;flesh_or_not&quot;, &quot;department&quot;, &quot;position&quot;) values
+       (#{memberId,jdbcType=VARCHAR},#{startDate,jdbcType=DATE},#{name,jdbcType=VARCHAR},#{enterDate,jdbcType=DATE},
+       #{enterOld,jdbcType=INTEGER},#{status,jdbcType=INTEGER},#{retirementDate,jdbcType=DATE},
+       #{retirementType,jdbcType=INTEGER},#{sex,jdbcType=INTEGER},#{fleshOrNot,jdbcType=INTEGER},
+       #{department,jdbcType=INTEGER},#{position,jdbcType=INTEGER})
+  </insert>
+
+  <insert id="insertManyMemberHistInfo" useGeneratedKeys="true"
+    keyProperty="tblId">
+    insert into &quot;public&quot;.&quot;member_hist_info&quot;
+     (&quot;member_id&quot;, &quot;start_date&quot;, &quot;name&quot;, &quot;enter_date&quot;, &quot;enter_old&quot;,
+     &quot;status&quot;, &quot;retirement_date&quot;, &quot;retirement_type&quot;, &quot;sex&quot;,
+     &quot;flesh_or_not&quot;, &quot;department&quot;, &quot;position&quot;) values
+    <foreach item="item" collection="list" separator=",">
+       (#{item.memberId,jdbcType=VARCHAR},#{item.startDate,jdbcType=DATE},#{item.name,jdbcType=VARCHAR},
+       #{item.enterDate,jdbcType=DATE},#{item.enterOld,jdbcType=INTEGER},#{item.status,jdbcType=INTEGER},
+       #{item.retirementDate,jdbcType=DATE},#{item.retirementType,jdbcType=INTEGER},
+       #{item.sex,jdbcType=INTEGER},#{item.fleshOrNot,jdbcType=INTEGER},
+       #{item.department,jdbcType=INTEGER},#{item.position,jdbcType=INTEGER})
+    </foreach>
+  </insert>
+
+  <update id="updateMemberHistInfo">
+    update member_hist_info set (
+    status = #{status},
+    retirement_date = #{retirementDate},
+    retirement_type = #{retirementType})
+    where member_id = #{memberId}
+  </update>
+
+  <delete id="truncateMemberHistInfo">
+ 	 truncate table &quot;public&quot;.&quot;member_hist_info&quot;
+  </delete>
+  <delete id="cleanMemberHistInfoTblId">
+ 	 select setval(&apos;member_hist_info_tbl_id_seq&apos;, 1, false)
+  </delete>
+
   <insert id="insertClientInfo" useGeneratedKeys="true"    keyProperty="tblId">
     insert into &quot;public&quot;.&quot;client_info&quot;
     (&quot;client_id&quot;,&quot;client_name&quot;) values
@@ -140,46 +182,5 @@
  	 select setval(&apos;project_member_num_info_tbl_id_seq&apos;, 1, false)
   </delete>
 
-  <insert id="insertMemberHistInfo" useGeneratedKeys="true"
-    keyProperty="tblId">
-    insert into &quot;public&quot;.&quot;member_hist_info&quot;
-     (&quot;project_id&quot;, &quot;project_name&quot;, &quot;start_date&quot;, &quot;name&quot;, &quot;enter_date&quot;, &quot;enter_old&quot;,
-     &quot;status&quot;, &quot;retirement_date&quot;, &quot;retirement_type&quot;, &quot;sex&quot;,
-     &quot;flesh_or_not&quot;, &quot;department&quot;, &quot;position&quot;) values
-       (#{memberId,jdbcType=VARCHAR},#{startDate,jdbcType=DATE},#{name,jdbcType=VARCHAR},#{enterDate,jdbcType=DATE},
-       #{enterOld,jdbcType=INTEGER},#{status,jdbcType=INTEGER},#{retirementDate,jdbcType=DATE},
-       #{retirementType,jdbcType=INTEGER},#{sex,jdbcType=INTEGER},#{fleshOrNot,jdbcType=INTEGER},
-       #{department,jdbcType=INTEGER},#{position,jdbcType=INTEGER})
-  </insert>
-
-  <insert id="insertManyMemberHistInfo" useGeneratedKeys="true"
-    keyProperty="tblId">
-    insert into &quot;public&quot;.&quot;member_hist_info&quot;
-     (&quot;member_id&quot;, &quot;start_date&quot;, &quot;name&quot;, &quot;enter_date&quot;, &quot;enter_old&quot;,
-     &quot;status&quot;, &quot;retirement_date&quot;, &quot;retirement_type&quot;, &quot;sex&quot;,
-     &quot;flesh_or_not&quot;, &quot;department&quot;, &quot;position&quot;) values
-    <foreach item="item" collection="list" separator=",">
-       (#{item.memberId,jdbcType=VARCHAR},#{item.startDate,jdbcType=DATE},#{item.name,jdbcType=VARCHAR},
-       #{item.enterDate,jdbcType=DATE},#{item.enterOld,jdbcType=INTEGER},#{item.status,jdbcType=INTEGER},
-       #{item.retirementDate,jdbcType=DATE},#{item.retirementType,jdbcType=INTEGER},
-       #{item.sex,jdbcType=INTEGER},#{item.fleshOrNot,jdbcType=INTEGER},
-       #{item.department,jdbcType=INTEGER},#{item.position,jdbcType=INTEGER})
-    </foreach>
-  </insert>
-
-  <update id="updateMemberHistInfo">
-    update member_hist_info set (
-    status = #{status},
-    retirement_date = #{retirementDate},
-    retirement_type = #{retirementType})
-    where member_id = #{memberId}
-  </update>
-
-  <delete id="truncateMemberHistInfo">
- 	 truncate table &quot;public&quot;.&quot;member_hist_info&quot;
-  </delete>
-  <delete id="cleanMemberHistInfoTblId">
- 	 select setval(&apos;member_hist_info_tbl_id_seq&apos;, 1, false)
-  </delete>
 
 </mapper>

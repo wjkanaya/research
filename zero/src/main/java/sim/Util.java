@@ -192,7 +192,16 @@ public class Util {
 	}
 
 
-	public static SqlSession getSqlSession() {
+	static final ThreadLocal<SqlSession> th = new ThreadLocal<SqlSession>();
+
+	public static void startTransaction() {
+
+		SqlSession session = th.get();
+
+		if (session != null){
+			session.close();
+		}
+
 		String resource = "mybatis-config.xml";
 		InputStream inputStream = null;
 		try {
@@ -202,10 +211,49 @@ public class Util {
 			e.printStackTrace();
 		}
 
-        SqlSession session = null;
-        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
-        session = sqlSessionFactory.openSession();
+		SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+		session = sqlSessionFactory.openSession();
+		th.set(session);
+
+	}
+
+	public static SqlSession getSqlSession() {
+
+		SqlSession session = th.get();
+
 		return session;
 	}
+
+	public static void endTransaction() {
+
+		SqlSession session = th.get();
+
+		if (session != null){
+			session.commit();
+			session.close();
+		}
+
+		th.set(null);
+	}
+
+	public static void rollbackTransaction() {
+
+		SqlSession session = th.get();
+
+		if (session != null){
+			session.rollback();
+		}
+	}
+
+	public static void commitTransaction() {
+
+		SqlSession session = th.get();
+
+		if (session != null){
+			session.commit();
+		}
+	}
+
+
 
 }

@@ -33,17 +33,17 @@ public class ProjectInfo {
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
 	}
-	public Integer getProject_status() {
-		return project_status;
+	public Integer getProjectStatus() {
+		return projectStatus;
 	}
-	public void setProject_status(Integer project_status) {
-		this.project_status = project_status;
+	public void setProjectStatus(Integer projectStatus) {
+		this.projectStatus = projectStatus;
 	}
 	String projectId;
 	String projectName;
 	String clientDd;
 	Date startDate;
 	Date endDate;
-	Integer project_status;
+	Integer projectStatus;
 
 }

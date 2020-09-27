@@ -1,5 +1,6 @@
 package mybatis.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
@@ -22,6 +23,8 @@ public class MemberHistInfoDAO {
 
     public static final String INSERT_MANY_MEMBER_HIST_INFO = "insertManyMemberHistInfo";
 
+    public static final String UPDATE_MEMBER_HIST_INFO = "updateMemberHistInfo";
+
     public void trancateMemberHistInfo() {
     	SqlSession session = Util.getSqlSession();
     	session.delete(TRUNCATE_MEMBER_HIST_INFO);
@@ -42,15 +45,27 @@ public class MemberHistInfoDAO {
 
     public int insertMemberHistInfo(MemberHistInfo info) {
     	SqlSession session = Util.getSqlSession();
-    	int id = session.insert(INSERT_MEMBER_HIST_INFO, info);
-    	return id;
+    	int count = session.insert(INSERT_MEMBER_HIST_INFO, info);
+    	return count;
     }
 
     public int insertManyMemberHistInfo(List<MemberHistInfo> list) {
     	SqlSession session = Util.getSqlSession();
-    	int id = session.insert(INSERT_MEMBER_HIST_INFO, list);
-    	return id;
+    	int count = session.insert(INSERT_MEMBER_HIST_INFO, list);
+    	return count;
     }
+
+    public int updateMemberHistInfo(String memberId,Integer retirementType,Date retirementDate) {
+    	MemberHistInfo info = new MemberHistInfo();
+    	info.setMemberId(memberId);
+    	info.setRetirementType(retirementType);
+    	info.setRetirementDate(retirementDate);
+    	SqlSession session = Util.getSqlSession();
+    	int count = session.insert(UPDATE_MEMBER_HIST_INFO, info);
+    	return count;
+    }
+
+
 
 
 }

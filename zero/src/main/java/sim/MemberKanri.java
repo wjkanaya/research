@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import deus.enums.RetirementType;
 import deus_proto.Member;
+import mybatis.dao.MemberHistInfoDAO;
 
 public class MemberKanri {
 
@@ -39,7 +41,8 @@ public class MemberKanri {
 	}
 
 
-	public void inc(Random random,int jiki,EigyouKanri eigyouKanri,SankakuRidatuYoteiKanri yoteikanri,MakeHazad mh) {
+	public void inc(Random random,int jiki,EigyouKanri eigyouKanri,SankakuRidatuYoteiKanri yoteikanri,
+			MakeHazad mh,MemberHistInfoDAO dao,SimCalendar simcal) {
 
 
 		// 退職チェック
@@ -48,6 +51,8 @@ public class MemberKanri {
 				if (m.retT == jiki) {
 					m.retire = 1;
 					System.out.println(m.name + "君がやめました。 ");
+					dao.updateMemberHistInfo(m.memberId, RetirementType.JIKO, simcal.getJikiDate(jiki));
+
 				}
 			}
 		}

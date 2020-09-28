@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
 
+import deus.enums.RetirementType;
 import mybaits.vo.MemberHistInfo;
 import mybaits.vo.YearCount;
 import sim.Util;
@@ -51,14 +52,15 @@ public class MemberHistInfoDAO {
 
     public int insertManyMemberHistInfo(List<MemberHistInfo> list) {
     	SqlSession session = Util.getSqlSession();
-    	int count = session.insert(INSERT_MEMBER_HIST_INFO, list);
+    	int count = session.insert(INSERT_MANY_MEMBER_HIST_INFO, list);
     	return count;
     }
 
-    public int updateMemberHistInfo(String memberId,Integer retirementType,Date retirementDate) {
+    public int updateMemberHistInfo(String memberId,RetirementType retirementType,Date retirementDate) {
     	MemberHistInfo info = new MemberHistInfo();
     	info.setMemberId(memberId);
-    	info.setRetirementType(retirementType);
+    	info.setRetirementType(retirementType.getInteger());
+    	info.setStatus(1); // 1:退社
     	info.setRetirementDate(retirementDate);
     	SqlSession session = Util.getSqlSession();
     	int count = session.insert(UPDATE_MEMBER_HIST_INFO, info);

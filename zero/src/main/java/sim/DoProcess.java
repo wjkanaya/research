@@ -8,10 +8,20 @@ import java.util.Random;
 import java.util.Set;
 
 import deus_proto.Member;
+import mybaits.vo.MemberHistInfo;
+import mybatis.dao.MemberHistInfoDAO;
 
 public class DoProcess {
 
-	public static void main(String[] args) {
+	// 計算期間
+	private static final int KIKAN  = 360;
+
+	private void execute() {
+
+		SimCalendar simCal = new SimCalendar(KIKAN);
+
+		MemberHistInfoDAO memberHIstInfoDAO = new MemberHistInfoDAO();
+		memberHIstInfoDAO.trancateMemberHistInfo();
 
 		// 社員リスト
 		//List<Set<Member>> memberList = new ArrayList<Set<Member>>();
@@ -54,7 +64,7 @@ public class DoProcess {
 
 		int nenUri = 0; // 年間売上
 
-		while (jiki <= 360){
+		while (jiki <= KIKAN){
 			System.out.println("時期：" + jiki + "人数:" + memKanri.getAllCnt());
 
 			int jikiUri = 0;
@@ -106,6 +116,31 @@ public class DoProcess {
 
 			// 社員リストに格納しよう。
 			memKanri.memberList.add(memberSet);
+			List<MemberHistInfo> infoList = new ArrayList<MemberHistInfo>();
+			for (Member mem :memberSet) {
+				MemberHistInfo inf = new MemberHistInfo();
+				inf.setMemberId(mem.memberId);
+				inf.setStartDate(simCal.getJikiDate(jiki));
+				inf.setName(mem.name);
+				inf.setEnterDate(simCal.getJikiDate(jiki));
+				inf.setEnterOld(20);
+				inf.setStatus(0);
+				inf.setSex(mem.sex);
+//				if (mem.retire == 1) {
+//					inf.setStatus(1);
+//					calendar.setTime(day1);
+//					calendar.add(Calendar.MONTH, mem.retT);
+//					inf.setRetirementDate(calendar.getTime());
+//					inf.setRetirementType(0);
+//				}
+				infoList.add(inf);
+			}
+
+			if (infoList.size() > 0) {
+				memberHIstInfoDAO.insertManyMemberHistInfo(infoList);
+			}
+			// memberHIstInfoDAO.
+
 			// 空き社員リストに格納しよう。
 
 			for (Iterator<Member> itr = memberSet.iterator(); itr.hasNext();) {
@@ -239,7 +274,7 @@ public class DoProcess {
 			}
 
 			// 一か月経過
-			memKanri.inc(random, jiki, eigyouKanri, yoteikanri, mh);
+			memKanri.inc(random, jiki, eigyouKanri, yoteikanri, mh,memberHIstInfoDAO, simCal);
 			akiPool.inc();
 			yoteikanri.inc();
 			proPool.inc();
@@ -248,7 +283,18 @@ public class DoProcess {
 		}
 
 
-		Util.makeMemberHIstInfo(jiki,memKanri.getList());
+	///	Util.makeMemberHIstInfo(jiki,memKanri.getList());
+	}
+
+	public static void main(String[] args) {
+		Util.startTransaction();
+		try {
+		DoProcess process = new DoProcess();
+		process.execute();
+
+		} finally {
+			Util.endTransaction();;
+		}
 	}
 
 }

@@ -47,10 +47,10 @@
   </insert>
 
   <update id="updateMemberHistInfo">
-    update member_hist_info set (
+    update member_hist_info set
     status = #{status},
     retirement_date = #{retirementDate},
-    retirement_type = #{retirementType})
+    retirement_type = #{retirementType}
     where member_id = #{memberId}
   </update>
 

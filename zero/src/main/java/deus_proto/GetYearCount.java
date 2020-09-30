@@ -10,25 +10,27 @@ import sim.Util;
 public class GetYearCount {
 
 	public static void main(String[] args) {
+
+		Util.startTransaction();
+		try {
+			GetYearCount count = new GetYearCount();
+			count.execute();
+
+		} finally {
+			Util.endTransaction();;
+		}
+
+	}
+
+	private void execute() {
 		// TODO 自動生成されたメソッド・スタブ
 		SqlSession session = Util.getSqlSession();
 		List<YearCount> result = null;
-
-        if(session != null) {
-
-        	try {
-                result = session.selectList("selectAllMemberYearCount");
-
-        	} finally {
-        		session.close();
-        	}
-        }
+		result = session.selectList("selectAllMemberYearCount");
 
         for (YearCount count : result) {
         	System.out.println(count.getYear() + "," + count.getCount());
         }
-
-
 	}
 
 }

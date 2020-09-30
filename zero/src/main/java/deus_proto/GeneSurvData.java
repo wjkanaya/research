@@ -17,6 +17,20 @@ public class GeneSurvData {
 	public static void main(String[] args) {
 		// TODO 自動生成されたメソッド・スタブ
 
+		Util.startTransaction();
+		try {
+			GeneSurvData gene = new GeneSurvData();
+			gene.excute();
+
+		} finally {
+			Util.endTransaction();;
+		}
+
+	}
+
+
+
+	private void excute() {
 		SqlSession session = Util.getSqlSession();
         List<MemberHistInfo> result = null;
 
@@ -26,13 +40,9 @@ public class GeneSurvData {
 
         if(session != null) {
 
-        	try {
-                result = session.selectList("selectAllMemberHistInfo");
-                System.out.println(result.size());
-                memberNum = result.size();
-        	} finally {
-        		session.close();
-        	}
+        	result = session.selectList("selectAllMemberHistInfo");
+        	System.out.println(result.size());
+        	memberNum = result.size();
         }
 
 		  // 今日の日付
@@ -85,7 +95,6 @@ public class GeneSurvData {
         	+ ent.getValue()[1] + "," +String.format("%.3f", S) );
         	wa -= ent.getValue()[1];
         }
-
 	}
 
 

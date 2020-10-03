@@ -14,14 +14,14 @@ public class Project {
 //
 //	}
 
-
-
-
 	// 状態0引き合い、1、実行中、2プロジェクト終了
 	public int status;
 
 
 	public int nexEigyouJiki;
+
+	// 開始時期
+	public int startJiki = -1;
 
 	// 終了時期
 	public int endJiki = -1;

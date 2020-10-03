@@ -1,6 +1,17 @@
 package mybaits.vo;
 
 public class ProjectMemberNumInfo {
+
+	//	tbl_id	tbl_id	serial
+	private Integer tblId;
+
+	public Integer getTblId() {
+		return tblId;
+	}
+	public void setTblId(Integer tblId) {
+		this.tblId = tblId;
+	}
+
 	public String getProjectId() {
 		return projectId;
 	}

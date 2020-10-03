@@ -3,6 +3,17 @@ package mybaits.vo;
 import java.util.Date;
 
 public class ProjectInfo {
+
+	//	tbl_id	tbl_id	serial
+	private Integer tblId;
+
+	public Integer getTblId() {
+		return tblId;
+	}
+	public void setTblId(Integer tblId) {
+		this.tblId = tblId;
+	}
+
 	public String getProjectId() {
 		return projectId;
 	}
@@ -15,12 +26,7 @@ public class ProjectInfo {
 	public void setProjectName(String projectName) {
 		this.projectName = projectName;
 	}
-	public String getClientDd() {
-		return clientDd;
-	}
-	public void setClientDd(String clientDd) {
-		this.clientDd = clientDd;
-	}
+
 	public Date getStartDate() {
 		return startDate;
 	}
@@ -39,9 +45,18 @@ public class ProjectInfo {
 	public void setProjectStatus(Integer projectStatus) {
 		this.projectStatus = projectStatus;
 	}
+	
+	public String getClientId() {
+		return clientId;
+	}
+	public void setClientId(String clientId) {
+		this.clientId = clientId;
+	}
+	
 	String projectId;
 	String projectName;
-	String clientDd;
+
+	String clientId;
 	Date startDate;
 	Date endDate;
 	Integer projectStatus;

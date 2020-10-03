@@ -88,6 +88,7 @@ public class GeneHikiai {
 
 					tran.nannkagetugo = MakePoasonRandom.getPoisson(random,
 							(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 12));
+				
 					pro.name = Util.getGeneProName(random, list.get(i).name, jiki);
 					pro.nexEigyouJiki = tran.jiki + tran.nannkagetugo +1;
 
@@ -151,7 +152,7 @@ public class GeneHikiai {
 				Kyaku k = new Kyaku();
 
 				k.name = "株式会社"+ i + "興業";
-				k.kyakuCd = i;
+				k.kyakuCd = String.format("K%05d", i);
 				k.heiiDo = random.nextGaussian();
 				k.ooi = random.nextGaussian();
 				k.maxooi = random.nextGaussian();

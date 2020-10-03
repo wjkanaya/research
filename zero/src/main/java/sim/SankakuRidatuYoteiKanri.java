@@ -1,12 +1,20 @@
 package sim;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import deus_proto.Member;
+import mybaits.vo.ProjectMemberNumInfo;
+import mybatis.dao.ProjectMemberNumInfoDAO;
 
 public class SankakuRidatuYoteiKanri {
+	static Logger logger = LogManager.getLogger(SankakuRidatuYoteiKanri.class);
 
 	AkiPool akiPool = null;
 
@@ -213,7 +221,10 @@ public class SankakuRidatuYoteiKanri {
     }
 
 
-    public void inc() {
+    public void inc(int jiki) {
+
+    	// 人数可変したプロジェクト
+    	Set<Project> kahenSet = new HashSet<Project>();
 
     	// 参画予定リスト
 //    	List<SankakuRidatuYotei> slist = new LinkedList<SankakuRidatuYotei>();
@@ -235,7 +246,11 @@ public class SankakuRidatuYoteiKanri {
     			yotei.pro.memberSet.add(yotei.mem); //
 
 
-    			System.out.println(yotei.mem.name + "君が"+ yotei.pro.name + "に参画しました。");
+    			logger.debug(yotei.mem.name + "君が"+ yotei.pro.name + "に参画しました。");
+
+    			if (!kahenSet.contains(yotei.pro)) {
+    				kahenSet.add(yotei.pro);
+    			}
 
     		} else {
     			snlist.get(i).itukara -= 1;
@@ -256,10 +271,7 @@ public class SankakuRidatuYoteiKanri {
     		} else {
     			llist.get(i).itukara -= 1;
     		}
-
-
     	}
-
 
     	// 離脱内定リスト
     	// 	List<SankakuRidatuYotei> lnlist = new LinkedList<SankakuRidatuYotei>();
@@ -268,8 +280,10 @@ public class SankakuRidatuYoteiKanri {
     			SankakuRidatuYotei yotei =lnlist.remove(i);
     			yotei.pro.memberSet.remove(yotei.mem);
 
-    			System.out.println(yotei.mem.name + "君が"+ yotei.pro.name + "から離脱しました。");
-
+    			logger.debug(yotei.mem.name + "君が"+ yotei.pro.name + "から離脱しました。");
+       			if (!kahenSet.contains(yotei.pro)) {
+    				kahenSet.add(yotei.pro);
+    			}
 
     		} else {
     			lnlist.get(i).itukara -= 1;
@@ -278,5 +292,28 @@ public class SankakuRidatuYoteiKanri {
 
     	}
 
+    	if (kahenSet.size() > 0) {
+    		ProjectMemberNumInfoDAO projectMemberNumInfoDAO = new ProjectMemberNumInfoDAO();
+    		for (Project kahenPro :kahenSet) {
+
+    			// レコード数
+    			int recCount = projectMemberNumInfoDAO.selectCountProjectMemberNumInfo(kahenPro.name);
+
+    			if (recCount > 0) {
+    				ProjectMemberNumInfo projectMemberNumInfo
+    				    = projectMemberNumInfoDAO.selectLastProjectMemberNumInfo(kahenPro.name);
+
+    				if (projectMemberNumInfo.getMemberNum().intValue() == kahenPro.memberSet.size()) {
+    					continue;
+    				}
+    			}
+
+    			ProjectMemberNumInfo projectMemberNumInfo = new ProjectMemberNumInfo();
+    			projectMemberNumInfo.setProjectId(kahenPro.name);
+    			projectMemberNumInfo.setProjectMonths(jiki - kahenPro.startJiki);
+    			projectMemberNumInfo.setMemberNum(Integer.valueOf(kahenPro.memberSet.size()));
+    			projectMemberNumInfoDAO.insertProjectMemberNumInfo(projectMemberNumInfo);
+    		}
+    	}
     }
 }

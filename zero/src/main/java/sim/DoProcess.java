@@ -7,21 +7,52 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import deus.enums.ProjectStatus;
 import deus_proto.Member;
+import mybaits.vo.ClientInfo;
 import mybaits.vo.MemberHistInfo;
+import mybaits.vo.ProjectInfo;
+import mybatis.dao.ClientInfoDAO;
 import mybatis.dao.MemberHistInfoDAO;
+import mybatis.dao.PriceTransitionInfoDAO;
+import mybatis.dao.ProjectInfoDAO;
+import mybatis.dao.ProjectMemberNumInfoDAO;
 
 public class DoProcess {
+	static Logger logger = LogManager.getLogger(DoProcess.class);
 
 	// 計算期間
 	private static final int KIKAN  = 360;
 
 	private void execute() {
 
+		logger.debug("_debug");
+
+
 		SimCalendar simCal = new SimCalendar(KIKAN);
 
 		MemberHistInfoDAO memberHIstInfoDAO = new MemberHistInfoDAO();
 		memberHIstInfoDAO.trancateMemberHistInfo();
+
+		// 顧客情報
+		ClientInfoDAO clientInfoDAO = new ClientInfoDAO();
+		clientInfoDAO.truncateClientInfo();
+
+		// プロジェクト情報
+		ProjectInfoDAO projectInfoDAO = new ProjectInfoDAO();
+		projectInfoDAO.truncateProjectInfo();
+
+		// プロジェクト人数推移情報
+		ProjectMemberNumInfoDAO projectMemberNumInfoDAO = new ProjectMemberNumInfoDAO();
+		projectMemberNumInfoDAO.truncateProjectMemberNumInfo();
+
+
+		// 単金推移情報
+		PriceTransitionInfoDAO priceTransitionDAO = new PriceTransitionInfoDAO();
+		priceTransitionDAO.truncatePriceTransitionInfo();
 
 		// 社員リスト
 		//List<Set<Member>> memberList = new ArrayList<Set<Member>>();
@@ -65,7 +96,7 @@ public class DoProcess {
 		int nenUri = 0; // 年間売上
 
 		while (jiki <= KIKAN){
-			System.out.println("時期：" + jiki + "人数:" + memKanri.getAllCnt());
+			logger.debug("時期：" + jiki + "人数:" + memKanri.getAllCnt());
 
 			int jikiUri = 0;
 
@@ -79,23 +110,24 @@ public class DoProcess {
 						if (jiki -mem.entT <= 12) {
 							uri = pro.tankin / 2;
 						}
-						System.out.println(mem.name + "売上:" + uri);
+						logger.debug(mem.name + "売上:" + uri);
+
 						proUriSum += uri;
 					}
-					System.out.println(pro.name + "売上:" + proUriSum);
+					logger.debug(pro.name + "売上:" + proUriSum);
 					jikiUri += proUriSum;
 				}
 			}
-			System.out.println("時期:" + jiki + " 売上:" + jikiUri);
+			logger.debug("時期:" + jiki + " 売上:" + jikiUri);
 
 			nenUri += jikiUri;
 
 			if (jiki % 12 == 0) {
 
-				System.out.println(jiki / 12 + "年度売上:" + nenUri);
+				logger.debug(jiki / 12 + "年度売上:" + nenUri);
 
 				int rieki  = nenUri - (int)Math.ceil(memKanri.getAllCnt() * 1.1) * jinkenhi * 12;
-				System.out.println(jiki / 12 + "利益:" + rieki);
+				logger.debug(jiki / 12 + "利益:" + rieki);
 
 
 				freshnum = (int)Math.floor( rieki * 0.97 / (jinkenhi  * 12));
@@ -160,7 +192,10 @@ public class DoProcess {
 					if (random.nextDouble() < proh) { // プロジェクト終了する確率
 						int ituowaru =  MakePoasonRandom.getPoisson(random,
 								(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 12));
-						System.out.println("プロジェクト終了!! ：" + pro.name + ":時期=" + (jiki + ituowaru));
+						logger.debug("プロジェクト終了!! ：" + pro.name + ":時期=" + (jiki + ituowaru));
+
+						projectInfoDAO.updateProjectInfo(pro.name, ProjectStatus.KAN.getInteger(), simCal.getJikiDate(jiki + ituowaru));
+
 						pro.endJiki = jiki + ituowaru;
 						for (Iterator<Member> mitr = pro.memberSet.iterator(); mitr.hasNext();) {
 							Member mem = mitr.next();
@@ -204,7 +239,7 @@ public class DoProcess {
 							if (random.nextDouble() < h) { // プロジェクト終了する確率
 								int ituowaru =  MakePoasonRandom.getPoisson(random,
 										(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 3));
-								System.out.println(mem.name + "プロジェクトやめたい!! ：" + pro.name + ":" + (jiki + ituowaru) + "に終了");
+								logger.debug(mem.name + "プロジェクトやめたい!! ：" + pro.name + ":" + (jiki + ituowaru) + "に終了");
 								yoteikanri.lnyoteiHimozukiNow(mem,pro,ituowaru, false);
 							}
 						}
@@ -225,13 +260,13 @@ public class DoProcess {
 			// 12か月後一番トータルで儲かるのはどこ？
 			List<Transaction> yuusenJunList = proPool.moukaruJun(jiki, 6);
 
-			System.out.println("-儲かる順--");
+			logger.debug("-儲かる順--");
 			for (int i = 0; i < 5 ; i++) {
 				Transaction tran = yuusenJunList.get(i);
 				Project pro = tran.pro;
 				int n1 = tran.nannin;
 
-				System.out.println(jiki + ":" + pro.name + ":" + tran.getItukara(jiki) + "月後:" + n1 + "人:" +
+				logger.debug(jiki + ":" + pro.name + ":" + tran.getItukara(jiki) + "月後:" + n1 + "人:" +
 						pro.tankin +":" + (6 - tran.getItukara(jiki)) *  pro.tankin);
 			}
 
@@ -243,40 +278,67 @@ public class DoProcess {
 				// 開始時期人数
 				List<Member> akiList = akiPool.getList(tran.getItukara(jiki));
 
+
+
 				for (int i = 0 ; i < akiList.size(); i++) {
 					if (tran.nannin - tran.juutounin == 0) {
 						break;
 					}
 
 					// 参画内定
-					System.out.println(tran.jiki + tran.nannkagetugo +"に"+ akiList.get(i).name+ "を"+ pro.name + "に参画予定");
+					logger.debug(tran.jiki + tran.nannkagetugo +"に"+ akiList.get(i).name+ "を"+ pro.name + "に参画予定");
 					yoteikanri.snyoteiHimozukiNow(akiList.get(i), pro, tran.nannkagetugo);
 					tran.juutounin += 1;
 
 					// 営業中リスト
 					if (!eigyouKanri.eigyoutyuProList.contains(pro)) {
+
+						// 開始時期確定
+						pro.startJiki = tran.jiki + tran.nannkagetugo;
+
+						ProjectInfo proInfo = new ProjectInfo();
+						proInfo.setProjectId(pro.name);
+						proInfo.setProjectName(pro.name);
+
+						proInfo.setClientId(pro.kyaku.kyakuCd);
+						proInfo.setStartDate(simCal.getJikiDate(tran.jiki + tran.nannkagetugo));
+						proInfo.setProjectStatus(ProjectStatus.TYU.getInteger());
+						projectInfoDAO.insertProjectInfo(proInfo);
+
 						eigyouKanri.eigyoutyuProList.add(pro);
 
 					}
 					// 取引あり顧客リスト
 					if (!toriKyakuList.contains(pro.kyaku)) {
-						toriKyakuList.add(pro.kyaku);
 
+						toriKyakuList.add(pro.kyaku);
+						ClientInfo clientInfo = new ClientInfo();
+						clientInfo.setClientId(pro.kyaku.kyakuCd);
+						clientInfo.setClientName(pro.kyaku.name);
+						clientInfoDAO.insertClientInfo(clientInfo);
 					}
 
 					// 空き要員から減らす。
 					//akiList.remove(i);
 					akiPool.delete(akiList.get(i));
 
-
 				}
 
+
+
+
+
+
+
+
 			}
+
+
 
 			// 一か月経過
 			memKanri.inc(random, jiki, eigyouKanri, yoteikanri, mh,memberHIstInfoDAO, simCal);
 			akiPool.inc();
-			yoteikanri.inc();
+			yoteikanri.inc(jiki);
 			proPool.inc();
 
 			jiki++;

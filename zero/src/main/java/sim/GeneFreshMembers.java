@@ -3,11 +3,17 @@ package sim;
 import java.util.Random;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import deus_proto.Member;
 
 
 // 新人生成
 public class GeneFreshMembers {
+
+	static Logger logger = LogManager.getLogger(GeneFreshMembers.class);
+
 	public  int getFreshMembers(Set<Member> doukiSet ,Random random, int freshnum, int namecnt,int j) {
 		if (j%12 == 0) {
 
@@ -48,7 +54,7 @@ public class GeneFreshMembers {
 				  // 成長しやすさ [0-1] 正規分布
 
 				  member.entT = j; // 入社時期
-				  System.out.println(member.name + "君が入社しました");
+				  logger.debug(member.name + "君が入社しました");
 				  doukiSet.add(member);
 			  }
 

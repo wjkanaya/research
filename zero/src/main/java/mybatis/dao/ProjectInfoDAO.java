@@ -17,6 +17,16 @@ public class ProjectInfoDAO {
 
 	public static final String UPDATE_PROJECT_INFO = "updateProjectInfo";
 
+	public static final String SELECT_PROJECT_INFO = "selectProjectInfo";
+
+	public ProjectInfo selectProjectInfo(String projectId) {
+		ProjectInfo param = new ProjectInfo();
+		param.setProjectId(projectId);
+		SqlSession session = Util.getSqlSession();
+		ProjectInfo info = session.selectOne(SELECT_PROJECT_INFO, param);
+		return info;
+	}
+
 	public int insertProjectInfo(ProjectInfo info) {
 		SqlSession session = Util.getSqlSession();
 		int id = session.insert(INSERT_PROJECT_INFO, info);

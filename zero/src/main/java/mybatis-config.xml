@@ -5,6 +5,7 @@
 <configuration>
   <settings>
     <setting name="mapUnderscoreToCamelCase" value="true"/>
+    <setting name="logImpl" value="LOG4J2"/>
   </settings>
   <typeAliases>
       <package name="mybaits.vo"/>

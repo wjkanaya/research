@@ -5,7 +5,7 @@ public class Kyaku {
 	public String name;
 
 	// 客コード
-	public int kyakuCd;
+	public String kyakuCd;
 
     // 要求技術平易度(信頼度の高まりやすさ)
 	public double heiiDo; //
@@ -36,6 +36,23 @@ public class Kyaku {
 
     public int torinin = 0; // 取引人月
 
+    @Override
+    public int hashCode(){
+        return kyakuCd.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+		if (this == obj) {
+			return true;
+		}
+		if (obj instanceof Kyaku) {
+			Kyaku p = (Kyaku)obj;
+			return p.kyakuCd.equals(this.kyakuCd);
+		}
+		return false;
+	}
 
 
 }

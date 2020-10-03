@@ -6,11 +6,16 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import deus.enums.RetirementType;
 import deus_proto.Member;
 import mybatis.dao.MemberHistInfoDAO;
 
 public class MemberKanri {
+
+	static Logger logger = LogManager.getLogger(MemberKanri.class);
 
 	public List<Set<Member>> memberList = new ArrayList<Set<Member>>();
 
@@ -50,7 +55,7 @@ public class MemberKanri {
 			for (Member m :set) {
 				if (m.retT == jiki) {
 					m.retire = 1;
-					System.out.println(m.name + "君がやめました。 ");
+					logger.debug(m.name + "君がやめました。 ");
 					dao.updateMemberHistInfo(m.memberId, RetirementType.JIKO, simcal.getJikiDate(jiki));
 
 				}
@@ -76,7 +81,7 @@ public class MemberKanri {
 						double yammeritu = mh.culcMemHzard(allcnt, sennpaicnt, mem, keika);
 
 						if (random.nextDouble() < yammeritu) { // やめる確率
-							System.out.println(mem.name + "君がやめます。 ");
+							logger.debug(mem.name + "君がやめます。 ");
 							// mem.retire = 1;
 							Project pro = eigyouKanri.getMemberProject(mem);
 
@@ -84,7 +89,7 @@ public class MemberKanri {
 									(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 3));
 
 							if (pro != null) {
-								System.out.println(mem.name + "プロジェクト終了!! ：" + pro.name + ":" + ituowaru);
+								logger.debug(mem.name + "プロジェクト終了!! ：" + pro.name + ":" + ituowaru);
 								yoteikanri.lnyoteiHimozukiNow(mem,pro,ituowaru, false);
 							}
 

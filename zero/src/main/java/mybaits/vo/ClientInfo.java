@@ -6,6 +6,15 @@ package mybaits.vo;
  */
 public class ClientInfo {
 
+	//	tbl_id	tbl_id	serial
+	private Integer tblId;
+
+	public Integer getTblId() {
+		return tblId;
+	}
+	public void setTblId(Integer tblId) {
+		this.tblId = tblId;
+	}
 	String clientId;
 	String clientName;
 

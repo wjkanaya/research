@@ -287,7 +287,7 @@ public class DoProcess {
 
 					// 参画内定
 					logger.debug(tran.jiki + tran.nannkagetugo +"に"+ akiList.get(i).name+ "を"+ pro.name + "に参画予定");
-					yoteikanri.snyoteiHimozukiNow(akiList.get(i), pro, tran.nannkagetugo);
+					yoteikanri.snyoteiHimozukiNow(akiList.get(i), pro, tran.jiki + tran.nannkagetugo - jiki);
 					tran.juutounin += 1;
 
 					// 営業中リスト

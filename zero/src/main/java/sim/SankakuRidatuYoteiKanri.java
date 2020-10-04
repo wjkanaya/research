@@ -175,6 +175,12 @@ public class SankakuRidatuYoteiKanri {
 
 	// 離脱内定リストに即登録
     public void lnyoteiHimozukiNow( Member mem, Project pro, int itukara,StopType stopType, boolean taishokuFlg) {
+
+    	if (mem.name.equals("8郎")) {
+    	  	logger.debug(mem.name+ "★★");
+
+    	}
+
     	lyoteiHimozuki( mem, pro, itukara, stopType);
 
     	 for (SankakuRidatuYotei yotei: getLYotei(pro) ) {

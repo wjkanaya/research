@@ -12,6 +12,17 @@ public class ProPool {
 
 	List<Set<Transaction>> proList = new LinkedList<Set<Transaction>>();
 
+	public void deleteTransaction(Project pro) {
+
+		for (Set<Transaction> set :proList) {
+			for (Transaction tran :set) {
+				if (tran.pro.equals(pro)) {
+					set.remove(tran);
+				}
+			}
+		}
+	}
+
 
 	public void setProjectList(List<Transaction> proList, int nowJiki) {
 

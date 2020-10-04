@@ -8,7 +8,7 @@ public class Transaction {
 	// 新規客(0)、既存客+新規プロジェクト(1)、既存客+既存プロジェクト(終了)(2)、既存客+既存プロジェクト(営業中)(3)
 	int transType;
 
-	Project pro;
+	public Project pro;
 
 	public int getItukara(int nowJiki) {
 

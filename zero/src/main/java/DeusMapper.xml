@@ -109,40 +109,46 @@
   <insert id="insertProjectEnrolledHistInfo" useGeneratedKeys="true"
     keyProperty="tblId">
     insert into &quot;public&quot;.&quot;project_enrolled_hist_info&quot;
-     (&quot;member_id&quot;,&quot;project_id&quot;, &quot;branch_num&quot;,
-      &quot;join_date&quot;, &quot;stop_date&quot;, &quot;stop_type&quot;,
+     (&quot;enrolled_hist_id&quot;,
+     &quot;member_id&quot;,
+     &quot;project_id&quot;,
+      &quot;branch_num&quot;,
+      &quot;join_date&quot;,
+      &quot;stop_date&quot;,
+      &quot;stop_type&quot;,
      &quot;enrolled_status&quot;) values
-       (#{memberId,jdbcType=VARCHAR},#{projectId,jdbcType=VARCHAR},#{branchNum,jdbcType=INTEGER},
+       (
+       #{enrolledHistId,jdbcType=VARCHAR},
+       #{memberId,jdbcType=VARCHAR},
+       #{projectId,jdbcType=VARCHAR},
+       #{branchNum,jdbcType=INTEGER},
         #{joinDate,jdbcType=DATE},#{stopDate,jdbcType=DATE},
        #{stopType,jdbcType=INTEGER},
        #{enrolledStatus,jdbcType=INTEGER})
   </insert>
 
 
+   <select id="selectCountProjectEnrolledHistInfo" resultType="Integer">
+    select count(*) as count from project_enrolled_hist_info
+    where member_id = #{memberId}  and project_id = #{projectId}
+  </select>
+
    <select id="selectProjectEnrolledHistInfoBranchNum" resultType="Integer">
     select max(branch_num) as branch_num from project_enrolled_hist_info
     where member_id = #{memberId}  and project_id = #{projectId}
   </select>
 
-
-
  <update id="updateProjectEnrolledHistInfo">
   update project_enrolled_hist_info set
-    (stop_date = #{stopDate},
-    password = #{password},
-    stop_type = #{stopType},
-    enrolled_status = #{enrolledStatus})
-  from (select member_id,project_id,max(branch_num) as branch_num from project_enrolled_hist_info
-    where member_id = #{memberId}  and project_id = #{projectId}) maxbranchrec
-  where project_enrolled_hist_info.member_id  = maxbranchrec.member_id AND
-        project_enrolled_hist_info.project_id = maxbranchrec.project_id AND
-        project_enrolled_hist_info.branch_num = maxbranchrec.branch_num
-
-
-
+    stop_date = #{stopDate,jdbcType=DATE},
+    stop_type = #{stopType,jdbcType=INTEGER},
+    enrolled_status = #{enrolledStatus,jdbcType=INTEGER}
+    where project_enrolled_hist_info.member_id  = #{memberId} AND
+        project_enrolled_hist_info.project_id = #{projectId} AND
+        project_enrolled_hist_info.branch_num = (select max(branch_num) as branch_num
+        from project_enrolled_hist_info
+    where member_id = #{memberId,jdbcType=VARCHAR} and project_id = #{projectId,jdbcType=VARCHAR})
 </update>
-
-
 
   <delete id="truncateProjectEnrolledHistInfo">
  	 truncate table &quot;public&quot;.&quot;project_enrolled_hist_info&quot;

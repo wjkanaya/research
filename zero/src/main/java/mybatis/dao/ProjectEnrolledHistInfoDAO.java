@@ -19,11 +19,24 @@ public class ProjectEnrolledHistInfoDAO {
 
 	public static final String CLEAN_PROJECT_ENROLLED_HIST_INFO_TBL_ID = "cleanProjectEnrolledHistInfoTblId";
 
+	public static final String SELECT_COUNT_PROJECT_ENROLLED_HIST_INFO = "selectCountProjectEnrolledHistInfo";
+
+
 	public int insertProjectEnrolledHistInfo(ProjectEnrolledHistInfo info) {
 		SqlSession session = Util.getSqlSession();
 		int count = session.insert(INSERT_PROJECT_ENROLLED_HIST_INFO, info);
 		return count;
 	}
+
+	public Integer selectCountProjectEnrolledHistInfo(String memberId, String projectId) {
+		ProjectEnrolledHistInfo info = new ProjectEnrolledHistInfo();
+		info.setMemberId(memberId);
+		info.setProjectId(projectId);
+		SqlSession session = Util.getSqlSession();
+		Integer count = session.selectOne(SELECT_COUNT_PROJECT_ENROLLED_HIST_INFO, info);
+		return count;
+	}
+
 
 	public Integer selectProjectEnrolledHistInfoBranchNum(String memberId, String projectId) {
 		ProjectEnrolledHistInfo info = new ProjectEnrolledHistInfo();

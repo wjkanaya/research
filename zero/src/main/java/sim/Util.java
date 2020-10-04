@@ -16,6 +16,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
+import deus.enums.StopType;
 import deus_proto.Member;
 import mybaits.vo.MemberHistInfo;
 
@@ -31,7 +32,7 @@ public class Util {
 		selectGensyoMember(random, delSet,tran.nannin, targetList);
 
 		for (Member mem : delSet) {
-			yoteikanri.lnyoteiHimozukiNow(mem,tran.pro,tran.nannkagetugo, false);
+			yoteikanri.lnyoteiHimozukiNow(mem,tran.pro,tran.nannkagetugo, StopType.KOKYAKU,false);
 		}
 	}
 

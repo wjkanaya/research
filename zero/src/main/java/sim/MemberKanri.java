@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import deus.enums.RetirementType;
+import deus.enums.StopType;
 import deus_proto.Member;
 import mybatis.dao.MemberHistInfoDAO;
 
@@ -90,7 +91,7 @@ public class MemberKanri {
 
 							if (pro != null) {
 								logger.debug(mem.name + "プロジェクト終了!! ：" + pro.name + ":" + ituowaru);
-								yoteikanri.lnyoteiHimozukiNow(mem,pro,ituowaru, false);
+								yoteikanri.lnyoteiHimozukiNow(mem,pro,ituowaru,StopType.KOJIN, false);
 							}
 
 							mem.retT = jiki + ituowaru; // 退社時期

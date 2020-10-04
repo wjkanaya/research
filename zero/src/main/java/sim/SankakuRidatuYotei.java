@@ -1,5 +1,6 @@
 package sim;
 
+import deus.enums.StopType;
 import deus_proto.Member;
 
 public class SankakuRidatuYotei {
@@ -10,6 +11,8 @@ public class SankakuRidatuYotei {
 	public Project pro;
 
 	public int itukara;
+
+	public StopType stopType;
 
 
 	public boolean equals(Object anObject) {

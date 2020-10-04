@@ -9,8 +9,12 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import deus.enums.EnrolledStatus;
+import deus.enums.StopType;
 import deus_proto.Member;
+import mybaits.vo.ProjectEnrolledHistInfo;
 import mybaits.vo.ProjectMemberNumInfo;
+import mybatis.dao.ProjectEnrolledHistInfoDAO;
 import mybatis.dao.ProjectMemberNumInfoDAO;
 
 public class SankakuRidatuYoteiKanri {
@@ -116,13 +120,14 @@ public class SankakuRidatuYoteiKanri {
 
 
 	// 離脱予定リストに登録
-    public void lyoteiHimozuki( Member mem, Project pro, int itukara) {
+    public void lyoteiHimozuki( Member mem, Project pro, int itukara,StopType stopType) {
 
     	SankakuRidatuYotei yotei = new SankakuRidatuYotei();
 
     	yotei.mem = mem;
         yotei.pro = pro;
         yotei.itukara = itukara;
+        yotei.stopType = stopType;
 
         llist.add(yotei);
     }
@@ -169,8 +174,8 @@ public class SankakuRidatuYoteiKanri {
 
 
 	// 離脱内定リストに即登録
-    public void lnyoteiHimozukiNow( Member mem, Project pro, int itukara, boolean taishokuFlg) {
-    	lyoteiHimozuki( mem, pro, itukara);
+    public void lnyoteiHimozukiNow( Member mem, Project pro, int itukara,StopType stopType, boolean taishokuFlg) {
+    	lyoteiHimozuki( mem, pro, itukara, stopType);
 
     	 for (SankakuRidatuYotei yotei: getLYotei(pro) ) {
 
@@ -221,7 +226,10 @@ public class SankakuRidatuYoteiKanri {
     }
 
 
-    public void inc(int jiki) {
+    public void inc(SimCalendar simCal,int jiki) {
+
+		// プロジェクト在籍履歴情報
+		ProjectEnrolledHistInfoDAO projectEnrolledHistInfoDAO = new ProjectEnrolledHistInfoDAO();
 
     	// 人数可変したプロジェクト
     	Set<Project> kahenSet = new HashSet<Project>();
@@ -244,6 +252,25 @@ public class SankakuRidatuYoteiKanri {
     		if (snlist.get(i).itukara == 0) {
     			SankakuRidatuYotei yotei =snlist.remove(i);
     			yotei.pro.memberSet.add(yotei.mem); //
+    			Integer count =
+    					projectEnrolledHistInfoDAO.selectCountProjectEnrolledHistInfo(yotei.mem.memberId, yotei.pro.name);
+
+    			int branchNum = 0;
+    			if (count > 0) {
+    				branchNum = projectEnrolledHistInfoDAO.selectProjectEnrolledHistInfoBranchNum(yotei.mem.memberId, yotei.pro.name);
+    				branchNum++;
+    			}
+
+				ProjectEnrolledHistInfo info  = new ProjectEnrolledHistInfo();
+
+				info.setEnrolledHistId(yotei.mem.memberId + "_" + yotei.pro.name + "_" + branchNum);
+				info.setMemberId(yotei.mem.memberId);
+				info.setProjectId( yotei.pro.name);
+				info.setBranchNum(Integer.valueOf(branchNum));
+				info.setJoinDate(simCal.getJikiDate(jiki));
+				info.setEnrolledStatus(EnrolledStatus.TYU.getInteger());
+
+				projectEnrolledHistInfoDAO.insertProjectEnrolledHistInfo(info);
 
 
     			logger.debug(yotei.mem.name + "君が"+ yotei.pro.name + "に参画しました。");
@@ -279,6 +306,10 @@ public class SankakuRidatuYoteiKanri {
     		if (lnlist.get(i).itukara == 0) {
     			SankakuRidatuYotei yotei =lnlist.remove(i);
     			yotei.pro.memberSet.remove(yotei.mem);
+
+				projectEnrolledHistInfoDAO.updateProjectEnrolledHistInfo(
+					yotei.mem.memberId, yotei.pro.name, simCal.getJikiDate(jiki),
+					yotei.stopType.getInteger(), EnrolledStatus.DAT.getInteger());
 
     			logger.debug(yotei.mem.name + "君が"+ yotei.pro.name + "から離脱しました。");
        			if (!kahenSet.contains(yotei.pro)) {

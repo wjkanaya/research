@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import deus.enums.ProjectStatus;
+import deus.enums.StopType;
 import deus_proto.Member;
 import mybaits.vo.ClientInfo;
 import mybaits.vo.MemberHistInfo;
@@ -18,6 +19,7 @@ import mybaits.vo.ProjectInfo;
 import mybatis.dao.ClientInfoDAO;
 import mybatis.dao.MemberHistInfoDAO;
 import mybatis.dao.PriceTransitionInfoDAO;
+import mybatis.dao.ProjectEnrolledHistInfoDAO;
 import mybatis.dao.ProjectInfoDAO;
 import mybatis.dao.ProjectMemberNumInfoDAO;
 
@@ -49,6 +51,9 @@ public class DoProcess {
 		ProjectMemberNumInfoDAO projectMemberNumInfoDAO = new ProjectMemberNumInfoDAO();
 		projectMemberNumInfoDAO.truncateProjectMemberNumInfo();
 
+		// プロジェクト在籍履歴情報
+		ProjectEnrolledHistInfoDAO projectEnrolledHistInfoDAO = new ProjectEnrolledHistInfoDAO();
+		projectEnrolledHistInfoDAO.truncateProjectEnrolledHistInfo();
 
 		// 単金推移情報
 		PriceTransitionInfoDAO priceTransitionDAO = new PriceTransitionInfoDAO();
@@ -201,7 +206,7 @@ public class DoProcess {
 							Member mem = mitr.next();
 
 							if (!yoteikanri.containLNYotei(pro, mem)){
-								yoteikanri.lnyoteiHimozukiNow(mem,pro,ituowaru, false);
+								yoteikanri.lnyoteiHimozukiNow(mem,pro,ituowaru,StopType.KOKYAKU, false);
 							}
 						}
 					}
@@ -240,13 +245,12 @@ public class DoProcess {
 								int ituowaru =  MakePoasonRandom.getPoisson(random,
 										(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 3));
 								logger.debug(mem.name + "プロジェクトやめたい!! ：" + pro.name + ":" + (jiki + ituowaru) + "に終了");
-								yoteikanri.lnyoteiHimozukiNow(mem,pro,ituowaru, false);
+								yoteikanri.lnyoteiHimozukiNow(mem,pro,ituowaru,StopType.KOJIN, false);
 							}
 						}
 					}
 				}
 			}
-
 
 			// とりあえず引き合い情報を確認しよう
 
@@ -324,21 +328,12 @@ public class DoProcess {
 
 				}
 
-
-
-
-
-
-
-
 			}
-
-
 
 			// 一か月経過
 			memKanri.inc(random, jiki, eigyouKanri, yoteikanri, mh,memberHIstInfoDAO, simCal);
 			akiPool.inc();
-			yoteikanri.inc(jiki);
+			yoteikanri.inc(simCal, jiki);
 			proPool.inc();
 
 			jiki++;

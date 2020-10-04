@@ -3,6 +3,16 @@ package mybaits.vo;
 import java.util.Date;
 
 public class ProjectEnrolledHistInfo {
+	//	tbl_id	tbl_id	serial
+	private Integer tblId;
+
+	public Integer getTblId() {
+		return tblId;
+	}
+	public void setTblId(Integer tblId) {
+		this.tblId = tblId;
+	}
+
 	public String getEnrolledHistId() {
 		return enrolledHistId;
 	}
@@ -21,10 +31,10 @@ public class ProjectEnrolledHistInfo {
 	public void setProjectId(String projectId) {
 		this.projectId = projectId;
 	}
-	public String getBranchNum() {
+	public Integer getBranchNum() {
 		return branchNum;
 	}
-	public void setBranchNum(String branchNum) {
+	public void setBranchNum(Integer branchNum) {
 		this.branchNum = branchNum;
 	}
 	public Date getJoinDate() {
@@ -54,7 +64,7 @@ public class ProjectEnrolledHistInfo {
 	String enrolledHistId;
 	String memberId;
 	String projectId;
-	String branchNum;
+	Integer branchNum;
 	Date joinDate;
 	Date stopDate;
 	Integer stopType;

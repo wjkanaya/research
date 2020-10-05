@@ -1,6 +1,7 @@
 package sim;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -180,9 +181,17 @@ public class DoProcess {
 
 			// 空き社員リストに格納しよう。
 
+			Date nowDate = simCal.getJikiDate(jiki);
 			for (Iterator<Member> itr = memberSet.iterator(); itr.hasNext();) {
 				Member m  = itr.next();
-				akiPool.setAkiMember(m, 0);
+
+				AkiMember akimem = new AkiMember();
+
+				akimem.member = m;
+				akimem.itukaraDate = (Date)nowDate.clone();
+
+
+				akiPool.setAkiMember(akimem, 0);
 			}
 
 			// プロジェクトが終わるか確認しよう
@@ -205,8 +214,15 @@ public class DoProcess {
 						for (Iterator<Member> mitr = pro.memberSet.iterator(); mitr.hasNext();) {
 							Member mem = mitr.next();
 
-							if (!yoteikanri.containLNYotei(pro, mem)){
-								yoteikanri.lnyoteiHimozukiNow(mem,pro,ituowaru,StopType.KOKYAKU, false);
+							AkiMember akiMember = new AkiMember();
+							akiMember.member = mem;
+							akiMember.itukaraDate = simCal.getJikiDate(jiki + ituowaru);
+
+
+							if (!yoteikanri.containLNYotei(pro, akiMember)){
+
+
+								yoteikanri.lnyoteiHimozukiNow(akiMember,pro,ituowaru,StopType.KOKYAKU, false);
 							}
 						}
 					}
@@ -220,7 +236,7 @@ public class DoProcess {
 			List<Transaction> addList = new ArrayList<Transaction>();
 			for (Transaction tran :list) {
 				if (tran.genFlg) {
-					Util.gensyoMember(random, yoteikanri, tran);
+					Util.gensyoMember(random, yoteikanri, tran , simCal);
 				} else {
 					addList.add(tran);
 
@@ -238,14 +254,19 @@ public class DoProcess {
 					for (Iterator<Member> memitr = pro.memberSet.iterator();memitr.hasNext();){
 
 						Member mem = memitr.next();
+						AkiMember akiMember = new AkiMember();
+						akiMember.member = mem;
 
-						if (!yoteikanri.containLNYotei(pro, mem)){
+						if (!yoteikanri.containLNYotei(pro, akiMember)){
 							double h = mh.culcTaiProhazard(mem, pro);
 							if (random.nextDouble() < h) { // プロジェクト終了する確率
 								int ituowaru =  MakePoasonRandom.getPoisson(random,
 										(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 3));
 								logger.debug(mem.name + "プロジェクトやめたい!! ：" + pro.name + ":" + (jiki + ituowaru) + "に終了");
-								yoteikanri.lnyoteiHimozukiNow(mem,pro,ituowaru,StopType.KOJIN, false);
+
+								akiMember.itukaraDate = simCal.getJikiDate(jiki + ituowaru);
+
+								yoteikanri.lnyoteiHimozukiNow(akiMember,pro,ituowaru,StopType.KOJIN, false);
 							}
 						}
 					}
@@ -280,7 +301,7 @@ public class DoProcess {
 				Project pro = tran.pro;
 
 				// 開始時期人数
-				List<Member> akiList = akiPool.getList(tran.getItukara(jiki));
+				List<AkiMember> akiList = akiPool.getList(tran.getItukara(jiki));
 
 
 
@@ -290,7 +311,7 @@ public class DoProcess {
 					}
 
 					// 参画内定
-					logger.debug(tran.jiki + tran.nannkagetugo +"に"+ akiList.get(i).name+ "を"+ pro.name + "に参画予定");
+					logger.debug(tran.jiki + tran.nannkagetugo +"に"+ akiList.get(i).member.name+ "を"+ pro.name + "に参画予定");
 					yoteikanri.snyoteiHimozukiNow(akiList.get(i), pro, tran.jiki + tran.nannkagetugo - jiki);
 					tran.juutounin += 1;
 

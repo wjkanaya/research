@@ -22,7 +22,7 @@ import mybaits.vo.MemberHistInfo;
 
 public class Util {
 
-	public static void gensyoMember(Random random, SankakuRidatuYoteiKanri yoteikanri,Transaction tran) {
+	public static void gensyoMember(Random random, SankakuRidatuYoteiKanri yoteikanri,Transaction tran, SimCalendar simcal) {
 
 		Set<Member> delSet = new HashSet<Member>();
 
@@ -32,7 +32,10 @@ public class Util {
 		selectGensyoMember(random, delSet,tran.nannin, targetList);
 
 		for (Member mem : delSet) {
-			yoteikanri.lnyoteiHimozukiNow(mem,tran.pro,tran.nannkagetugo, StopType.KOKYAKU,false);
+			AkiMember akiMember = new AkiMember();
+			akiMember.member = mem;
+			akiMember.itukaraDate = simcal.getJikiDate(tran.jiki + tran.nannkagetugo);
+			yoteikanri.lnyoteiHimozukiNow(akiMember ,tran.pro,tran.nannkagetugo, StopType.KOKYAKU,false);
 		}
 	}
 

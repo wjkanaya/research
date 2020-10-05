@@ -68,6 +68,12 @@ public class Project {
     // 参画中メンバーセット
     public Set<Member> memberSet = new HashSet<Member>();
 
+    @Override
+    public int hashCode(){
+        return name.hashCode();
+    }
+
+
 	public boolean equals(Object anObject) {
 		if (this == anObject) {
 			return true;

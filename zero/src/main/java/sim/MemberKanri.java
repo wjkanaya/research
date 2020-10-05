@@ -91,7 +91,13 @@ public class MemberKanri {
 
 							if (pro != null) {
 								logger.debug(mem.name + "プロジェクト終了!! ：" + pro.name + ":" + ituowaru);
-								yoteikanri.lnyoteiHimozukiNow(mem,pro,ituowaru,StopType.KOJIN, false);
+
+								AkiMember akiMember = new AkiMember();
+								akiMember.member = mem;
+								akiMember.itukaraDate =  simcal.getJikiDate(jiki + ituowaru);
+
+
+								yoteikanri.lnyoteiHimozukiNow(akiMember,pro,ituowaru,StopType.KOJIN, true);
 							}
 
 							mem.retT = jiki + ituowaru; // 退社時期

@@ -6,20 +6,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import deus_proto.Member;
-
 public class AkiPool {
 
-	public List<Set<Member>> akiList = new LinkedList<Set<Member>>();
+	public List<Set<AkiMember>> akiList = new LinkedList<Set<AkiMember>>();
 
 
-	public void setAkiMember(Member mem, int itukara) {
+	public void setAkiMember(AkiMember mem, int itukara) {
 
 		delete(mem); // 既存の設定を削除
 		;
 
 		while (akiList.size() < itukara + 1) {
-			akiList.add(new HashSet<Member>());
+			akiList.add(new HashSet<AkiMember>());
 		}
 		akiList.get(itukara).add(mem);
 	}
@@ -27,15 +25,15 @@ public class AkiPool {
 	public void inc() {
 
 		if (akiList.size() > 1) {
-			Set<Member> oneSet = akiList.get(1);
+			Set<AkiMember> oneSet = akiList.get(1);
 			akiList.get(0).addAll(oneSet);
 			akiList.remove(1);
 		}
 	}
 
 
-	public List<Member> getList(int itukara) {
-		List list = new ArrayList();
+	public List<AkiMember> getList(int itukara) {
+		List<AkiMember> list = new ArrayList<AkiMember>();
 
 		int max =0;
 
@@ -54,9 +52,9 @@ public class AkiPool {
 	}
 
 
-	public void delete(Member m) {
+	public void delete(AkiMember m) {
 
-		for (Set<Member> set :akiList) {
+		for (Set<AkiMember> set :akiList) {
 			if (set.contains(m)) {
 				set.remove(m);
 			}

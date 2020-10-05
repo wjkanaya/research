@@ -1,12 +1,11 @@
 package sim;
 
 import deus.enums.StopType;
-import deus_proto.Member;
 
 public class SankakuRidatuYotei {
 
 
-	public Member mem;
+	public AkiMember mem;
 
 	public Project pro;
 

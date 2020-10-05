@@ -28,6 +28,12 @@ public class Member {
 
 	public int retire;
 
+    @Override
+    public int hashCode(){
+        return memberId.hashCode();
+    }
+
+
 	public boolean equals(Object anObject) {
 		if (this == anObject) {
 			return true;

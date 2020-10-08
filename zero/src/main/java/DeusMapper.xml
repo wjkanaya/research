@@ -128,8 +128,13 @@
   </insert>
 
 
-   <select id="selectCountProjectEnrolledHistInfo" resultType="Integer">
+  <select id="selectCountProjectEnrolledHistInfo" resultType="Integer">
     select count(*) as count from project_enrolled_hist_info
+    where member_id = #{memberId}  and project_id = #{projectId}
+  </select>
+
+   <select id="selectProjectEnrolledHistId" resultType="String">
+    select max(enrolled_hist_id) as enrolled_hist_id from project_enrolled_hist_info
     where member_id = #{memberId}  and project_id = #{projectId}
   </select>
 
@@ -137,6 +142,7 @@
     select max(branch_num) as branch_num from project_enrolled_hist_info
     where member_id = #{memberId}  and project_id = #{projectId}
   </select>
+
 
  <update id="updateProjectEnrolledHistInfo">
   update project_enrolled_hist_info set
@@ -157,6 +163,19 @@
   <delete id="cleanProjectEnrolledHistInfoTblId">
  	 select setval(&apos;project_enrolled_hist_info_tbl_id_seq&apos;, 1, false)
   </delete>
+
+  <select id="selectCountPriceTransitionInfo" resultType="Integer">
+   select count(*) from price_transition_info
+    where enrolled_hist_id = #{enrolledHistId}
+  </select>
+
+   <select id="selectNowPrice" resultType="Integer">
+   select price from price_transition_info
+    where enrolled_hist_id = #{enrolledHistId}
+     and price_start_date = (
+    select max(distinct price_start_date) from price_transition_info
+    where enrolled_hist_id = #{enrolledHistId})
+  </select>
 
   <insert id="insertPriceTransitionInfo" useGeneratedKeys="true"
     keyProperty="tblId">

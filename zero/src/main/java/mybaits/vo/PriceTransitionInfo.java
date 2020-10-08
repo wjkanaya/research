@@ -3,6 +3,17 @@ package mybaits.vo;
 import java.util.Date;
 
 public class PriceTransitionInfo {
+
+	//	tbl_id	tbl_id	serial
+	private Integer tblId;
+
+	public Integer getTblId() {
+		return tblId;
+	}
+	public void setTblId(Integer tblId) {
+		this.tblId = tblId;
+	}
+
 	public String getMemberId() {
 		return memberId;
 	}

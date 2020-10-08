@@ -21,12 +21,24 @@ public class ProjectEnrolledHistInfoDAO {
 
 	public static final String SELECT_COUNT_PROJECT_ENROLLED_HIST_INFO = "selectCountProjectEnrolledHistInfo";
 
+	public static final String SELECT_PROJECT_ENROLLED_HIST_ID =  "selectProjectEnrolledHistId";
+
 
 	public int insertProjectEnrolledHistInfo(ProjectEnrolledHistInfo info) {
 		SqlSession session = Util.getSqlSession();
 		int count = session.insert(INSERT_PROJECT_ENROLLED_HIST_INFO, info);
 		return count;
 	}
+
+	public String selectProjectEnrolledHistId(String memberId, String projectId) {
+		ProjectEnrolledHistInfo info = new ProjectEnrolledHistInfo();
+		info.setMemberId(memberId);
+		info.setProjectId(projectId);
+		SqlSession session = Util.getSqlSession();
+		String id = session.selectOne(SELECT_PROJECT_ENROLLED_HIST_ID, info);
+		return id;
+	}
+
 
 	public Integer selectCountProjectEnrolledHistInfo(String memberId, String projectId) {
 		ProjectEnrolledHistInfo info = new ProjectEnrolledHistInfo();

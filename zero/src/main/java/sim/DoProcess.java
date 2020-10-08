@@ -3,7 +3,6 @@ package sim;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -16,6 +15,7 @@ import deus.enums.StopType;
 import deus_proto.Member;
 import mybaits.vo.ClientInfo;
 import mybaits.vo.MemberHistInfo;
+import mybaits.vo.PriceTransitionInfo;
 import mybaits.vo.ProjectInfo;
 import mybatis.dao.ClientInfoDAO;
 import mybatis.dao.MemberHistInfoDAO;
@@ -28,7 +28,7 @@ public class DoProcess {
 	static Logger logger = LogManager.getLogger(DoProcess.class);
 
 	// 計算期間
-	private static final int KIKAN  = 360;
+	private static final int KIKAN  = 480;
 
 	private void execute() {
 
@@ -118,6 +118,40 @@ public class DoProcess {
 						}
 						logger.debug(mem.name + "売上:" + uri);
 
+						String enrolledHistId =
+								projectEnrolledHistInfoDAO.selectProjectEnrolledHistId(mem.memberId, pro.name);
+
+						int count  = priceTransitionDAO.selectCountPriceTransitionInfo(enrolledHistId);
+
+						boolean doInsert = true;
+						if (count > 0) {
+
+							logger.debug("hosi:" + enrolledHistId);
+							int price  = priceTransitionDAO.selectNowPrice(enrolledHistId);
+							if (price == uri) {
+								doInsert = false;
+							}
+						}
+
+						if (doInsert) {
+							PriceTransitionInfo priceTransitionInfo = new PriceTransitionInfo();
+
+							priceTransitionInfo.setMemberId(mem.memberId);
+							priceTransitionInfo.setMenberMonths(jiki - mem.entT);
+							priceTransitionInfo.setEnrolledHistId(enrolledHistId);
+							priceTransitionInfo.setPriceStartDate(simCal.getJikiDate(jiki-1));
+							priceTransitionInfo.setPrice(uri);
+
+							priceTransitionDAO.insertPriceTransitionInfo(priceTransitionInfo);
+						}
+
+
+//						String memberId;
+//						Integer menberMonths;
+//						String enrolledHistId;
+//						Date priceStartDate;
+//						Integer price;
+
 						proUriSum += uri;
 					}
 					logger.debug(pro.name + "売上:" + proUriSum);
@@ -134,7 +168,6 @@ public class DoProcess {
 
 				int rieki  = nenUri - (int)Math.ceil(memKanri.getAllCnt() * 1.1) * jinkenhi * 12;
 				logger.debug(jiki / 12 + "利益:" + rieki);
-
 
 				freshnum = (int)Math.floor( rieki * 0.97 / (jinkenhi  * 12));
 
@@ -182,22 +215,19 @@ public class DoProcess {
 			// 空き社員リストに格納しよう。
 
 			Date nowDate = simCal.getJikiDate(jiki);
-			for (Iterator<Member> itr = memberSet.iterator(); itr.hasNext();) {
-				Member m  = itr.next();
+			for (Member m :memberSet) {
 
 				AkiMember akimem = new AkiMember();
 
 				akimem.member = m;
 				akimem.itukaraDate = (Date)nowDate.clone();
 
-
 				akiPool.setAkiMember(akimem, 0);
 			}
 
 			// プロジェクトが終わるか確認しよう
 
-			for (Iterator<Project> itr = eigyouKanri.eigyoutyuProList.iterator();itr.hasNext();){
-				Project pro = itr.next();
+			for (Project pro :eigyouKanri.eigyoutyuProList){
 
 				// 参画中
 				if (pro.memberSet.size() > 0) {
@@ -211,17 +241,13 @@ public class DoProcess {
 						projectInfoDAO.updateProjectInfo(pro.name, ProjectStatus.KAN.getInteger(), simCal.getJikiDate(jiki + ituowaru));
 
 						pro.endJiki = jiki + ituowaru;
-						for (Iterator<Member> mitr = pro.memberSet.iterator(); mitr.hasNext();) {
-							Member mem = mitr.next();
+						for (Member mem :pro.memberSet) {
 
 							AkiMember akiMember = new AkiMember();
 							akiMember.member = mem;
 							akiMember.itukaraDate = simCal.getJikiDate(jiki + ituowaru);
 
-
 							if (!yoteikanri.containLNYotei(pro, akiMember)){
-
-
 								yoteikanri.lnyoteiHimozukiNow(akiMember,pro,ituowaru,StopType.KOKYAKU, false);
 							}
 						}
@@ -246,14 +272,12 @@ public class DoProcess {
 
 
 			// 個人的にプロジェクト辞めたい
-			for (Iterator<Project> itr = eigyouKanri.eigyoutyuProList.iterator();itr.hasNext();){
-				Project pro = itr.next();
+			for (Project pro :eigyouKanri.eigyoutyuProList){
 
 				// 参画中
 				if (pro.memberSet.size() > 0) {
-					for (Iterator<Member> memitr = pro.memberSet.iterator();memitr.hasNext();){
+					for (Member mem :pro.memberSet){
 
-						Member mem = memitr.next();
 						AkiMember akiMember = new AkiMember();
 						akiMember.member = mem;
 
@@ -357,6 +381,8 @@ public class DoProcess {
 			yoteikanri.inc(simCal, jiki);
 			proPool.inc();
 
+
+			Util.commitTransaction();
 			jiki++;
 		}
 

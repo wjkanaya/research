@@ -1,5 +1,6 @@
 package sim;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -28,7 +29,7 @@ public class DoProcess {
 	static Logger logger = LogManager.getLogger(DoProcess.class);
 
 	// 計算期間
-	private static final int KIKAN  = 480;
+	private static final int KIKAN  = 200;
 
 	private void execute() {
 
@@ -93,7 +94,6 @@ public class DoProcess {
 		int jinkenhi = 52;
 
 		Random random = new Random(1234);
-
 
 
 		int jiki = 0;
@@ -383,6 +383,10 @@ public class DoProcess {
 
 
 			Util.commitTransaction();
+
+		     SimpleDateFormat sdf = new SimpleDateFormat("yyyy'年'MM'月'");
+
+			logger.debug("時期：" + sdf.format(simCal.getJikiDate(jiki)) +":" + jiki );
 			jiki++;
 		}
 

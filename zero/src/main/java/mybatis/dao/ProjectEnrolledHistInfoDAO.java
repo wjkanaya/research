@@ -1,6 +1,7 @@
 package mybatis.dao;
 
 import java.util.Date;
+import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
 
@@ -23,12 +24,21 @@ public class ProjectEnrolledHistInfoDAO {
 
 	public static final String SELECT_PROJECT_ENROLLED_HIST_ID =  "selectProjectEnrolledHistId";
 
+	public static final String SELECT_ALL_PROJECT_ENROLLED_HIST_AND_PRICE =  "selectAllProjectEnrolledHistAndPrice";
 
 	public int insertProjectEnrolledHistInfo(ProjectEnrolledHistInfo info) {
 		SqlSession session = Util.getSqlSession();
 		int count = session.insert(INSERT_PROJECT_ENROLLED_HIST_INFO, info);
 		return count;
 	}
+
+
+	public List<ProjectEnrolledHistInfo> selectAllProjectEnrolledHistAndPrice() {
+		SqlSession session = Util.getSqlSession();
+		return session.selectList(SELECT_ALL_PROJECT_ENROLLED_HIST_AND_PRICE);
+	}
+
+
 
 	public String selectProjectEnrolledHistId(String memberId, String projectId) {
 		ProjectEnrolledHistInfo info = new ProjectEnrolledHistInfo();
@@ -59,12 +69,13 @@ public class ProjectEnrolledHistInfoDAO {
 		return branchNum;
 	}
 
-	public int updateProjectEnrolledHistInfo(String memberId, String projectId,Date stopDate,
+	public int updateProjectEnrolledHistInfo(String memberId, String projectId,Date stopDate,Integer stopMemberMonth,
 			Integer stopType,Integer enrolledStatus) {
 		ProjectEnrolledHistInfo info = new ProjectEnrolledHistInfo();
 		info.setMemberId(memberId);
 		info.setProjectId(projectId);
 		info.setStopDate(stopDate);
+		info.setStopMemberMonths(stopMemberMonth);
 		info.setStopType(stopType);
 		info.setEnrolledStatus(enrolledStatus);
 		SqlSession session = Util.getSqlSession();

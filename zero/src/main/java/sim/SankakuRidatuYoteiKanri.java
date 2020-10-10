@@ -269,6 +269,7 @@ public class SankakuRidatuYoteiKanri {
 				info.setProjectId( yotei.pro.name);
 				info.setBranchNum(Integer.valueOf(branchNum));
 				info.setJoinDate(simCal.getJikiDate(jiki));
+				info.setJoinMemberMonths(jiki - yotei.mem.member.entT);
 				info.setEnrolledStatus(EnrolledStatus.TYU.getInteger());
 
 				projectEnrolledHistInfoDAO.insertProjectEnrolledHistInfo(info);
@@ -309,7 +310,7 @@ public class SankakuRidatuYoteiKanri {
     			yotei.pro.memberSet.remove(yotei.mem.member);
 
 				projectEnrolledHistInfoDAO.updateProjectEnrolledHistInfo(
-					yotei.mem.member.memberId, yotei.pro.name, simCal.getJikiDate(jiki),
+					yotei.mem.member.memberId, yotei.pro.name, simCal.getJikiDate(jiki),jiki - yotei.mem.member.entT,
 					yotei.stopType.getInteger(), EnrolledStatus.DAT.getInteger());
 
     			logger.debug(yotei.mem.member.name + "君が"+ yotei.pro.name + "から離脱しました。");

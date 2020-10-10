@@ -5,15 +5,21 @@ import java.util.Date;
 
 public class SimCalendar {
 
-	Calendar calendar;
+	int kikan;
+	Date nowDate;
 
 	// 計算期間月数
-	public SimCalendar(int manths) {
+	public SimCalendar(int kikan) {
+		nowDate = new Date();
+		this.kikan = kikan;
+
+	}
+
+
+	public Date getJikiDate(int jiki) {
+
 		//kikan
 		Calendar calendar = Calendar.getInstance();
-
-		// 今日の日付
-		Date nowDate = new Date();
 
 		calendar.setTime(nowDate);
 
@@ -22,15 +28,11 @@ public class SimCalendar {
 		int date = 1;
 
 		calendar.set(year, month, date, 0, 0, 0); // 今月の月初
-		calendar.add(Calendar.MONTH, - manths); // 計算期間分マイナス
-		this.calendar = calendar;
+		calendar.add(Calendar.MONTH, - kikan + jiki); // 計算期間分マイナス
+
+		return calendar.getTime();
 	}
 
-	
-	public Date getJikiDate(int jiki) {
-		Calendar clone = (Calendar)calendar.clone();
-		clone.add(Calendar.MONTH, jiki); // 時期分だけずらす
-		return clone.getTime();
-	}
+
 
 }

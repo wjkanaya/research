@@ -196,6 +196,37 @@ public class Util {
 	}
 
 
+
+	public static int differenceMonth(Date from, Date to) {
+		 Calendar calFrom = Calendar.getInstance();
+
+		    calFrom.setTime(from);
+
+		    calFrom.set(Calendar.DATE, 1);
+
+
+		    Calendar calTo = Calendar.getInstance();
+
+		    calTo.setTime(to);
+
+		    calTo.set(Calendar.DATE, 1);
+
+		    int count = 0;
+
+		    while (calFrom.before(calTo)) {
+
+		        calFrom.add(Calendar.MONTH, 1);
+
+		        count++;
+
+		    }
+
+
+	    return count;
+	}
+
+
+
 	static final ThreadLocal<SqlSession> th = new ThreadLocal<SqlSession>();
 
 	public static void startTransaction() {

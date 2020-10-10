@@ -114,7 +114,9 @@
      &quot;project_id&quot;,
       &quot;branch_num&quot;,
       &quot;join_date&quot;,
+      &quot;join_member_months&quot;,
       &quot;stop_date&quot;,
+      &quot;stop_member_months&quot;,
       &quot;stop_type&quot;,
      &quot;enrolled_status&quot;) values
        (
@@ -122,23 +124,62 @@
        #{memberId,jdbcType=VARCHAR},
        #{projectId,jdbcType=VARCHAR},
        #{branchNum,jdbcType=INTEGER},
-        #{joinDate,jdbcType=DATE},#{stopDate,jdbcType=DATE},
+       #{joinDate,jdbcType=DATE},
+       #{joinMemberMonths,jdbcType=INTEGER},
+       #{stopDate,jdbcType=DATE},
+       #{stopMemberMonths,jdbcType=INTEGER},
        #{stopType,jdbcType=INTEGER},
        #{enrolledStatus,jdbcType=INTEGER})
   </insert>
 
+  <resultMap id="projectEnrolledHistAndPriceMap" type="ProjectEnrolledHistInfo">
+    <id property="tblId" column="hist_tbl_id"/>
+    <result property="enrolledHistId" column="hist_enrolled_hist_id" />
+    <result property="memberId" column="hist_member_id" />
+    <result property="projectId" column="project_id" />
+    <result property="branchNum" column="branch_num" />
+    <result property="joinDate" column="join_date" />
+    <result property="joinMemberMonths" column="join_member_months" />
+    <result property="stopDate" column="stop_date" />
+    <result property="stopMemberMonths" column="stop_member_months" />
+
+    <result property="stopType" column="stop_type" />
+    <result property="enrolledStatus" column="enrolled_status" />
+    <collection property="priceTransitionInfoList" ofType="PriceTransitionInfo">
+      <id property="tblId"  column="price_tbl_id"/>
+      <result property="menberMonths" column="menber_months"/>
+      <result property="enrolledHistId" column="price_enrolled_hist_id"/>
+      <result property="priceStartDate" column="price_start_date"/>
+      <result property="price" column="price"/>
+    </collection>
+  </resultMap>
+  <select id="selectAllProjectEnrolledHistAndPrice" resultMap="projectEnrolledHistAndPriceMap">
+    select
+    h.tbl_id as hist_tbl_id,h.enrolled_hist_id as hist_enrolled_hist_id,
+    h.member_id as hist_member_id,
+    h.project_id,h.branch_num,h.join_date,h.stop_date,
+    h.stop_type,h.enrolled_status,
+    p.tbl_id as price_tbl_id,p.menber_months,
+    p.enrolled_hist_id as price_enrolled_hist_id,
+    p.price_start_date,p.price
+    from
+    INNER JOIN project_enrolled_hist_info h
+    INNER JOIN price_transition_info p
+    ON h.enrolled_hist_id = p.enrolled_hist_id
+    order by hist_member_id,join_date,price_start_date
+  </select>
 
   <select id="selectCountProjectEnrolledHistInfo" resultType="Integer">
     select count(*) as count from project_enrolled_hist_info
     where member_id = #{memberId}  and project_id = #{projectId}
   </select>
 
-   <select id="selectProjectEnrolledHistId" resultType="String">
+  <select id="selectProjectEnrolledHistId" resultType="String">
     select max(enrolled_hist_id) as enrolled_hist_id from project_enrolled_hist_info
     where member_id = #{memberId}  and project_id = #{projectId}
   </select>
 
-   <select id="selectProjectEnrolledHistInfoBranchNum" resultType="Integer">
+  <select id="selectProjectEnrolledHistInfoBranchNum" resultType="Integer">
     select max(branch_num) as branch_num from project_enrolled_hist_info
     where member_id = #{memberId}  and project_id = #{projectId}
   </select>
@@ -147,6 +188,7 @@
  <update id="updateProjectEnrolledHistInfo">
   update project_enrolled_hist_info set
     stop_date = #{stopDate,jdbcType=DATE},
+    stop_member_months = #{stopMemberMonths,jdbcType=INTEGER},
     stop_type = #{stopType,jdbcType=INTEGER},
     enrolled_status = #{enrolledStatus,jdbcType=INTEGER}
     where project_enrolled_hist_info.member_id  = #{memberId} AND

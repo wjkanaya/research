@@ -1,6 +1,7 @@
 package mybaits.vo;
 
 import java.util.Date;
+import java.util.List;
 
 public class ProjectEnrolledHistInfo {
 	//	tbl_id	tbl_id	serial
@@ -69,5 +70,30 @@ public class ProjectEnrolledHistInfo {
 	Date stopDate;
 	Integer stopType;
 	Integer enrolledStatus;
+
+	public Integer getJoinMemberMonths() {
+		return joinMemberMonths;
+	}
+	public void setJoinMemberMonths(Integer joinMemberMonths) {
+		this.joinMemberMonths = joinMemberMonths;
+	}
+	public Integer getStopMemberMonths() {
+		return stopMemberMonths;
+	}
+	public void setStopMemberMonths(Integer stopMemberMonths) {
+		this.stopMemberMonths = stopMemberMonths;
+	}
+
+	Integer joinMemberMonths;
+	Integer stopMemberMonths;
+
+
+	public List<PriceTransitionInfo> getPriceTransitionInfoList() {
+		return priceTransitionInfoList;
+	}
+	public void setPriceTransitionInfoList(List<PriceTransitionInfo> priceTransitionInfoList) {
+		this.priceTransitionInfoList = priceTransitionInfoList;
+	}
+	List<PriceTransitionInfo> priceTransitionInfoList;
 
 }

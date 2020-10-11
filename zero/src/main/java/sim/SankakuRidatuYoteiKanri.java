@@ -54,13 +54,12 @@ public class SankakuRidatuYoteiKanri {
 	// 参画予定リストから削除
     public void syoteiSakujyo(SankakuRidatuYotei yotei) {
 
-
-    	for (int i=0; i<slist.size();i++) {
-    		if (slist.get(i).equals(yotei)){
+    	for (int i = slist.size() -1  ;i >= 0;i--) {
+       		if (slist.get(i).equals(yotei)){
     			slist.remove(i);
-    			break;
     		}
     	}
+
     }
 
 	// 参画内定リストに登録
@@ -115,6 +114,25 @@ public class SankakuRidatuYoteiKanri {
         return l;
     }
 
+    public List<AkiMember> torikesiSankakuNaiteiForPro(Project pro) {
+    	List<AkiMember> l = new ArrayList<AkiMember>();
+
+
+    	for (int i = slist.size() -1  ;i >= 0;i--) {
+       		if (slist.get(i).pro.equals(pro)){
+       			SankakuRidatuYotei yotei = slist.remove(i);
+       			l.add(yotei.mem);
+    		}
+    	}
+    	for (int i = snlist.size() -1  ;i >= 0;i--) {
+       		if (snlist.get(i).pro.equals(pro)){
+       			SankakuRidatuYotei yotei = snlist.remove(i);
+       			l.add(yotei.mem);
+    		}
+    	}
+    	return l;
+
+    }
 
 
 

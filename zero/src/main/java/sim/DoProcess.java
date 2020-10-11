@@ -32,8 +32,6 @@ public class DoProcess {
 
 	private void execute() {
 
-		logger.debug("_debug");
-
 
 		SimCalendar simCal = new SimCalendar(KIKAN);
 
@@ -136,7 +134,7 @@ public class DoProcess {
 							PriceTransitionInfo priceTransitionInfo = new PriceTransitionInfo();
 
 							priceTransitionInfo.setMemberId(mem.memberId);
-							priceTransitionInfo.setMenberMonths(jiki - mem.entT);
+							priceTransitionInfo.setMenberMonths(jiki - mem.entT-1);
 							priceTransitionInfo.setEnrolledHistId(enrolledHistId);
 							priceTransitionInfo.setPriceStartDate(simCal.getJikiDate(jiki-1));
 							priceTransitionInfo.setPrice(uri);
@@ -165,12 +163,17 @@ public class DoProcess {
 
 				logger.debug(jiki / 12 + "年度売上:" + nenUri);
 
-				int rieki  = nenUri - (int)Math.ceil(memKanri.getAllCnt() * 1.1) * jinkenhi * 12;
+				int allCount = memKanri.getAllCnt() ;
+				int allCountKanri = allCount;
+//				if (allCount > 20) {
+//					allCountKanri = (int)Math.ceil(memKanri.getAllCnt() * (1 + 1.0/30.0)) ;
+//				}
+				int rieki  = nenUri - (int)Math.floor(memKanri.getAllCnt() * 1.1) * jinkenhi * 12;
 				logger.debug(jiki / 12 + "利益:" + rieki);
 
 				freshnum = (int)Math.floor( rieki * 0.97 / (jinkenhi  * 12));
 
-				if (freshnum == 0) {
+				if (freshnum <= 0) {
 					freshnum = 1;
 				}
 
@@ -219,7 +222,7 @@ public class DoProcess {
 				AkiMember akimem = new AkiMember();
 
 				akimem.member = m;
-				akimem.itukaraDate = (Date)nowDate.clone();
+				akimem.itukara = jiki;
 
 				akiPool.setAkiMember(akimem, 0);
 			}
@@ -228,8 +231,8 @@ public class DoProcess {
 
 			for (Project pro :eigyouKanri.eigyoutyuProList){
 
-				// 参画中
-				if (pro.memberSet.size() > 0) {
+				// 参画& まだ終了じゃない
+				if (pro.memberSet.size() > 0 && pro.endJiki < 0) {
 
 					double proh =  mh.culcprohzard(pro);
 					if (random.nextDouble() < proh) { // プロジェクト終了する確率
@@ -240,11 +243,28 @@ public class DoProcess {
 						projectInfoDAO.updateProjectInfo(pro.name, ProjectStatus.KAN.getInteger(), simCal.getJikiDate(jiki + ituowaru));
 
 						pro.endJiki = jiki + ituowaru;
+
+						// プロジェクトの予定管理の参画内定 or 予定をリセット
+						List<AkiMember> akiMemberList =  yoteikanri.torikesiSankakuNaiteiForPro(pro);
+
+						for (AkiMember akimem :akiMemberList) {
+
+							int soutaiItukara = akimem.itukara - jiki;
+							if (soutaiItukara < 0) {
+								akiPool.setAkiMember(akimem, 0);
+							} else {
+								akiPool.setAkiMember(akimem, soutaiItukara);
+							}
+						}
+
+						// 引き合いプールからも削除
+						proPool.deleteTransaction(pro);
+
 						for (Member mem :pro.memberSet) {
 
 							AkiMember akiMember = new AkiMember();
 							akiMember.member = mem;
-							akiMember.itukaraDate = simCal.getJikiDate(jiki + ituowaru);
+							akiMember.itukara = jiki + ituowaru;
 
 							if (!yoteikanri.containLNYotei(pro, akiMember)){
 								yoteikanri.lnyoteiHimozukiNow(akiMember,pro,ituowaru,StopType.KOKYAKU, false);
@@ -287,7 +307,7 @@ public class DoProcess {
 										(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 3));
 								logger.debug(mem.name + "プロジェクトやめたい!! ：" + pro.name + ":" + (jiki + ituowaru) + "に終了");
 
-								akiMember.itukaraDate = simCal.getJikiDate(jiki + ituowaru);
+								akiMember.itukara = jiki + ituowaru;
 
 								yoteikanri.lnyoteiHimozukiNow(akiMember,pro,ituowaru,StopType.KOJIN, false);
 							}

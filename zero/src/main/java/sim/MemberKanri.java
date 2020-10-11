@@ -93,7 +93,7 @@ public class MemberKanri {
 
 								AkiMember akiMember = new AkiMember();
 								akiMember.member = mem;
-								akiMember.itukaraDate =  simcal.getJikiDate(jiki + ituowaru);
+								akiMember.itukara = jiki + ituowaru;
 
 
 								yoteikanri.lnyoteiHimozukiNow(akiMember,pro,ituowaru,StopType.KOJIN, true);

@@ -33,7 +33,7 @@ public class Util {
 		for (Member mem : delSet) {
 			AkiMember akiMember = new AkiMember();
 			akiMember.member = mem;
-			akiMember.itukaraDate = simcal.getJikiDate(tran.jiki + tran.nannkagetugo);
+			akiMember.itukara = tran.jiki + tran.nannkagetugo;
 			yoteikanri.lnyoteiHimozukiNow(akiMember ,tran.pro,tran.nannkagetugo, StopType.KOKYAKU,false);
 		}
 	}

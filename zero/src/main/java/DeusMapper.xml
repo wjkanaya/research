@@ -142,7 +142,6 @@
     <result property="joinMemberMonths" column="join_member_months" />
     <result property="stopDate" column="stop_date" />
     <result property="stopMemberMonths" column="stop_member_months" />
-
     <result property="stopType" column="stop_type" />
     <result property="enrolledStatus" column="enrolled_status" />
     <collection property="priceTransitionInfoList" ofType="PriceTransitionInfo">
@@ -157,13 +156,15 @@
     select
     h.tbl_id as hist_tbl_id,h.enrolled_hist_id as hist_enrolled_hist_id,
     h.member_id as hist_member_id,
-    h.project_id,h.branch_num,h.join_date,h.stop_date,
+    h.project_id,h.branch_num,h.join_date,
+    h.join_member_months,
+    h.stop_date,
+    h.stop_member_months,
     h.stop_type,h.enrolled_status,
     p.tbl_id as price_tbl_id,p.menber_months,
     p.enrolled_hist_id as price_enrolled_hist_id,
     p.price_start_date,p.price
-    from
-    INNER JOIN project_enrolled_hist_info h
+    from project_enrolled_hist_info h
     INNER JOIN price_transition_info p
     ON h.enrolled_hist_id = p.enrolled_hist_id
     order by hist_member_id,join_date,price_start_date

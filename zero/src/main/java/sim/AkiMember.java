@@ -1,14 +1,12 @@
 package sim;
 
-import java.util.Date;
-
 import deus_proto.Member;
 
 public class AkiMember implements Comparable<AkiMember>  {
 
 	public Member member;
 
-	public Date itukaraDate;
+	public int itukara;
 
     @Override
     public int hashCode(){

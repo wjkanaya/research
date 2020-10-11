@@ -15,10 +15,14 @@ public class ProPool {
 	public void deleteTransaction(Project pro) {
 
 		for (Set<Transaction> set :proList) {
+			List<Transaction> delList = new ArrayList<Transaction>();
 			for (Transaction tran :set) {
 				if (tran.pro.equals(pro)) {
-					set.remove(tran);
+					delList.add(tran);
 				}
+			}
+			for (Transaction target :delList) {
+				set.remove(target);
 			}
 		}
 	}

@@ -1,16 +1,16 @@
 package sim;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import deus_proto.Member;
 
 public class EigyouKanri {
 
 	// 営業中プロジェクトリスト
-	public Set<Project> eigyoutyuProList = new HashSet<Project>();
+	public Set<Project> eigyoutyuProList = new TreeSet<Project>();
 
 	public Project getMemberProject(Member mem) {
 

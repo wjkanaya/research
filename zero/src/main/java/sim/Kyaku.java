@@ -1,6 +1,6 @@
 package sim;
 
-public class Kyaku {
+public class Kyaku implements Comparable<Kyaku>  {
 
 	public String name;
 
@@ -53,6 +53,13 @@ public class Kyaku {
 		}
 		return false;
 	}
+
+
+	public int compareTo(Kyaku o) {
+		// TODO 自動生成されたメソッド・スタブ
+		return this.kyakuCd.compareTo(o.kyakuCd);
+	}
+
 
 
 }

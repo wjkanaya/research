@@ -1,6 +1,6 @@
 package sim;
 
-public class Transaction {
+public class Transaction implements Comparable<Transaction> {
 
 	// 増減フラグ(false=増加、true=減少)
 	boolean genFlg;
@@ -15,7 +15,6 @@ public class Transaction {
 		return jiki + nannkagetugo - nowJiki;
 
 	}
-
 
 	// 提案時期 1
 	public int jiki;
@@ -37,6 +36,10 @@ public class Transaction {
     public int juutounin;
 
 
+    public int hashCode() {
+        return (this.pro.name + this.jiki).hashCode();
+    }
+
 	public boolean equals(Object anObject) {
 		if (this == anObject) {
 			return true;
@@ -46,6 +49,18 @@ public class Transaction {
 			return t.pro.name.equals(this.pro.name) && t.jiki == this.jiki;
 		}
 		return false;
+	}
+
+	public int compareTo(Transaction o) {
+		// TODO 自動生成されたメソッド・スタブ
+
+		int result = this.pro.name.compareTo(o.pro.name);
+
+		if (result == 0) {
+			result = this.jiki  - o.jiki;
+		}
+
+		return result;
 	}
 
 

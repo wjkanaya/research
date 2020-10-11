@@ -1,12 +1,12 @@
 package sim;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 
 import deus_proto.Member;
 
-public class Project {
+public class Project  implements Comparable<Project>  {
 
 //	public int getItukara(int nowJiki) {
 //
@@ -66,7 +66,7 @@ public class Project {
     public double syukiisou;
 
     // 参画中メンバーセット
-    public Set<Member> memberSet = new HashSet<Member>();
+    public Set<Member> memberSet = new TreeSet<Member>();
 
     @Override
     public int hashCode(){
@@ -103,6 +103,14 @@ public class Project {
     	}
 
     }
+
+	public int compareTo(Project o) {
+		// TODO 自動生成されたメソッド・スタブ
+
+		int result = this.name.compareTo(o.name);
+
+		return result;
+	}
 
 
 

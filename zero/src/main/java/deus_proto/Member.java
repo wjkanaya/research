@@ -1,6 +1,6 @@
 package deus_proto;
 
-public class Member {
+public class Member  implements Comparable<Member>   {
 	public int entT; // 入社時期
 	public int retT = -1; // 退社時期
     public String memberId;
@@ -44,5 +44,15 @@ public class Member {
 		}
 		return false;
 	}
+
+	public int compareTo(Member o) {
+		// TODO 自動生成されたメソッド・スタブ
+
+		int result = this.memberId.compareTo(o.memberId);
+
+		return result;
+	}
+
+
 
 }

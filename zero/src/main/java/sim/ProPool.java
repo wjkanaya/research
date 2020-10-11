@@ -3,10 +3,10 @@
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class ProPool {
 
@@ -35,7 +35,7 @@ public class ProPool {
 	public void setProject(Transaction pro, int nowJiki) {
 
 		while (proList.size() < pro.getItukara(nowJiki) + 1) {
-			proList.add(new HashSet<Transaction>());
+			proList.add(new TreeSet<Transaction>());
 		}
 
 		proList.get(pro.getItukara(nowJiki)).add(pro);

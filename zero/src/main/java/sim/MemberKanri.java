@@ -3,7 +3,6 @@ package sim;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
@@ -47,7 +46,7 @@ public class MemberKanri {
 	}
 
 
-	public void inc(Random random,int jiki,EigyouKanri eigyouKanri,SankakuRidatuYoteiKanri yoteikanri,
+	public void inc(SimRandom random,int jiki,EigyouKanri eigyouKanri,SankakuRidatuYoteiKanri yoteikanri,
 			MakeHazad mh,MemberHistInfoDAO dao,SimCalendar simcal) {
 
 

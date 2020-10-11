@@ -5,11 +5,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
@@ -22,9 +21,9 @@ import mybaits.vo.MemberHistInfo;
 
 public class Util {
 
-	public static void gensyoMember(Random random, SankakuRidatuYoteiKanri yoteikanri,Transaction tran, SimCalendar simcal) {
+	public static void gensyoMember(SimRandom random, SankakuRidatuYoteiKanri yoteikanri,Transaction tran, SimCalendar simcal) {
 
-		Set<Member> delSet = new HashSet<Member>();
+		Set<Member> delSet = new TreeSet<Member>();
 
 		List<Member> targetList = new LinkedList<Member>();
 		targetList.addAll(tran.pro.memberSet);
@@ -39,7 +38,7 @@ public class Util {
 		}
 	}
 
-	public static void selectGensyoMember(Random random, Set<Member> resultSet, int delnin, List<Member> targetList) {
+	public static void selectGensyoMember(SimRandom random, Set<Member> resultSet, int delnin, List<Member> targetList) {
 
 		if (delnin == 0) {
 			return;
@@ -81,7 +80,7 @@ public class Util {
 	}
 
 
-	public static String getGeneProName(Random random,String kyakuName, int jiki) {
+	public static String getGeneProName(SimRandom random,String kyakuName, int jiki) {
 
 		return kyakuName +"_" + jiki + "_" + random.nextInt(10);
 	}

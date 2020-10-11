@@ -4,7 +4,7 @@ import java.util.Date;
 
 import deus_proto.Member;
 
-public class AkiMember {
+public class AkiMember implements Comparable<AkiMember>  {
 
 	public Member member;
 
@@ -30,6 +30,11 @@ public class AkiMember {
 			return m.member.memberId.equals(this.member.memberId);
 		}
 		return false;
+	}
+
+	public int compareTo(AkiMember o) {
+		// TODO 自動生成されたメソッド・スタブ
+		return this.member.memberId.compareTo(o.member.memberId);
 	}
 
 

@@ -1,10 +1,10 @@
 package sim;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -233,7 +233,7 @@ public class SankakuRidatuYoteiKanri {
 		ProjectEnrolledHistInfoDAO projectEnrolledHistInfoDAO = new ProjectEnrolledHistInfoDAO();
 
     	// 人数可変したプロジェクト
-    	Set<Project> kahenSet = new HashSet<Project>();
+    	Set<Project> kahenSet = new TreeSet<Project>();
 
     	// 参画予定リスト
 //    	List<SankakuRidatuYotei> slist = new LinkedList<SankakuRidatuYotei>();

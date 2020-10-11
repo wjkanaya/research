@@ -3,10 +3,9 @@ package sim;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,7 +28,7 @@ public class DoProcess {
 	static Logger logger = LogManager.getLogger(DoProcess.class);
 
 	// 計算期間
-	private static final int KIKAN  = 200;
+	private static final int KIKAN  = 360;
 
 	private void execute() {
 
@@ -78,7 +77,7 @@ public class DoProcess {
 		EigyouKanri eigyouKanri = new EigyouKanri();
 
 		// 取引あり顧客リスト
-		Set<Kyaku> toriKyakuList = new HashSet<Kyaku>();
+		Set<Kyaku> toriKyakuList = new TreeSet<Kyaku>();
 
 		// ハザード計算
 		MakeHazad mh = new MakeHazad();
@@ -93,7 +92,7 @@ public class DoProcess {
 
 		int jinkenhi = 52;
 
-		Random random = new Random(1234);
+		SimRandom random = new SimRandom(1234);
 
 
 		int jiki = 0;
@@ -178,7 +177,7 @@ public class DoProcess {
 				nenUri = 0;
 			}
 
-			Set<Member> memberSet = new HashSet<Member>();
+			Set<Member> memberSet = new TreeSet<Member>();
 			GeneFreshMembers gene = new GeneFreshMembers();
 			// -- 一番最初
 			// とりあえず新人を雇おう
@@ -310,10 +309,10 @@ public class DoProcess {
 			List<Transaction> yuusenJunList = proPool.moukaruJun(jiki, 6);
 
 			logger.debug("-儲かる順--");
-			for (int i = 0; i < 5 ; i++) {
+			for (int i = 0; i < 15 ; i++) {
 				Transaction tran = yuusenJunList.get(i);
 				Project pro = tran.pro;
-				int n1 = tran.nannin;
+				int n1 = tran.nannin- tran.juutounin;
 
 				logger.debug(jiki + ":" + pro.name + ":" + tran.getItukara(jiki) + "月後:" + n1 + "人:" +
 						pro.tankin +":" + (6 - tran.getItukara(jiki)) *  pro.tankin);

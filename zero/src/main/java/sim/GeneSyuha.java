@@ -1,7 +1,5 @@
 package sim;
 
-import java.util.Random;
-
 public class GeneSyuha {
 
 
@@ -42,7 +40,7 @@ public class GeneSyuha {
 	}
 
 
-	public int makeSyukiRandom(Random random) {
+	public int makeSyukiRandom(SimRandom random) {
 		double ran = random.nextDouble();
 		double logmin = Math.log(PRO_SYUKI_MIN);
 		double logmax = Math.log(PRO_SYUKI_MAX);

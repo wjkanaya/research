@@ -1,6 +1,5 @@
 package sim;
 
-import java.util.Random;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
@@ -14,7 +13,7 @@ public class GeneFreshMembers {
 
 	static Logger logger = LogManager.getLogger(GeneFreshMembers.class);
 
-	public  int getFreshMembers(Set<Member> doukiSet ,Random random, int freshnum, int namecnt,int j) {
+	public  int getFreshMembers(Set<Member> doukiSet ,SimRandom random, int freshnum, int namecnt,int j) {
 		if (j%12 == 0) {
 
 

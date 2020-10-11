@@ -2,7 +2,6 @@ package sim;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 
 // 営業引き合い
@@ -22,7 +21,7 @@ public class GeneHikiai {
 
 
 	public static void main(String[] args) {
-		 Random random = new Random(1234);
+		 SimRandom random = new SimRandom(1234);
 
 
 //		// TODO 自動生成されたメソッド・スタブ
@@ -65,7 +64,7 @@ public class GeneHikiai {
 	}
 
 	// 引き合いデータ作成
-	public  List<Transaction> makeHikiai(Random random, int jiki) {
+	public  List<Transaction> makeHikiai(SimRandom random, int jiki) {
 		makeKyaku(random); // 客を生成する
 
 		List<Transaction> prolist = new ArrayList<Transaction>();
@@ -88,7 +87,7 @@ public class GeneHikiai {
 
 					tran.nannkagetugo = MakePoasonRandom.getPoisson(random,
 							(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 12));
-				
+
 					pro.name = Util.getGeneProName(random, list.get(i).name, jiki);
 					pro.nexEigyouJiki = tran.jiki + tran.nannkagetugo +1;
 
@@ -143,7 +142,7 @@ public class GeneHikiai {
 		return prolist;
 	}
 
-	private void makeKyaku(Random random) {
+	private void makeKyaku(SimRandom random) {
 		if (list == null) {
 
 

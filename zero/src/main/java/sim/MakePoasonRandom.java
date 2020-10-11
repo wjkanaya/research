@@ -1,7 +1,5 @@
 package sim;
 
-import java.util.Random;
-
 public class MakePoasonRandom {
 
 	public static void main(String[] args) {
@@ -10,7 +8,7 @@ public class MakePoasonRandom {
 	}
 
 	// ポアソン乱数生成方法
-	public static int getPoisson(Random random, double lambda) {
+	public static int getPoisson(SimRandom random, double lambda) {
 
 		double L = Math.exp(-lambda);
 		double p = 1.0;

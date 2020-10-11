@@ -1,21 +1,21 @@
 package deus_proto;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
+import java.util.TreeSet;
 
 import sim.GeneFreshMembers;
+import sim.SimRandom;
 import sim.Util;
 
 public class MakeMemberInfo {
 
 	public static void main(String[] args) {
 
-		Random random = new Random();
+		SimRandom random = new SimRandom(1234);
 
 		//get two double numbers
 		double x = 5;
@@ -67,7 +67,7 @@ public class MakeMemberInfo {
 				}
 			}
 
-			Set<Member> memberSet = new HashSet<Member>();
+			Set<Member> memberSet = new TreeSet<Member>();
 			GeneFreshMembers gene = new GeneFreshMembers();
 			namecnt = gene.getFreshMembers(memberSet,random, freshnum, namecnt, j);
 			memberList.add(memberSet);

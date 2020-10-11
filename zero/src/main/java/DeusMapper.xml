@@ -132,10 +132,30 @@
        #{enrolledStatus,jdbcType=INTEGER})
   </insert>
 
-  <resultMap id="projectEnrolledHistAndPriceMap" type="ProjectEnrolledHistInfo">
-    <id property="tblId" column="hist_tbl_id"/>
-    <result property="enrolledHistId" column="hist_enrolled_hist_id" />
-    <result property="memberId" column="hist_member_id" />
+  <resultMap id="memberProjectEnrolledHistAndPriceMap" type="MemberHistPriceInfo">
+   <id column="tbl_id"/>
+   <association property="memberHistInfo" javaType="MemberHistInfo">
+           <id property="tblId" column="tbl_id"/>
+           <result property="memberId" column="member_id" />
+           <result property="startDate" column="start_date" />
+           <result property="name" column="name" />
+           <result property="enterDate" column="enter_date" />
+           <result property="enterOld" column="enter_old" />
+           <result property="status" column="status" />
+           <result property="retirementDate" column="retirement_date" />
+           <result property="retirementType" column="retirement_type" />
+           <result property="sex" column="sex" />
+           <result property="fleshOrNot" column="flesh_or_not" />
+           <result property="department" column="department" />
+           <result property="position" column="position" />
+   </association>
+   <collection property="projectEnrolledHistInfoList" columnPrefix="hist_" resultMap="projectEnrolledHistAndPriceMap" />
+  </resultMap>
+
+    <resultMap id="projectEnrolledHistAndPriceMap" type="ProjectEnrolledHistInfo">
+    <id property="tblId" column="tbl_id"/>
+    <result property="enrolledHistId" column="enrolled_hist_id" />
+    <result property="memberId" column="member_id" />
     <result property="projectId" column="project_id" />
     <result property="branchNum" column="branch_num" />
     <result property="joinDate" column="join_date" />
@@ -146,26 +166,49 @@
     <result property="enrolledStatus" column="enrolled_status" />
     <collection property="priceTransitionInfoList" ofType="PriceTransitionInfo">
       <id property="tblId"  column="price_tbl_id"/>
-      <result property="menberMonths" column="menber_months"/>
+      <result property="menberMonths" column="price_menber_months"/>
       <result property="enrolledHistId" column="price_enrolled_hist_id"/>
-      <result property="priceStartDate" column="price_start_date"/>
-      <result property="price" column="price"/>
+      <result property="priceStartDate" column="price_price_start_date"/>
+      <result property="price" column="price_price"/>
     </collection>
   </resultMap>
-  <select id="selectAllProjectEnrolledHistAndPrice" resultMap="projectEnrolledHistAndPriceMap">
+
+  <select id="selectAllMemberProjectEnrolledHistAndPrice" resultMap="memberProjectEnrolledHistAndPriceMap">
     select
-    h.tbl_id as hist_tbl_id,h.enrolled_hist_id as hist_enrolled_hist_id,
+    m.tbl_id,
+    m.member_id,
+    m.start_date,
+    m.name,
+    m.enter_date,
+    m.enter_old,
+    m.status,
+    m.retirement_date,
+    m.retirement_type,
+    m.sex,
+    m.flesh_or_not,
+    m.department,
+    m.position,
+    h.tbl_id as hist_tbl_id,
+    h.enrolled_hist_id as hist_enrolled_hist_id,
     h.member_id as hist_member_id,
-    h.project_id,h.branch_num,h.join_date,
-    h.join_member_months,
-    h.stop_date,
-    h.stop_member_months,
-    h.stop_type,h.enrolled_status,
-    p.tbl_id as price_tbl_id,p.menber_months,
-    p.enrolled_hist_id as price_enrolled_hist_id,
-    p.price_start_date,p.price
-    from project_enrolled_hist_info h
-    INNER JOIN price_transition_info p
+    h.project_id as hist_project_id,
+    h.branch_num as hist_branch_num,
+    h.join_date as hist_join_date,
+    h.join_member_months as hist_join_member_months,
+    h.stop_date as hist_stop_date,
+    h.stop_member_months as hist_stop_member_months,
+    h.stop_type as hist_stop_type,
+    h.enrolled_status as hist_enrolled_status,
+    p.tbl_id as hist_price_tbl_id,
+    p.menber_months as hist_price_menber_months,
+    p.enrolled_hist_id as hist_price_enrolled_hist_id,
+    p.price_start_date as hist_price_price_start_date,
+    p.price as hist_price_price
+    from
+    member_hist_info m
+    INNER JOIN project_enrolled_hist_info h
+       ON m.member_id = h.member_id
+       INNER JOIN price_transition_info p
     ON h.enrolled_hist_id = p.enrolled_hist_id
     order by hist_member_id,join_date,price_start_date
   </select>

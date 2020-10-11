@@ -7,6 +7,7 @@ import org.apache.ibatis.session.SqlSession;
 
 import deus.enums.RetirementType;
 import mybaits.vo.MemberHistInfo;
+import mybaits.vo.MemberHistPriceInfo;
 import mybaits.vo.YearCount;
 import sim.Util;
 
@@ -26,10 +27,21 @@ public class MemberHistInfoDAO {
 
     public static final String UPDATE_MEMBER_HIST_INFO = "updateMemberHistInfo";
 
+    public static final String SELECT_ALL_MEMBER_PROJECT_ENROLLED_HIST_AND_PRICE
+        = "selectAllMemberProjectEnrolledHistAndPrice";
+
     public void trancateMemberHistInfo() {
     	SqlSession session = Util.getSqlSession();
     	session.delete(TRUNCATE_MEMBER_HIST_INFO);
     	session.delete(CLEAN_MEMBER_HIST_INFO_TBL_ID);
+    }
+
+
+
+    public List<MemberHistPriceInfo> selectAllMemberProjectEnrolledHistAndPrice() {
+    	SqlSession session = Util.getSqlSession();
+    	List<MemberHistPriceInfo> result = session.selectList(SELECT_ALL_MEMBER_PROJECT_ENROLLED_HIST_AND_PRICE);
+    	return result;
     }
 
     public List<MemberHistInfo> selectAllMemberHistInfo() {

@@ -1,5 +1,6 @@
 package deus_proto;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -30,7 +31,7 @@ public class GeneTotalUriageData {
 
 		Date nowDate = new Date();
 
-
+		TotalUriageData totalUriageData = new TotalUriageData();
 		MemberHistInfoDAO dao = new MemberHistInfoDAO();
 
 		List<MemberHistPriceInfo> list  = dao.selectAllMemberProjectEnrolledHistAndPrice();
@@ -47,6 +48,8 @@ public class GeneTotalUriageData {
 
 			// 入社日
 			Date enterDate = memberHistPriceInfo.getMemberHistInfo().getEnterDate();
+
+			totalUriageData.init(enterDate);
 
 			// 退社日
 			Date lastDate =  memberHistPriceInfo.getMemberHistInfo().getRetirementDate();
@@ -81,6 +84,7 @@ public class GeneTotalUriageData {
 							priceDataList.add(new ArrayList<Integer>());
 						}
 
+						totalUriageData.set(nowMonth, nowPrice);
 						priceDataList.get(nowMonth).add(nowPrice);
 
 						nowMonth++;
@@ -93,6 +97,7 @@ public class GeneTotalUriageData {
 					if (priceDataList.size() == nowMonth) {
 						priceDataList.add(new ArrayList<Integer>());
 					}
+					totalUriageData.set(nowMonth, nowPrice);
 					priceDataList.get(nowMonth).add(nowPrice);
 
 					nowMonth++;
@@ -104,6 +109,7 @@ public class GeneTotalUriageData {
 				if (priceDataList.size() == nowMonth) {
 					priceDataList.add(new ArrayList<Integer>());
 				}
+				totalUriageData.set(nowMonth, nowPrice);
 				priceDataList.get(nowMonth).add(nowPrice);
 
 				nowMonth++;
@@ -140,10 +146,29 @@ public class GeneTotalUriageData {
 
 		}
 
+		List<MonthUriageData> monthUriageDataList =  totalUriageData.getUriageDataList();
+		//書式の作成
+		SimpleDateFormat sdf = new SimpleDateFormat("GGGGy年M月");
+
+		for (MonthUriageData monthUriageData : monthUriageDataList) {
+			// 平均計算
+			int sum = 0;
+			List<Integer> priceList = monthUriageData.getPriceList();
+
+			for (Integer price :priceList) {
+				sum += price.intValue();
+			}
+
+			System.out.println(sdf.format(monthUriageData.getTargetDate()) + ":"  + sum + ":"  + priceList.size());
+		}
+
 	}
 
 
-
-
-
 }
+
+
+
+
+
+

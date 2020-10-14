@@ -213,6 +213,21 @@
     order by hist_member_id,join_date,price_start_date
   </select>
 
+
+  <select id="selectAllProjectEnrolledHistInfo" resultType="ProjectEnrolledHistInfo">
+    select * from project_enrolled_hist_info
+    where member_id = #{memberId}  and project_id = #{projectId}
+  </select>
+
+  <select id="selectAllProjectEnrolledHistYearMonthsInfo" resultType="ProjectEnrolledHistYearMonthsInfo">
+    SELECT enrolled_hist_id,member_id,project_id,branch_num,
+    join_date,COALESCE(stop_date,CAST(DATE_TRUNC('month', now()) as DATE)) as stop_date,
+ 	EXTRACT(year from AGE(COALESCE(stop_date,CAST(DATE_TRUNC('month', now()) as DATE)),join_date )) * 12 +
+    EXTRACT(month from AGE(COALESCE(stop_date,CAST(DATE_TRUNC('month', now()) as DATE)),join_date )) as year_months ,
+    COALESCE(stop_type,'-1') as stop_type from project_enrolled_hist_info
+    order by year_months
+  </select>
+
   <select id="selectCountProjectEnrolledHistInfo" resultType="Integer">
     select count(*) as count from project_enrolled_hist_info
     where member_id = #{memberId}  and project_id = #{projectId}

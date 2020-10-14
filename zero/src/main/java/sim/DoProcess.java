@@ -395,7 +395,7 @@ public class DoProcess {
 			}
 
 			// 一か月経過
-			memKanri.inc(random, jiki, eigyouKanri, yoteikanri, mh,memberHIstInfoDAO, simCal);
+			memKanri.inc(random, jiki, eigyouKanri, yoteikanri, mh,memberHIstInfoDAO, simCal, akiPool);
 			akiPool.inc();
 			yoteikanri.inc(simCal, jiki);
 			proPool.inc();

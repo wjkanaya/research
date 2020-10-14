@@ -72,6 +72,34 @@ public class SankakuRidatuYoteiKanri {
 
     }
 
+    public void deleteMember(int jiki, AkiMember mem) {
+
+    	// 参画予定リストから削除
+    	for (int i = slist.size() -1  ;i >= 0;i--) {
+       		if (slist.get(i).mem.member.equals(mem.member)) {
+       		    if (slist.get(i).mem.itukara >= mem.itukara) {
+       		    	slist.remove(i);
+       		    }
+    		}
+    	}
+
+    	// 参画内定リストから削除
+     	for (int i = snlist.size() -1  ;i >= 0;i--) {
+       		if (snlist.get(i).mem.member.equals(mem.member)) {
+       			if (snlist.get(i).mem.itukara >= mem.itukara) {
+       				snlist.remove(i);
+       			} else {
+
+       				lnyoteiHimozukiNow(snlist.get(i).mem,snlist.get(i).pro,mem.itukara - jiki,StopType.KOJIN, true);
+
+       			}
+
+
+    		}
+    	}
+
+    }
+
 	// 参画内定リストに即登録
     public void snyoteiHimozukiNow( AkiMember mem, Project pro, int itukara) {
     	syoteiHimozuki( mem, pro, itukara);

@@ -47,7 +47,7 @@ public class MemberKanri {
 
 
 	public void inc(SimRandom random,int jiki,EigyouKanri eigyouKanri,SankakuRidatuYoteiKanri yoteikanri,
-			MakeHazad mh,MemberHistInfoDAO dao,SimCalendar simcal) {
+			MakeHazad mh,MemberHistInfoDAO dao,SimCalendar simcal, AkiPool akiPool) {
 
 
 		// 退職チェック
@@ -94,9 +94,12 @@ public class MemberKanri {
 								AkiMember akiMember = new AkiMember();
 								akiMember.member = mem;
 								akiMember.itukara = jiki + ituowaru;
-
-
+								yoteikanri.deleteMember(jiki,akiMember); // 予定管理から削除
+								akiPool.delete(akiMember);// 空プールから削除
 								yoteikanri.lnyoteiHimozukiNow(akiMember,pro,ituowaru,StopType.KOJIN, true);
+
+
+
 							}
 
 							mem.retT = jiki + ituowaru; // 退社時期

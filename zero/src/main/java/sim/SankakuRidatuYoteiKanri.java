@@ -195,6 +195,13 @@ public class SankakuRidatuYoteiKanri {
 	// 離脱内定リストに登録
     public void lnyoteiHimozuki(SankakuRidatuYotei yotei, boolean taishokuFlg) {
 
+    	if (yotei.itukara == 0) {
+    		// 即プロジェクト離脱
+    		logger.debug("即プロジェクト離脱:");
+    	}
+
+
+
     	for (int i = 0; i < lnlist.size(); i++) {
     		if (lnlist.get(i).mem.equals(yotei.mem) && lnlist.get(i).pro.equals(yotei.pro)) {
     			if (yotei.itukara < lnlist.get(i).itukara) {
@@ -203,8 +210,6 @@ public class SankakuRidatuYoteiKanri {
 
 
     			}
-
-
     			return;
     		}
     	}
@@ -298,32 +303,9 @@ public class SankakuRidatuYoteiKanri {
     	// 参画確定
     	//    	List<SankakuRidatuYotei> snlist = new LinkedList<SankakuRidatuYotei>();
     	for (int i = snlist.size() -1  ;i >= 0;i--) {
-    		if (snlist.get(i).itukara == 0) {
+    		if (snlist.get(i).itukara <= 1) {
     			SankakuRidatuYotei yotei =snlist.remove(i);
-    			yotei.pro.memberSet.add(yotei.mem.member); //
-    			Integer count =
-    					projectEnrolledHistInfoDAO.selectCountProjectEnrolledHistInfo(yotei.mem.member.memberId, yotei.pro.name);
-
-    			int branchNum = 0;
-    			if (count > 0) {
-    				branchNum = projectEnrolledHistInfoDAO.selectProjectEnrolledHistInfoBranchNum(yotei.mem.member.memberId, yotei.pro.name);
-    				branchNum++;
-    			}
-
-				ProjectEnrolledHistInfo info  = new ProjectEnrolledHistInfo();
-
-				info.setEnrolledHistId(yotei.mem.member.memberId + "_" + yotei.pro.name + "_" + branchNum);
-				info.setMemberId(yotei.mem.member.memberId);
-				info.setProjectId( yotei.pro.name);
-				info.setBranchNum(Integer.valueOf(branchNum));
-				info.setJoinDate(simCal.getJikiDate(jiki));
-				info.setJoinMemberMonths(jiki - yotei.mem.member.entT);
-				info.setEnrolledStatus(EnrolledStatus.TYU.getInteger());
-
-				projectEnrolledHistInfoDAO.insertProjectEnrolledHistInfo(info);
-
-
-    			logger.debug(yotei.mem.member.name + "君が"+ yotei.pro.name + "に参画しました。");
+    			joinProject(simCal, jiki, projectEnrolledHistInfoDAO, yotei);
 
     			if (!kahenSet.contains(yotei.pro)) {
     				kahenSet.add(yotei.pro);
@@ -332,16 +314,10 @@ public class SankakuRidatuYoteiKanri {
     		} else {
     			snlist.get(i).itukara -= 1;
     		}
-
-
     	}
-
-
-
 
     	// 離脱予定リスト
     	// お流れ
-    	//  	List<SankakuRidatuYotei> llist = new LinkedList<SankakuRidatuYotei>();
     	for (int i = llist.size() -1  ;i >= 0;i--) {
     		if (llist.get(i).itukara == 0) {
     			llist.remove(i);
@@ -351,17 +327,11 @@ public class SankakuRidatuYoteiKanri {
     	}
 
     	// 離脱内定リスト
-    	// 	List<SankakuRidatuYotei> lnlist = new LinkedList<SankakuRidatuYotei>();
     	for (int i = lnlist.size() -1  ;i >= 0;i--) {
-    		if (lnlist.get(i).itukara == 0) {
+    		if (lnlist.get(i).itukara <= 1) {
     			SankakuRidatuYotei yotei =lnlist.remove(i);
-    			yotei.pro.memberSet.remove(yotei.mem.member);
 
-				projectEnrolledHistInfoDAO.updateProjectEnrolledHistInfo(
-					yotei.mem.member.memberId, yotei.pro.name, simCal.getJikiDate(jiki),jiki - yotei.mem.member.entT,
-					yotei.stopType.getInteger(), EnrolledStatus.DAT.getInteger());
-
-    			logger.debug(yotei.mem.member.name + "君が"+ yotei.pro.name + "から離脱しました。");
+    			endProject(simCal, jiki, projectEnrolledHistInfoDAO, yotei);
        			if (!kahenSet.contains(yotei.pro)) {
     				kahenSet.add(yotei.pro);
     			}
@@ -377,24 +347,69 @@ public class SankakuRidatuYoteiKanri {
     		ProjectMemberNumInfoDAO projectMemberNumInfoDAO = new ProjectMemberNumInfoDAO();
     		for (Project kahenPro :kahenSet) {
 
-    			// レコード数
-    			int recCount = projectMemberNumInfoDAO.selectCountProjectMemberNumInfo(kahenPro.name);
-
-    			if (recCount > 0) {
-    				ProjectMemberNumInfo projectMemberNumInfo
-    				    = projectMemberNumInfoDAO.selectLastProjectMemberNumInfo(kahenPro.name);
-
-    				if (projectMemberNumInfo.getMemberNum().intValue() == kahenPro.memberSet.size()) {
-    					continue;
-    				}
-    			}
-
-    			ProjectMemberNumInfo projectMemberNumInfo = new ProjectMemberNumInfo();
-    			projectMemberNumInfo.setProjectId(kahenPro.name);
-    			projectMemberNumInfo.setProjectMonths(jiki - kahenPro.startJiki);
-    			projectMemberNumInfo.setMemberNum(Integer.valueOf(kahenPro.memberSet.size()));
-    			projectMemberNumInfoDAO.insertProjectMemberNumInfo(projectMemberNumInfo);
+    			insertProjectMemberNumInfo(jiki, projectMemberNumInfoDAO,kahenPro);
     		}
     	}
     }
+
+	private void endProject(SimCalendar simCal, int jiki, ProjectEnrolledHistInfoDAO projectEnrolledHistInfoDAO,
+			SankakuRidatuYotei yotei) {
+		yotei.pro.memberSet.remove(yotei.mem.member);
+
+		projectEnrolledHistInfoDAO.updateProjectEnrolledHistInfo(
+			yotei.mem.member.memberId, yotei.pro.name, simCal.getJikiDate(jiki),jiki - yotei.mem.member.entT,
+			yotei.stopType.getInteger(), EnrolledStatus.DAT.getInteger());
+
+		logger.debug(yotei.mem.member.name + "君が"+ yotei.pro.name + "から離脱しました。");
+	}
+
+	private void joinProject(SimCalendar simCal, int jiki,
+			ProjectEnrolledHistInfoDAO projectEnrolledHistInfoDAO, SankakuRidatuYotei yotei) {
+
+		yotei.pro.memberSet.add(yotei.mem.member); //
+		Integer count =
+				projectEnrolledHistInfoDAO.selectCountProjectEnrolledHistInfo(yotei.mem.member.memberId, yotei.pro.name);
+
+		int branchNum = 0;
+		if (count > 0) {
+			branchNum = projectEnrolledHistInfoDAO.selectProjectEnrolledHistInfoBranchNum(yotei.mem.member.memberId, yotei.pro.name);
+			branchNum++;
+		}
+
+		ProjectEnrolledHistInfo info  = new ProjectEnrolledHistInfo();
+
+		info.setEnrolledHistId(yotei.mem.member.memberId + "_" + yotei.pro.name + "_" + branchNum);
+		info.setMemberId(yotei.mem.member.memberId);
+		info.setProjectId( yotei.pro.name);
+		info.setBranchNum(Integer.valueOf(branchNum));
+		info.setJoinDate(simCal.getJikiDate(jiki));
+		info.setJoinMemberMonths(jiki - yotei.mem.member.entT);
+		info.setEnrolledStatus(EnrolledStatus.TYU.getInteger());
+
+		projectEnrolledHistInfoDAO.insertProjectEnrolledHistInfo(info);
+		logger.debug(yotei.mem.member.name + "君が"+ yotei.pro.name + "に参画しました。");
+
+	}
+
+	private void insertProjectMemberNumInfo(int jiki, ProjectMemberNumInfoDAO projectMemberNumInfoDAO,
+			Project kahenPro) {
+		// レコード数
+		int recCount = projectMemberNumInfoDAO.selectCountProjectMemberNumInfo(kahenPro.name);
+
+		if (recCount > 0) {
+			ProjectMemberNumInfo projectMemberNumInfo
+			    = projectMemberNumInfoDAO.selectLastProjectMemberNumInfo(kahenPro.name);
+
+			if (projectMemberNumInfo.getMemberNum().intValue() == kahenPro.memberSet.size()) {
+				return ;
+			}
+		}
+
+		ProjectMemberNumInfo projectMemberNumInfo = new ProjectMemberNumInfo();
+		projectMemberNumInfo.setProjectId(kahenPro.name);
+		projectMemberNumInfo.setProjectMonths(jiki - kahenPro.startJiki);
+		projectMemberNumInfo.setMemberNum(Integer.valueOf(kahenPro.memberSet.size()));
+		projectMemberNumInfoDAO.insertProjectMemberNumInfo(projectMemberNumInfo);
+
+	}
 }

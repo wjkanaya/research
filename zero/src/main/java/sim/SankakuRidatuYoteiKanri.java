@@ -77,7 +77,7 @@ public class SankakuRidatuYoteiKanri {
     	// 参画予定リストから削除
     	for (int i = slist.size() -1  ;i >= 0;i--) {
        		if (slist.get(i).mem.member.equals(mem.member)) {
-       		    if (slist.get(i).mem.itukara >= mem.itukara) {
+       		    if (slist.get(i).itukara + jiki >= mem.itukara) {
        		    	slist.remove(i);
        		    }
     		}
@@ -86,7 +86,9 @@ public class SankakuRidatuYoteiKanri {
     	// 参画内定リストから削除
      	for (int i = snlist.size() -1  ;i >= 0;i--) {
        		if (snlist.get(i).mem.member.equals(mem.member)) {
-       			if (snlist.get(i).mem.itukara >= mem.itukara) {
+
+       			logger.debug(jiki + ":" + mem.member.name + "参画内定リストから削除:" +  (snlist.get(i).itukara + jiki) + "：" + snlist.get(i).mem.itukara + ":" + mem.itukara );
+       			if (snlist.get(i).itukara + jiki >= mem.itukara) {
        				snlist.remove(i);
        			} else {
 

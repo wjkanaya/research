@@ -88,7 +88,7 @@ public class DoProcess {
 		// 新人の人数
 		int freshnum = 5;
 
-		int jinkenhi = 52;
+		int jinkenhi = 30;
 
 		SimRandom random = new SimRandom(1234);
 
@@ -99,7 +99,16 @@ public class DoProcess {
 		int nenUri = 0; // 年間売上
 
 		while (jiki <= KIKAN){
+
+			// 一か月経過
+			memKanri.inc(random, jiki, eigyouKanri, yoteikanri, mh,memberHIstInfoDAO, simCal, akiPool);
+			akiPool.inc();
+			yoteikanri.inc(simCal, jiki);
+			proPool.inc();
+
 			logger.debug("時期：" + jiki + "人数:" + memKanri.getAllCnt());
+
+
 
 			int jikiUri = 0;
 
@@ -109,6 +118,10 @@ public class DoProcess {
 					int proUriSum = 0;
 					for (Member mem :pro.memberSet) {
 
+						if (mem.retT > 0 && mem.retT <= jiki) {
+							logger.debug(mem.name + "がなぜかいる" + jiki);
+							throw new RuntimeException();
+						}
 						int uri = pro.tankin;
 						if (jiki -mem.entT <= 12) {
 							uri = pro.tankin / 2;
@@ -168,7 +181,7 @@ public class DoProcess {
 //				if (allCount > 20) {
 //					allCountKanri = (int)Math.ceil(memKanri.getAllCnt() * (1 + 1.0/30.0)) ;
 //				}
-				int rieki  = nenUri - (int)Math.floor(memKanri.getAllCnt() * 1.1) * jinkenhi * 12;
+				int rieki  = nenUri - (int)Math.floor(memKanri.getAllCnt() * 1.05) * jinkenhi * 12;
 				logger.debug(jiki / 12 + "利益:" + rieki);
 
 				freshnum = (int)Math.floor( rieki * 0.97 / (jinkenhi  * 12));
@@ -394,11 +407,6 @@ public class DoProcess {
 
 			}
 
-			// 一か月経過
-			memKanri.inc(random, jiki, eigyouKanri, yoteikanri, mh,memberHIstInfoDAO, simCal, akiPool);
-			akiPool.inc();
-			yoteikanri.inc(simCal, jiki);
-			proPool.inc();
 
 
 			Util.commitTransaction();

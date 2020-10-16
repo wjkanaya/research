@@ -47,7 +47,11 @@ public class ProPool {
 	}
 
 	public void inc() {
-		proList.remove(0);
+
+		if (proList.size() > 0) {
+			proList.remove(0);
+		}
+
 	}
 
 

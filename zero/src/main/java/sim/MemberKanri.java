@@ -50,17 +50,17 @@ public class MemberKanri {
 			MakeHazad mh,MemberHistInfoDAO dao,SimCalendar simcal, AkiPool akiPool) {
 
 
-		// 退職チェック
-		for (Set<Member> set :memberList) {
-			for (Member m :set) {
-				if (m.retT == jiki) {
-					m.retire = 1;
-					logger.debug(m.name + "君がやめました。 ");
-					dao.updateMemberHistInfo(m.memberId, RetirementType.JIKO, simcal.getJikiDate(jiki));
-
-				}
-			}
-		}
+//		// 退職チェック
+//		for (Set<Member> set :memberList) {
+//			for (Member m :set) {
+//				if (m.retT == jiki) {
+//					m.retire = 1;
+//					logger.debug(m.name + "君がやめました。 ");
+//					dao.updateMemberHistInfo(m.memberId, RetirementType.JIKO, simcal.getJikiDate(jiki));
+//
+//				}
+//			}
+//		}
 
 		// 全体数計算
 		int allcnt = getAllCnt();
@@ -81,24 +81,25 @@ public class MemberKanri {
 						double yammeritu = mh.culcMemHzard(allcnt, sennpaicnt, mem, keika);
 
 						if (random.nextDouble() < yammeritu) { // やめる確率
-							logger.debug(mem.name + "君がやめます。 ");
 							// mem.retire = 1;
 							Project pro = eigyouKanri.getMemberProject(mem);
 
 							int ituowaru =  MakePoasonRandom.getPoisson(random,
 									(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 3));
 
+
+							AkiMember akiMember = new AkiMember();
+							akiMember.member = mem;
+							akiMember.itukara = jiki + ituowaru;
+							yoteikanri.deleteMember(jiki,akiMember); // 予定管理から削除
+							akiPool.delete(akiMember);// 空プールから削除
+
+							logger.debug(jiki +":" +mem.name + "君がやめます。 " + (jiki + ituowaru));
+
 							if (pro != null) {
-								logger.debug(mem.name + "プロジェクト終了!! ：" + pro.name + ":" + ituowaru);
+								logger.debug(mem.name + "退職でプロジェクト終了!! ：" + pro.name + ":退職時期:" + jiki + ituowaru);
 
-								AkiMember akiMember = new AkiMember();
-								akiMember.member = mem;
-								akiMember.itukara = jiki + ituowaru;
-								yoteikanri.deleteMember(jiki,akiMember); // 予定管理から削除
-								akiPool.delete(akiMember);// 空プールから削除
 								yoteikanri.lnyoteiHimozukiNow(akiMember,pro,ituowaru,StopType.KOJIN, true);
-
-
 
 							}
 
@@ -113,6 +114,19 @@ public class MemberKanri {
 			sennpaicnt += doukicont;
 
 		}
+
+		// 退職チェック
+		for (Set<Member> set :memberList) {
+			for (Member m :set) {
+				if (m.retT == jiki) {
+					m.retire = 1;
+					logger.debug(m.name + "君がやめました。 ");
+					dao.updateMemberHistInfo(m.memberId, RetirementType.JIKO, simcal.getJikiDate(jiki));
+
+				}
+			}
+		}
+
 
 
 

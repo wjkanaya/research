@@ -10,7 +10,7 @@ public class AkiMember implements Comparable<AkiMember>  {
 
     @Override
     public int hashCode(){
-        return member.name.hashCode();
+        return member.memberId.hashCode();
     }
 
 	public boolean equals(Object anObject) {

@@ -73,6 +73,7 @@ public class SankakuRidatuYoteiKanri {
     }
 
     public void deleteMember(int jiki, AkiMember mem) {
+    	logger.debug(jiki + ":" + mem.member.name + "参画内定リストから削除するつもり");
 
     	// 参画予定リストから削除
     	for (int i = slist.size() -1  ;i >= 0;i--) {
@@ -104,6 +105,9 @@ public class SankakuRidatuYoteiKanri {
 
 	// 参画内定リストに即登録
     public void snyoteiHimozukiNow( AkiMember mem, Project pro, int itukara) {
+    	logger.debug(mem.member.name + "参画内定リストに登録");
+
+
     	syoteiHimozuki( mem, pro, itukara);
 
     	 for (SankakuRidatuYotei yotei: getSYotei(pro) ) {
@@ -195,19 +199,19 @@ public class SankakuRidatuYoteiKanri {
 	// 離脱内定リストに登録
     public void lnyoteiHimozuki(SankakuRidatuYotei yotei, boolean taishokuFlg) {
 
-    	if (yotei.itukara == 0) {
-    		// 即プロジェクト離脱
-    		logger.debug("即プロジェクト離脱:");
-    	}
-
-
 
     	for (int i = 0; i < lnlist.size(); i++) {
     		if (lnlist.get(i).mem.equals(yotei.mem) && lnlist.get(i).pro.equals(yotei.pro)) {
+
+
+
     			if (yotei.itukara < lnlist.get(i).itukara) {
     			// 先行して登録
     				lnlist.get(i).itukara = yotei.itukara;
-
+    				if (!taishokuFlg) {
+    					// 空きメンバー再設定
+    					akiPool.setAkiMember(yotei.mem, yotei.itukara);
+    		    	}
 
     			}
     			return;
@@ -304,7 +308,9 @@ public class SankakuRidatuYoteiKanri {
     	//    	List<SankakuRidatuYotei> snlist = new LinkedList<SankakuRidatuYotei>();
     	for (int i = snlist.size() -1  ;i >= 0;i--) {
     		if (snlist.get(i).itukara <= 1) {
+
     			SankakuRidatuYotei yotei =snlist.remove(i);
+
     			joinProject(simCal, jiki, projectEnrolledHistInfoDAO, yotei);
 
     			if (!kahenSet.contains(yotei.pro)) {

@@ -28,10 +28,11 @@ public class DoProcess {
 	static Logger logger = LogManager.getLogger(DoProcess.class);
 
 	// 計算期間
-	private static final int KIKAN  = 360;
+	private static final int KIKAN  = 240;
 
 	private void execute() {
 
+	    SimpleDateFormat sdf = new SimpleDateFormat("yyyy'年'MM'月'");
 
 		SimCalendar simCal = new SimCalendar(KIKAN);
 
@@ -99,6 +100,9 @@ public class DoProcess {
 		int nenUri = 0; // 年間売上
 
 		while (jiki <= KIKAN){
+			logger.debug("----------------------------------");
+
+			logger.debug("時期開始↓：" + sdf.format(simCal.getJikiDate(jiki)) +":" + jiki );
 
 			// 一か月経過
 			memKanri.inc(random, jiki, eigyouKanri, yoteikanri, mh,memberHIstInfoDAO, simCal, akiPool);
@@ -212,13 +216,7 @@ public class DoProcess {
 				inf.setEnterOld(20);
 				inf.setStatus(0);
 				inf.setSex(mem.sex);
-//				if (mem.retire == 1) {
-//					inf.setStatus(1);
-//					calendar.setTime(day1);
-//					calendar.add(Calendar.MONTH, mem.retT);
-//					inf.setRetirementDate(calendar.getTime());
-//					inf.setRetirementType(0);
-//				}
+
 				infoList.add(inf);
 			}
 
@@ -251,7 +249,12 @@ public class DoProcess {
 					if (random.nextDouble() < proh) { // プロジェクト終了する確率
 						int ituowaru =  MakePoasonRandom.getPoisson(random,
 								(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 12));
-						logger.debug("プロジェクト終了!! ：" + pro.name + ":時期=" + (jiki + ituowaru));
+
+						if (ituowaru == 0) { // さすがに0はない。
+							ituowaru = 1;
+						}
+
+						logger.debug("プロジェクト終了!! ：" + pro.name + ":時期=" + jiki + "+" + ituowaru);
 
 						projectInfoDAO.updateProjectInfo(pro.name, ProjectStatus.KAN.getInteger(), simCal.getJikiDate(jiki + ituowaru));
 
@@ -278,10 +281,9 @@ public class DoProcess {
 							AkiMember akiMember = new AkiMember();
 							akiMember.member = mem;
 							akiMember.itukara = jiki + ituowaru;
+							logger.debug("プロジェクト終了メンバ ：" + mem.name + ":時期=" + jiki + "+" + ituowaru);
+							yoteikanri.lnyoteiHimozukiNow(akiMember,pro,ituowaru,StopType.KOKYAKU, false);
 
-							if (!yoteikanri.containLNYotei(pro, akiMember)){
-								yoteikanri.lnyoteiHimozukiNow(akiMember,pro,ituowaru,StopType.KOKYAKU, false);
-							}
 						}
 					}
 				}
@@ -359,15 +361,15 @@ public class DoProcess {
 				// 開始時期人数
 				List<AkiMember> akiList = akiPool.getList(tran.getItukara(jiki));
 
-
-
 				for (int i = 0 ; i < akiList.size(); i++) {
 					if (tran.nannin - tran.juutounin == 0) {
 						break;
 					}
 
 					// 参画内定
-					logger.debug(tran.jiki + tran.nannkagetugo +"に"+ akiList.get(i).member.name+ "を"+ pro.name + "に参画予定");
+					logger.debug(tran.jiki + tran.nannkagetugo +
+							"(" + sdf.format(simCal.getJikiDate(tran.jiki + tran.nannkagetugo))  + ")に" +
+							akiList.get(i).member.name+ "を"+ pro.name + "に参画予定:" +(tran.jiki + tran.nannkagetugo - jiki));
 					yoteikanri.snyoteiHimozukiNow(akiList.get(i), pro, tran.jiki + tran.nannkagetugo - jiki);
 					tran.juutounin += 1;
 
@@ -382,7 +384,10 @@ public class DoProcess {
 						proInfo.setProjectName(pro.name);
 
 						proInfo.setClientId(pro.kyaku.kyakuCd);
-						proInfo.setStartDate(simCal.getJikiDate(tran.jiki + tran.nannkagetugo));
+						proInfo.setStartDate(simCal.getJikiDate(tran.jiki + tran.nannkagetugo));//
+						logger.debug(pro.name +"開始時期:" + sdf.format(simCal.getJikiDate(tran.jiki + tran.nannkagetugo)));
+
+
 						proInfo.setProjectStatus(ProjectStatus.TYU.getInteger());
 						projectInfoDAO.insertProjectInfo(proInfo);
 
@@ -411,9 +416,9 @@ public class DoProcess {
 
 			Util.commitTransaction();
 
-		     SimpleDateFormat sdf = new SimpleDateFormat("yyyy'年'MM'月'");
 
-			logger.debug("時期：" + sdf.format(simCal.getJikiDate(jiki)) +":" + jiki );
+
+			logger.debug("時期終了：" + sdf.format(simCal.getJikiDate(jiki)) +":" + jiki );
 			jiki++;
 		}
 

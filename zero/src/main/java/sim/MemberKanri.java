@@ -87,6 +87,9 @@ public class MemberKanri {
 							int ituowaru =  MakePoasonRandom.getPoisson(random,
 									(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 3));
 
+							if (ituowaru == 0) {
+								ituowaru = 1;
+							}
 
 							AkiMember akiMember = new AkiMember();
 							akiMember.member = mem;
@@ -97,7 +100,7 @@ public class MemberKanri {
 							logger.debug(jiki +":" +mem.name + "君がやめます。 " + (jiki + ituowaru));
 
 							if (pro != null) {
-								logger.debug(mem.name + "退職でプロジェクト終了!! ：" + pro.name + ":退職時期:" + jiki + ituowaru);
+								logger.debug(mem.name + "退職でプロジェクト終了!! ：" + pro.name + ":退職時期:" + jiki +"+" + ituowaru);
 
 								yoteikanri.lnyoteiHimozukiNow(akiMember,pro,ituowaru,StopType.KOJIN, true);
 

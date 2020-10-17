@@ -4,7 +4,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.logging.log4j.LogManager;
@@ -116,11 +118,22 @@ public class DoProcess {
 
 			int jikiUri = 0;
 
+			// 売上重複チェック
+			Map<Member,Project> checkMap = new TreeMap<Member,Project>();
+
 			// 売上を確認しよう。
 			for (Project pro : eigyouKanri.eigyoutyuProList) {
 				if (pro.memberSet.size() > 0) {
 					int proUriSum = 0;
 					for (Member mem :pro.memberSet) {
+
+						if (checkMap.get(mem) != null) {
+							logger.debug(mem.name + "がなぜか重複している:" + checkMap.get(mem).name  + ":" + pro.name) ;
+							throw new RuntimeException();
+						}
+
+						checkMap.put(mem, pro);
+
 
 						if (mem.retT > 0 && mem.retT <= jiki) {
 							logger.debug(mem.name + "がなぜかいる" + jiki);
@@ -130,7 +143,7 @@ public class DoProcess {
 						if (jiki -mem.entT <= 12) {
 							uri = pro.tankin / 2;
 						}
-						logger.debug(mem.name + "売上:" + uri);
+						logger.debug(pro.name + ":"+ mem.name + "売上:" + uri);
 
 						String enrolledHistId =
 								projectEnrolledHistInfoDAO.selectProjectEnrolledHistId(mem.memberId, pro.name);
@@ -140,7 +153,6 @@ public class DoProcess {
 						boolean doInsert = true;
 						if (count > 0) {
 
-							logger.debug("hosi:" + enrolledHistId);
 							int price  = priceTransitionDAO.selectNowPrice(enrolledHistId);
 							if (price == uri) {
 								doInsert = false;
@@ -281,7 +293,7 @@ public class DoProcess {
 							AkiMember akiMember = new AkiMember();
 							akiMember.member = mem;
 							akiMember.itukara = jiki + ituowaru;
-							logger.debug("プロジェクト終了メンバ ：" + mem.name + ":時期=" + jiki + "+" + ituowaru);
+							logger.debug(pro.name + "プロジェクト終了メンバ ：" + mem.name + ":時期=" + jiki + "+" + ituowaru);
 							yoteikanri.lnyoteiHimozukiNow(akiMember,pro,ituowaru,StopType.KOKYAKU, false);
 
 						}

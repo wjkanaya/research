@@ -208,10 +208,10 @@ public class SankakuRidatuYoteiKanri {
     			if (yotei.itukara < lnlist.get(i).itukara) {
     			// 先行して登録
     				lnlist.get(i).itukara = yotei.itukara;
-    				if (!taishokuFlg) {
-    					// 空きメンバー再設定
-    					akiPool.setAkiMember(yotei.mem, yotei.itukara);
-    		    	}
+//    				if (!taishokuFlg) {
+//    					// 空きメンバー再設定
+//    					akiPool.setAkiMember(yotei.mem, yotei.itukara);
+//    		    	}
 
     			}
     			return;

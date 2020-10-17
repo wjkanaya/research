@@ -14,12 +14,17 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import deus.enums.StopType;
 import deus_proto.Member;
 import mybaits.vo.MemberHistInfo;
 
 public class Util {
+
+	static Logger logger = LogManager.getLogger(Util.class);
+
 
 	public static void gensyoMember(SimRandom random, SankakuRidatuYoteiKanri yoteikanri,Transaction tran, SimCalendar simcal) {
 
@@ -34,6 +39,8 @@ public class Util {
 			AkiMember akiMember = new AkiMember();
 			akiMember.member = mem;
 			akiMember.itukara = tran.jiki + tran.nannkagetugo;
+
+			logger.debug("メンバー減少による離脱:" + tran.pro.name + ":" + mem.name);
 			yoteikanri.lnyoteiHimozukiNow(akiMember ,tran.pro,tran.nannkagetugo, StopType.KOKYAKU,false);
 		}
 	}

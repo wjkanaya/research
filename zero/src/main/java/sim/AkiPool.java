@@ -18,9 +18,9 @@ public class AkiPool {
 
 
 	public void setAkiMember(AkiMember mem, int itukara) {
-		logger.debug(mem.member.name + "を空きメンバーに入れます。");
-	
-		
+		// logger.debug(mem.member.name + "を空きメンバーに入れます。");
+
+
 		if (mem.member.retT > 0) {
 			logger.debug(mem.member.name + "はやめるので空プールには入れない！！");
 			return;
@@ -66,11 +66,11 @@ public class AkiPool {
 
 
 	public void delete(AkiMember m) {
-		logger.debug(m.member.name  + "を空きメンバーから削除します。");
+	//	logger.debug(m.member.name  + "を空きメンバーから削除します。");
 		for (Set<AkiMember> set :akiList) {
 			if (set.contains(m)) {
 				set.remove(m);
-				logger.debug(m.member.name  + "を空きメンバーから削除されました。");
+	//			logger.debug(m.member.name  + "を空きメンバーから削除されました。");
 
 			}
 

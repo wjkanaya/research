@@ -1,10 +1,13 @@
 package mybatis.dao;
 
 import java.util.Date;
+import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
 
 import mybaits.vo.ProjectEnrolledHistInfo;
+import mybaits.vo.ProjectEnrolledHistYearMonthsInfo;
+import mybaits.vo.YearMonthsCensorCount;
 import sim.Util;
 
 public class ProjectEnrolledHistInfoDAO {
@@ -23,11 +26,37 @@ public class ProjectEnrolledHistInfoDAO {
 
 	public static final String SELECT_PROJECT_ENROLLED_HIST_ID =  "selectProjectEnrolledHistId";
 
+	public static final String SELECT_ALL_PROJECT_ENROLLED_HIST_YEAR_MONTHS_INFO = "selectAllProjectEnrolledHistYearMonthsInfo" ;
+
+	public static final String SELECT_ALL_PROJECT_ENROLLED_HIST_INFO_COUNT = "selectAllProjectEnrolledHistInfoCount";
+
+	public static final String SELECT_ALL_PROJECT_ENROLLED_HIST_YEAR_MONTHS_COUNT_INFO = "selectAllProjectEnrolledHistYearMonthsCountInfo";
+
+
+	public List<YearMonthsCensorCount> selectAllProjectEnrolledHistYearMonthsCountInfo() {
+		SqlSession session = Util.getSqlSession();
+		List<YearMonthsCensorCount> list = session.selectList(SELECT_ALL_PROJECT_ENROLLED_HIST_YEAR_MONTHS_COUNT_INFO);
+		return list;
+	}
+
+
+	public int selectAllProjectEnrolledHistInfoCount() {
+		SqlSession session = Util.getSqlSession();
+		Integer count = session.selectOne(SELECT_ALL_PROJECT_ENROLLED_HIST_INFO_COUNT);
+		return count.intValue();
+	}
+
 
 	public int insertProjectEnrolledHistInfo(ProjectEnrolledHistInfo info) {
 		SqlSession session = Util.getSqlSession();
 		int count = session.insert(INSERT_PROJECT_ENROLLED_HIST_INFO, info);
 		return count;
+	}
+
+	public List<ProjectEnrolledHistYearMonthsInfo> selectAllProjectEnrolledHistYearMonthsInfo() {
+		SqlSession session = Util.getSqlSession();
+		List<ProjectEnrolledHistYearMonthsInfo> list = session.selectList(SELECT_ALL_PROJECT_ENROLLED_HIST_YEAR_MONTHS_INFO);
+		return list;
 	}
 
 

@@ -219,6 +219,13 @@
     where member_id = #{memberId}  and project_id = #{projectId}
   </select>
 
+
+  <select id="selectAllProjectEnrolledHistInfoCount" resultType="Integer">
+    select count(*) from project_enrolled_hist_info
+  </select>
+
+
+
   <select id="selectAllProjectEnrolledHistYearMonthsInfo" resultType="ProjectEnrolledHistYearMonthsInfo">
     SELECT enrolled_hist_id,member_id,project_id,branch_num,
     join_date,COALESCE(stop_date,CAST(DATE_TRUNC('month', now()) as DATE)) as stop_date,
@@ -227,6 +234,27 @@
     COALESCE(stop_type,'-1') as stop_type from project_enrolled_hist_info
     order by year_months
   </select>
+
+
+
+
+  <select id="selectAllProjectEnrolledHistYearMonthsCountInfo" resultType="YearMonthsCensorCount">
+  select t.year_months,
+    count(t.stop_type='2' or null) as count,
+    count(*) - count(t.stop_type='2' or null) as censored
+    from (
+    SELECT
+ 	cast(EXTRACT(year from AGE(COALESCE(stop_date,CAST(DATE_TRUNC('month', now()) as DATE)),join_date )) * 12 +
+    EXTRACT(month from AGE(COALESCE(stop_date,CAST(DATE_TRUNC('month', now()) as DATE)),join_date ))as integer)
+    as year_months,stop_type
+    from project_enrolled_hist_info
+        ) t
+
+
+    group by t.year_months
+    order by year_months
+  </select>
+
 
   <select id="selectCountProjectEnrolledHistInfo" resultType="Integer">
     select count(*) as count from project_enrolled_hist_info

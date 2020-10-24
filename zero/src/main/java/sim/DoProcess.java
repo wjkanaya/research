@@ -30,7 +30,7 @@ public class DoProcess {
 	static Logger logger = LogManager.getLogger(DoProcess.class);
 
 	// 計算期間
-	private static final int KIKAN  = 240;
+	private static final int KIKAN  = 360;
 
 	private void execute() {
 

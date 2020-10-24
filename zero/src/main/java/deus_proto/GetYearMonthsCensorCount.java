@@ -1,6 +1,5 @@
 package deus_proto;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import mybaits.vo.YearMonthsCensorCount;
@@ -24,16 +23,8 @@ public class GetYearMonthsCensorCount {
 	}
 
 	private void execute() {
-
 		ProjectEnrolledHistInfoDAO dao = new ProjectEnrolledHistInfoDAO();
-
-
-		// TODO 自動生成されたメソッド・スタブ
 		int allCount = dao.selectAllProjectEnrolledHistInfoCount();
-
-
-		// 生存率
-		List<Double> livePoint = new ArrayList<Double>();
 
 		List<YearMonthsCensorCount> list = dao.selectAllProjectEnrolledHistYearMonthsCountInfo();
 
@@ -45,14 +36,7 @@ public class GetYearMonthsCensorCount {
 			System.out.println("" + info.getYearMonths() + ":" + nowLiveCount +":" + q +":" + savePoint );
 			savePoint = savePoint * (1 - q );
 			nowLiveCount -= (info.getCount() + info.getCensored());
-
 		}
-
-
-
-
-
-
 	}
 
 }

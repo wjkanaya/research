@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import org.apache.ibatis.session.SqlSession;
 
 import mybaits.vo.MemberHistInfo;
+import mybatis.dao.MemberHistInfoDAO;
 import sim.Util;
 
 public class GeneSurvData {
@@ -37,16 +38,14 @@ public class GeneSurvData {
         // 社員数
         int memberNum = 0;
 
+        MemberHistInfoDAO dao = new MemberHistInfoDAO();
+        result =   dao.selectAllMemberHistInfo();
+        System.out.println(result.size());
+        memberNum = result.size();
 
-        if(session != null) {
 
-        	result = session.selectList("selectAllMemberHistInfo");
-        	System.out.println(result.size());
-        	memberNum = result.size();
-        }
-
-		  // 今日の日付
-		 Date nowDate = new Date();
+        // 今日の日付
+        Date nowDate = new Date();
 
 
         TreeMap<Integer,Integer[]> tm = new TreeMap<Integer,Integer[]>();

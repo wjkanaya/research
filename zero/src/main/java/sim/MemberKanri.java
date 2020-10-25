@@ -47,7 +47,7 @@ public class MemberKanri {
 
 
 	public void inc(SimRandom random,int jiki,EigyouKanri eigyouKanri,SankakuRidatuYoteiKanri yoteikanri,
-			MakeHazad mh,MemberHistInfoDAO dao,SimCalendar simcal, AkiPool akiPool) {
+			MakeHazard mh,MemberHistInfoDAO dao,SimCalendar simcal, AkiPool akiPool) {
 
 
 //		// 退職チェック

@@ -4,7 +4,7 @@ import java.util.Iterator;
 
 import deus_proto.Member;
 
-public class MakeHazad {
+public class MakeHazard {
 
     // proラムダ
 	public static final double PRO_LAMBDA = 0.1;
@@ -82,10 +82,11 @@ public class MakeHazad {
 		double h = (MEM_P/(Math.pow(MEM_LAMBDA, MEM_P))) * Math.pow(keika,MEM_P-1); //ハザード値
 
 
-		  double yammeritu =h * Math.exp (mem.yameritu* 0.0000001
-				  - 0.000001 * mem.omosiroido // 仕事面白いと思っていたらやめない
+		  double yammeritu =h * Math.exp (
+				  mem.yameritu   * HazardConst.YAMERITU_CONST
+		        + mem.omosiroido * HazardConst.OMOSIROIDO_CONST   // 仕事面白いと思っていたらやめない
 				  + 0.000001  * (
-						  2* (((double)sennpaicnt)/ allcnt-0.5)
+						  2* (((double)sennpaicnt)/ allcnt-0.5) // 後輩の比率が大きければやめにくい
 						  )
 				  ) ;
 		return yammeritu;

@@ -30,7 +30,7 @@ public class DoProcess {
 	static Logger logger = LogManager.getLogger(DoProcess.class);
 
 	// 計算期間
-	private static final int KIKAN  = 360;
+	private static final int KIKAN  = 120;
 
 	private void execute() {
 
@@ -81,7 +81,7 @@ public class DoProcess {
 		Set<Kyaku> toriKyakuList = new TreeSet<Kyaku>();
 
 		// ハザード計算
-		MakeHazad mh = new MakeHazad();
+		MakeHazard mh = new MakeHazard();
 
 
 		// TODO 自動生成されたメソッド・スタブ

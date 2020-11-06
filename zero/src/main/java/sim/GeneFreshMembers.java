@@ -27,7 +27,7 @@ public class GeneFreshMembers {
 
 				//  double kojinsa = random.nextGaussian() ;
 
-				  if (random.nextDouble() < 0.1) {
+				  if (random.nextDouble() < HazardConst.FEMALE_RITU_CONST) {
 					  member.name = namecnt + "子";
 					  member.sex = 1;
 				  } else {

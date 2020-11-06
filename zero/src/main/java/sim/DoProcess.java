@@ -30,7 +30,7 @@ public class DoProcess {
 	static Logger logger = LogManager.getLogger(DoProcess.class);
 
 	// 計算期間
-	private static final int KIKAN  = 120;
+	private static final int KIKAN  = 360;
 
 	private void execute() {
 
@@ -430,7 +430,8 @@ public class DoProcess {
 
 
 
-			logger.debug("時期終了：" + sdf.format(simCal.getJikiDate(jiki)) +":" + jiki );
+			logger.debug("時期終了：" + sdf.format(simCal.getJikiDate(jiki)) +" 時期:" + jiki + " 人数:" + memKanri.getAllCnt());
+
 			jiki++;
 		}
 

@@ -14,9 +14,28 @@
     select * from member_hist_info
   </select>
 
+  <select id="selectAllMemberHistInfoCount" resultType="Integer">
+    select count(*) from member_hist_info
+  </select>
+
   <select id="selectAllMemberYearCount" resultType="YearCount">
     select to_char(enter_date, &apos;YYYY&apos;) as year,count(*) as count
     from &quot;member_hist_info&quot; where status = &apos;0&apos; group by year order by year
+  </select>
+
+  <select id="selectAllMemberHistYearMonthsCountInfo" resultType="YearMonthsCensorCount">
+    select t.year_months,count(t.status='1' or null) as count,count(t.status='0' or null) as censored
+    from (
+      SELECT
+ 	  cast(EXTRACT(year from AGE(COALESCE(retirement_date,CAST(DATE_TRUNC('month', now()) as DATE)),
+ 	  enter_date )) * 12 +
+      EXTRACT(month from AGE(COALESCE(retirement_date,CAST(DATE_TRUNC('month', now()) as DATE)),
+      enter_date ))as integer)
+      as year_months,status
+    from member_hist_info
+        ) t
+    group by t.year_months
+    order by year_months
   </select>
 
   <insert id="insertMemberHistInfo" useGeneratedKeys="true"

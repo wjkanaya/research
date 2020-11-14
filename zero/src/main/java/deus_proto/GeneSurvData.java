@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import org.apache.ibatis.session.SqlSession;
 
 import mybaits.vo.MemberHistInfo;
+import mybaits.vo.YearMonthsCensorCount;
 import mybatis.dao.MemberHistInfoDAO;
 import sim.Util;
 
@@ -29,9 +30,27 @@ public class GeneSurvData {
 
 	}
 
-
-
 	private void excute() {
+		 MemberHistInfoDAO dao = new MemberHistInfoDAO();
+
+		int allCount = dao.selectAllMemberHistInfoCount();
+
+		List<YearMonthsCensorCount> list = dao.selectAllMemberHistYearMonthsCountInfo();
+
+		int nowLiveCount = allCount;
+		double savePoint = 1.0;
+		for (YearMonthsCensorCount info :list) {
+			// 生存時間
+			double q = ((double)info.getCount())/ nowLiveCount;
+			System.out.println("" + info.getYearMonths() + ":" + nowLiveCount +":" + q +":" + savePoint );
+			savePoint = savePoint * (1 - q );
+			nowLiveCount -= (info.getCount() + info.getCensored());
+		}
+	}
+
+
+	// 古いやり方
+	private void oldExcute() {
 		SqlSession session = Util.getSqlSession();
         List<MemberHistInfo> result = null;
 

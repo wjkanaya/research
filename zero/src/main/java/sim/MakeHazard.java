@@ -91,5 +91,6 @@ public class MakeHazard {
 						  )
 				  ) ;
 		return yammeritu;
+		// return 1.0;
 	}
 }

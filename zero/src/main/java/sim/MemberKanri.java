@@ -49,18 +49,22 @@ public class MemberKanri {
 	public void inc(SimRandom random,int jiki,EigyouKanri eigyouKanri,SankakuRidatuYoteiKanri yoteikanri,
 			MakeHazard mh,MemberHistInfoDAO dao,SimCalendar simcal, AkiPool akiPool) {
 
+		// 退職チェック
+		for (Set<Member> set :memberList) {
+			for (Member m :set) {
+				if (m.retT == jiki) {
+					m.retire = 1;
+					logger.debug(m.name + "君がやめました。 ");
+					dao.updateMemberHistInfo(m.memberId, RetirementType.JIKO, simcal.getJikiDate(jiki));
 
-//		// 退職チェック
-//		for (Set<Member> set :memberList) {
-//			for (Member m :set) {
-//				if (m.retT == jiki) {
-//					m.retire = 1;
-//					logger.debug(m.name + "君がやめました。 ");
-//					dao.updateMemberHistInfo(m.memberId, RetirementType.JIKO, simcal.getJikiDate(jiki));
-//
-//				}
-//			}
-//		}
+				}
+			}
+		}
+
+	}
+
+	public void retireCheck(SimRandom random,int jiki,EigyouKanri eigyouKanri,SankakuRidatuYoteiKanri yoteikanri,
+			MakeHazard mh,MemberHistInfoDAO dao,SimCalendar simcal, AkiPool akiPool) {
 
 		// 全体数計算
 		int allcnt = getAllCnt();
@@ -76,64 +80,42 @@ public class MemberKanri {
 
 				if (mem.retire == 0 && mem.retT < 0) {
 					doukicont ++;
-					int keika = jiki - mem.entT;
-					if (keika > 0) {
-						double yammeritu = mh.culcMemHzard(allcnt, sennpaicnt, mem, keika);
+					int keika = jiki - mem.entT + 1;
 
-						if (random.nextDouble() < yammeritu) { // やめる確率
-							// mem.retire = 1;
-							Project pro = eigyouKanri.getMemberProject(mem);
+					double yammeritu = mh.culcMemHzard(allcnt, sennpaicnt, mem, keika);
 
-							int ituowaru =  MakePoasonRandom.getPoisson(random,
-									(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 3));
+					if (random.nextDouble() < yammeritu) { // やめる確率
+						// mem.retire = 1;
+						Project pro = eigyouKanri.getMemberProject(mem);
 
-							if (ituowaru == 0) {
-								ituowaru = 1;
-							}
+						int ituowaru =  MakePoasonRandom.getPoisson(random,
+								(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 3));
 
-							AkiMember akiMember = new AkiMember();
-							akiMember.member = mem;
-							akiMember.itukara = jiki + ituowaru;
-							yoteikanri.deleteMember(jiki,akiMember); // 予定管理から削除
-							akiPool.delete(akiMember);// 空プールから削除
+						if (ituowaru == 0) {
+							ituowaru = 1;
+						}
 
-							logger.debug(jiki +":" +mem.name + "君がやめます。 " + (jiki + ituowaru));
+						AkiMember akiMember = new AkiMember();
+						akiMember.member = mem;
+						akiMember.itukara = jiki + ituowaru;
+						yoteikanri.deleteMember(jiki,akiMember); // 予定管理から削除
+						akiPool.delete(akiMember);// 空プールから削除
 
-							if (pro != null) {
-								logger.debug(mem.name + "退職でプロジェクト終了!! ：" + pro.name + ":退職時期:" + jiki +"+" + ituowaru);
+						logger.debug(jiki +":" +mem.name + "君がやめます。 " + (jiki + ituowaru));
 
-								yoteikanri.lnyoteiHimozukiNow(akiMember,pro,ituowaru,StopType.KOJIN, true);
+						if (pro != null) {
+							logger.debug(mem.name + "退職でプロジェクト終了!! ：" + pro.name + ":退職時期:" + jiki +"+" + ituowaru);
 
-							}
-
-							mem.retT = jiki + ituowaru; // 退社時期
-
-
+							yoteikanri.lnyoteiHimozukiNow(akiMember,pro,ituowaru,StopType.KOJIN, true);
 
 						}
+
+						mem.retT = jiki + ituowaru; // 退社時期
 					}
 				}
 			}
 			sennpaicnt += doukicont;
 
 		}
-
-		// 退職チェック
-		for (Set<Member> set :memberList) {
-			for (Member m :set) {
-				if (m.retT == jiki) {
-					m.retire = 1;
-					logger.debug(m.name + "君がやめました。 ");
-					dao.updateMemberHistInfo(m.memberId, RetirementType.JIKO, simcal.getJikiDate(jiki));
-
-				}
-			}
-		}
-
-
-
-
 	}
-
-
 }

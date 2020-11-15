@@ -38,6 +38,20 @@
     order by year_months
   </select>
 
+  <select id="selectMemberHistYearEstimateInfo" resultType="YearEstimateInfo">
+    select t.years,t.sex as x0,
+      count(t.status='1' or null) as count,
+      count(t.status='0' or null) as censored
+      from (
+        SELECT
+          sex,cast(EXTRACT(year from AGE(COALESCE(retirement_date,CAST(DATE_TRUNC('month', now()) as DATE)),enter_date )) * 12 +
+          EXTRACT(month from AGE(COALESCE(retirement_date,CAST(DATE_TRUNC('month', now()) as DATE)),enter_date ))as integer) /12
+          as years,status
+        from member_hist_info   ) t
+      group by t.years,t.sex
+     order by years,x0
+  </select>
+
   <insert id="insertMemberHistInfo" useGeneratedKeys="true"
     keyProperty="tblId">
     insert into &quot;public&quot;.&quot;member_hist_info&quot;

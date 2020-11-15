@@ -30,7 +30,7 @@ public class DoProcess {
 	static Logger logger = LogManager.getLogger(DoProcess.class);
 
 	// 計算期間
-	private static final int KIKAN  = 360;
+	private static final int KIKAN  = HazardConst.KIKAN_CONST;
 
 	private void execute() {
 
@@ -107,7 +107,10 @@ public class DoProcess {
 			logger.debug("時期開始↓：" + sdf.format(simCal.getJikiDate(jiki)) +":" + jiki );
 
 			// 一か月経過
+			// メンバー状態
 			memKanri.inc(random, jiki, eigyouKanri, yoteikanri, mh,memberHIstInfoDAO, simCal, akiPool);
+
+
 			akiPool.inc();
 			yoteikanri.inc(simCal, jiki);
 			proPool.inc();
@@ -424,7 +427,8 @@ public class DoProcess {
 
 			}
 
-
+			// 退職判定
+			memKanri.retireCheck(random, jiki, eigyouKanri, yoteikanri, mh,memberHIstInfoDAO, simCal, akiPool);
 
 			Util.commitTransaction();
 

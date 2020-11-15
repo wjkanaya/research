@@ -48,7 +48,6 @@ public class GeneSurvData {
 		}
 	}
 
-
 	// 古いやり方
 	private void oldExcute() {
 		SqlSession session = Util.getSqlSession();
@@ -114,8 +113,6 @@ public class GeneSurvData {
         	wa -= ent.getValue()[1];
         }
 	}
-
-
 
 	private static int dateMonthSa(Date from, Date to) {
 

@@ -18,6 +18,7 @@ public class HazardConst {
 	// 女性比率
 	public static final double FEMALE_RITU_CONST = 0.5;
 
-
+    // 退職に絡む経過年以外の共変量数
+	public static final int RETIRE_X_INDEX_NUM = 1;
 
 }

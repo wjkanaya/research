@@ -85,7 +85,7 @@ public class MakeHazard {
 		  double yammeritu =h * Math.exp (
 				  mem.yameritu   * HazardConst.YAMERITU_CONST
 		        + mem.omosiroido * HazardConst.OMOSIROIDO_CONST   // 仕事面白いと思っていたらやめない
-		        + mem.sex * 10
+		        // + mem.sex * 10
 				  + HazardConst.SENPAIUZAI_CONST  * (
 						  2* (((double)sennpaicnt)/ allcnt-0.5) // 後輩の比率が大きければやめにくい
 						  )

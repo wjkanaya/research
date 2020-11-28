@@ -1,8 +1,8 @@
 package mybaits.vo;
 
-public class YearEstimateInfo {
+public class YearEstimateInfo implements Comparable{
 
-	String year;
+	Integer years;
 
 	Integer count;
 
@@ -60,12 +60,12 @@ public class YearEstimateInfo {
 
 
 
-	public String getYear() {
-		return year;
+	public Integer getYears() {
+		return years;
 	}
 
-	public void setYear(String year) {
-		this.year = year;
+	public void setYears(Integer years) {
+		this.years = years;
 	}
 
 	public Integer getCount() {
@@ -83,6 +83,186 @@ public class YearEstimateInfo {
 	public void setCensored(Integer censored) {
 		this.censored = censored;
 	}
+
+	public int compareTo(Object inO) {
+		YearEstimateInfo o = (YearEstimateInfo) inO;
+		int result = 0;
+
+		if (years != null && o.getYears()!= null) {
+			result = this.years.compareTo(o.getYears());
+			if (result != 0) {
+				return result;
+			}
+		} else if (years == null && o.getYears()!= null) {
+			return -1;
+		} else if (years != null && o.getYears()== null) {
+			return 1;
+		}
+
+    	if (x0 != null && o.getX0()!= null) {
+			result = this.x0.compareTo(o.getX0());
+			if (result != 0) {
+				return result;
+			}
+    	} else if (x0 == null && o.getX0()!= null) {
+			return -1;
+		} else if (x0 != null && o.getX0()== null) {
+			return 1;
+		}
+
+    	if (x1 != null && o.getX1()!= null) {
+    		result = this.x1.compareTo(o.getX1());
+			if (result != 0) {
+				return result;
+			}
+    	} else if (x1 == null && o.getX1()!= null) {
+			return -1;
+		} else if (x1 != null && o.getX1()== null) {
+			return 1;
+		}
+
+    	if (x2 != null && o.getX2()!= null) {
+    		result = this.x2.compareTo(o.getX2());
+			if (result != 0) {
+				return result;
+			}
+    	} else if (x2 == null && o.getX2()!= null) {
+			return -1;
+		} else if (x2 != null && o.getX2()== null) {
+			return 1;
+		}
+
+    	if (x3 != null && o.getX3()!= null) {
+    		result = this.x3.compareTo(o.getX3());
+			if (result != 0) {
+				return result;
+			}
+    	} else if (x3 == null && o.getX3()!= null) {
+			return -1;
+		} else if (x3 != null && o.getX3()== null) {
+			return 1;
+		}
+
+    	if (x4 != null && o.getX4()!= null) {
+    		result = this.x4.compareTo(o.getX4());
+    	} else if (x4 == null && o.getX4()!= null) {
+			return -1;
+		} else if (x4 != null && o.getX4()== null) {
+			return 1;
+		}
+
+    	return result;
+	}
+
+
+    @Override
+    public int hashCode(){
+
+    	StringBuilder sb = new StringBuilder();
+
+    	if (years != null) {
+    		sb.append("years").append(years.toString());
+    	}
+    	if (count != null) {
+    		sb.append("count").append(count.toString());
+    	}
+    	if (censored != null) {
+    		sb.append("censored").append(censored.toString());
+    	}
+    	if (x0 != null) {
+    		sb.append("x0").append(x0.toString());
+    	}
+      	if (x1 != null) {
+    		sb.append("x1").append(x1.toString());
+    	}
+       	if (x2 != null) {
+    		sb.append("x2").append(x2.toString());
+    	}
+       	if (x3 != null) {
+    		sb.append("x3").append(x3.toString());
+    	}
+     	if (x4 != null) {
+    		sb.append("x4").append(x4.toString());
+    	}
+
+     	return sb.hashCode();
+
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+    	return compareTo((YearEstimateInfo)obj)  == 0;
+	}
+//
+//	public int compareTo(YearEstimateInfo o) {
+//
+//		int result = 0;
+//
+//		if (years != null && o.getYears()!= null) {
+//			result = this.years.compareTo(o.getYears());
+//			if (result != 0) {
+//				return result;
+//			}
+//		} else if (years == null && o.getYears()!= null) {
+//			return -1;
+//		} else if (years != null && o.getYears()== null) {
+//			return 1;
+//		}
+//
+//    	if (x0 != null && o.getX0()!= null) {
+//			result = this.x0.compareTo(o.getX0());
+//			if (result != 0) {
+//				return result;
+//			}
+//    	} else if (x0 == null && o.getX0()!= null) {
+//			return -1;
+//		} else if (x0 != null && o.getX0()== null) {
+//			return 1;
+//		}
+//
+//    	if (x1 != null && o.getX1()!= null) {
+//    		result = this.x1.compareTo(o.getX1());
+//			if (result != 0) {
+//				return result;
+//			}
+//    	} else if (x1 == null && o.getX1()!= null) {
+//			return -1;
+//		} else if (x1 != null && o.getX1()== null) {
+//			return 1;
+//		}
+//
+//    	if (x2 != null && o.getX2()!= null) {
+//    		result = this.x2.compareTo(o.getX2());
+//			if (result != 0) {
+//				return result;
+//			}
+//    	} else if (x2 == null && o.getX2()!= null) {
+//			return -1;
+//		} else if (x2 != null && o.getX2()== null) {
+//			return 1;
+//		}
+//
+//    	if (x3 != null && o.getX3()!= null) {
+//    		result = this.x3.compareTo(o.getX3());
+//			if (result != 0) {
+//				return result;
+//			}
+//    	} else if (x3 == null && o.getX3()!= null) {
+//			return -1;
+//		} else if (x3 != null && o.getX3()== null) {
+//			return 1;
+//		}
+//
+//    	if (x4 != null && o.getX4()!= null) {
+//    		result = this.x4.compareTo(o.getX4());
+//    	} else if (x4 == null && o.getX4()!= null) {
+//			return -1;
+//		} else if (x4 != null && o.getX4()== null) {
+//			return 1;
+//		}
+//
+//    	return result;
+//	}
 
 
 }

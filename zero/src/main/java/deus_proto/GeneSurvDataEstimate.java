@@ -124,7 +124,6 @@ public class GeneSurvDataEstimate {
 			// 退職
 			Y = 1;
 			map = retireCountMeisaiList.get(year);
-			set = map.entrySet();
 			makeSumList(yearRange, betaArr, pdCacheList, sumList, map, year, Y, -1);
 		}
 
@@ -151,11 +150,12 @@ public class GeneSurvDataEstimate {
 			// 退職
 			Y = 1;
 			map = retireCountMeisaiList.get(year);
-			set = map.entrySet();
 			makeSumList(yearRange, betaArr, pdCacheList, sumList, map, year, Y, -1);
 
 			// 昇順ソート
 			Collections.sort(sumList);
+			// パネルデータの総和部分
+			sigma = 0;
 
 			for (DDouble dd :sumList) {
 				sigma += dd.getValue();
@@ -177,13 +177,14 @@ public class GeneSurvDataEstimate {
 				// 退職
 				Y = 1;
 				map = retireCountMeisaiList.get(year);
-				set = map.entrySet();
+			//	set = map.entrySet();
 				makeSumList(yearRange, betaArr, pdCacheList, sumList, map, year, Y, xIndex);
 			}
 
 			// 昇順ソート
 			Collections.sort(sumList);
-
+			// パネルデータの総和部分
+			sigma = 0;
 			for (DDouble dd :sumList) {
 				sigma += dd.getValue();
 			}
@@ -191,10 +192,225 @@ public class GeneSurvDataEstimate {
 
 		}
 
-		for (int i = 0; i < retireCountList.size(); i++) {
-			System.out.println("" + i+":" + notRetireCountList.get(i) +
-					":" + retireCountList.get(i));
+		// 二階微分デルタ
+		// beta0(全体) × beta0(全体)
+
+		sumList.clear();
+
+		List<List<Double>> delta2BetaList = new ArrayList<List<Double>>();
+
+		// beta0(全体)
+
+
+		delta2BetaList.add(new ArrayList<Double>());
+
+		// beta0(全体) × beta0(全体)
+		sumList.clear();
+		for (int year = 0; year < yearRange; year++) {
+			// 継続
+			map = notRetireCountMeisaiList.get(year);
+			makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, year, -1, -1);
+
+			map = retireCountMeisaiList.get(year);
+			makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, year, -1, -1);
 		}
+
+		// 昇順ソート
+		Collections.sort(sumList);
+		// パネルデータの総和部分
+		sigma = 0;
+		for (DDouble dd :sumList) {
+			sigma += dd.getValue();
+		}
+		delta2BetaList.get(0).add(sigma);
+
+		// beta0(全体) × 経過月
+		for (int year = 0; year < yearRange; year++) {
+			sumList.clear();
+
+			// 継続
+			map = notRetireCountMeisaiList.get(year);
+			makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, year, -1,-1);
+
+			map = retireCountMeisaiList.get(year);
+			makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, year, -1,-1);
+
+			// 昇順ソート
+			Collections.sort(sumList);
+			// パネルデータの総和部分
+			sigma = 0;
+
+			for (DDouble dd :sumList) {
+				sigma += dd.getValue();
+			}
+
+			delta2BetaList.get(0).add(sigma);
+		}
+
+		// beta0(全体) × 共変量
+		for (int xIndex = 0; xIndex < HazardConst.RETIRE_X_INDEX_NUM; xIndex++) {
+			sumList.clear();
+			// 年数
+			for (int year = 0; year < yearRange; year++) {
+				// 継続中のデータなのでY=0
+				int Y = 0;
+				// 継続
+				map = notRetireCountMeisaiList.get(year);
+				makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, year, xIndex, -1);
+
+				// 退職
+				Y = 1;
+				map = retireCountMeisaiList.get(year);
+			//	set = map.entrySet();
+				makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, year, xIndex, -1);
+			}
+
+			// 昇順ソート
+			Collections.sort(sumList);
+			// パネルデータの総和部分
+			sigma = 0;
+			for (DDouble dd :sumList) {
+				sigma += dd.getValue();
+			}
+			delta2BetaList.get(0).add(sigma);
+		}
+
+
+		// 経過年
+		for (int nowYear = 0; nowYear < yearRange; nowYear++) {
+
+			delta2BetaList.add(new ArrayList<Double>());
+
+			// 経過年1×beta0
+			// =beta0×経過年1
+
+			delta2BetaList.get(nowYear+1).add(delta2BetaList.get(0).get(nowYear+1));
+
+			// 経過
+			for (int year = 0; year < yearRange; year++) {
+
+				if (nowYear != year) { // 経過年が違うと0を設定する。
+					delta2BetaList.get(nowYear+1).add(Double.valueOf(0));
+					continue;
+				}
+
+				sumList.clear();
+				// 継続
+				map = notRetireCountMeisaiList.get(nowYear);
+				makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, nowYear, -1, -1);
+
+				map = retireCountMeisaiList.get(nowYear);
+				makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, nowYear, -1, -1);
+
+				// 昇順ソート
+				Collections.sort(sumList);
+				// パネルデータの総和部分
+				sigma = 0;
+
+				for (DDouble dd :sumList) {
+					sigma += dd.getValue();
+				}
+
+				delta2BetaList.get(nowYear+1).add(sigma);
+			}
+
+			// 経過年0×共変量x
+			for (int xIndex = 0; xIndex < HazardConst.RETIRE_X_INDEX_NUM; xIndex++) {
+				sumList.clear();
+				// 経過
+				for (int year = 0; year < yearRange; year++) {
+					// 継続
+					map = notRetireCountMeisaiList.get(nowYear);
+					makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, nowYear, xIndex, -1);
+
+					// 退職
+					map = retireCountMeisaiList.get(nowYear);
+					//	set = map.entrySet();
+					makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, nowYear, xIndex, -1);
+
+				}
+
+				// 昇順ソート
+				Collections.sort(sumList);
+				// パネルデータの総和部分
+				sigma = 0;
+				for (DDouble dd :sumList) {
+					sigma += dd.getValue();
+				}
+				delta2BetaList.get(nowYear+1).add(sigma);
+			}
+		}
+
+		// 共変量
+		for (int nowXIndex = 0; nowXIndex < HazardConst.RETIRE_X_INDEX_NUM; nowXIndex++) {
+
+			delta2BetaList.add(new ArrayList<Double>());
+			//x0
+			// 共変量x0×beta0
+			// =beta0×共変量x0
+			delta2BetaList.get(delta2BetaList.size() - 1).add(delta2BetaList.get(0).get(delta2BetaList.size() - 1));
+
+			// 共変量x0×経過年
+			// =経過年×共変量x0
+			// 経過
+			for (int year = 0; year < yearRange; year++) {
+				delta2BetaList.get(delta2BetaList.size() - 1).add(delta2BetaList.get(year+1).get(delta2BetaList.size() - 1));
+			}
+
+			// 共変量x×共変量x
+			for (int xIndex = 0; xIndex < HazardConst.RETIRE_X_INDEX_NUM; xIndex++) {
+				sumList.clear();
+				for (int year = 0; year < yearRange; year++) {
+					// 継続
+					map = notRetireCountMeisaiList.get(year);
+					makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, year, nowXIndex, xIndex);
+
+					// 退職
+					map = retireCountMeisaiList.get(year);
+					//	set = map.entrySet();
+					makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, year, nowXIndex, xIndex);
+				}
+
+				// 昇順ソート
+				Collections.sort(sumList);
+				// パネルデータの総和部分
+				sigma = 0;
+				for (DDouble dd :sumList) {
+					sigma += dd.getValue();
+				}
+				delta2BetaList.get(delta2BetaList.size() - 1).add(sigma);
+			}
+		}
+
+
+
+		System.out.print("Δβ=(");
+		for (int i = 0; i < deltaBetaList.size(); i++) {
+			if (i < deltaBetaList.size()-1) {
+	    		System.out.print(deltaBetaList.get(i) +",");
+			} else {
+				System.out.println(deltaBetaList.get(i) + ")");
+			}
+		}
+		System.out.println("ΔΔβ=(");
+		for (int i = 0; i < delta2BetaList.size(); i++) {
+			List<Double> tempList = delta2BetaList.get(i);
+
+			System.out.print("(");
+			for (int j = 0; j < tempList.size(); j++) {
+				if (j < tempList.size()-1) {
+					System.out.print(tempList.get(j) +",");
+				} else {
+					System.out.println(tempList.get(j) + ")");
+				}
+			}
+		}
+		System.out.println(")");
+
+//		for (int i = 0; i < retireCountList.size(); i++) {
+//			System.out.println("" + i+":" + notRetireCountList.get(i) +
+//					":" + retireCountList.get(i));
+//		}
 
 	}
 
@@ -226,7 +442,7 @@ public class GeneSurvDataEstimate {
 			//  共変量(経過年の場合は1)
 			int x = 1;
 
-			if (xIndex >=0 && xList.get(xIndex).intValue() == 0) {
+			if (xIndex >=0) {
 				//
 				x = xList.get(xIndex).intValue();
 			}
@@ -238,7 +454,52 @@ public class GeneSurvDataEstimate {
 		}
 	}
 
+	private void makeSumList2(int yearRange, double[] betaArr, List<Map<YearEstimateInfo, Double>> pdCacheList,
+			List<DDouble> sumList, Map<YearEstimateInfo, Integer> map, int year, int xIndex0, int xIndex1) {
+		Set<Entry<YearEstimateInfo, Integer>> set;
+		set = map.entrySet();
+		for (Entry<YearEstimateInfo, Integer> entry  :set) {
 
+			List<Integer> xList = getXList(entry.getKey());
+
+			if (xIndex0 >=0 && xList.get(xIndex0).intValue() == 0) {
+				continue;
+			}
+			if (xIndex1 >=0 && xList.get(xIndex1).intValue() == 0) {
+				continue;
+			}
+
+
+			double pd = 0;
+			if (!pdCacheList.get(year).containsKey(entry.getKey())) {
+				// キャッシュに値がない
+				// PD計算
+				pd  = culcPD(betaArr, year, yearRange, xList);
+				pdCacheList.get(year).put(entry.getKey(), Double.valueOf(pd));
+			} else {
+				pd = pdCacheList.get(year).get(entry.getKey()).doubleValue();
+			}
+
+			//  共変量(経過年の場合は1)
+			int xi = 1;
+			int xj = 1;
+
+			if (xIndex0 >=0) {
+				//
+				xi = xList.get(xIndex0).intValue();
+			}
+			if (xIndex1 >=0) {
+				//
+				xj = xList.get(xIndex1).intValue();
+			}
+
+			// ∑i=1NPDi・(1−PDi)・Xi,j・Xi,jj
+			//		∂2L(β)∂βj∂βjj=∑i=1NPDi・(1−PDi)・Xi,j・Xi,jj
+			double v = pd * (1-pd) * xi * xj * entry.getValue().intValue();
+			// 今日
+			sumList.add(new DDouble(v));
+		}
+	}
 	private List<Integer> getXList(YearEstimateInfo info) {
 		List<Integer> result = new ArrayList<Integer>();
 		if (info.getX0() != null) {

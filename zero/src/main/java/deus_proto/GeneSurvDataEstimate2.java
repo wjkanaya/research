@@ -18,14 +18,14 @@ import mybatis.dao.MemberHistInfoDAO;
 import sim.HazardConst;
 import sim.Util;
 
-public class GeneSurvDataEstimate {
+public class GeneSurvDataEstimate2 {
 
 	public static void main(String[] args) {
 		// TODO 自動生成されたメソッド・スタブ
 
 		Util.startTransaction();
 		try {
-			GeneSurvDataEstimate gene = new GeneSurvDataEstimate();
+			GeneSurvDataEstimate2 gene = new GeneSurvDataEstimate2();
 			gene.excute();
 
 		} finally {
@@ -100,8 +100,9 @@ public class GeneSurvDataEstimate {
 		// 何か年か？
 		int yearRange = retireCountList.size();
 
-
-		int betaSize = 1 + retireCountList.size() + getXList(list.get(0)).size();
+		// beta0は0と仮定
+		//int betaSize = 1 + retireCountList.size() + getXList(list.get(0)).size();
+		int betaSize = retireCountList.size() + getXList(list.get(0)).size();
 
 		double[] betaArr = new double[betaSize];
 		for (int i = 0; i < betaArr.length; i++) {
@@ -135,30 +136,31 @@ public class GeneSurvDataEstimate {
 			Map<YearEstimateInfo, Integer> map = null;
 			Set<Entry<YearEstimateInfo, Integer>> set = null;
 
-			// デルタbeta0 (全体)
-			for (int year = 0; year < yearRange; year++) {
-				// 継続中のデータなのでY=0
-				int Y = 0;
-				// 継続
-				map = notRetireCountMeisaiList.get(year);
-				makeSumList(yearRange, betaArr, pdCacheList, sumList, map, year, Y, -1);
-
-				// 退職
-				Y = 1;
-				map = retireCountMeisaiList.get(year);
-				makeSumList(yearRange, betaArr, pdCacheList, sumList, map, year, Y, -1);
-			}
-
-			// 昇順ソート
-			Collections.sort(sumList);
-			// パネルデータの総和部分
+// beta0は0と仮定
+//			// デルタbeta0 (全体)
+//			for (int year = 0; year < yearRange; year++) {
+//				// 継続中のデータなのでY=0
+//				int Y = 0;
+//				// 継続
+//				map = notRetireCountMeisaiList.get(year);
+//				makeSumList(yearRange, betaArr, pdCacheList, sumList, map, year, Y, -1);
+//
+//				// 退職
+//				Y = 1;
+//				map = retireCountMeisaiList.get(year);
+//				makeSumList(yearRange, betaArr, pdCacheList, sumList, map, year, Y, -1);
+//			}
+//
+//			// 昇順ソート
+//			Collections.sort(sumList);
+//			// パネルデータの総和部分
 			double sigma = 0;
-
-			for (DDouble dd :sumList) {
-				sigma += dd.getValue();
-			}
-
-			deltaBetaList.add(Double.valueOf(-sigma));
+//
+//			for (DDouble dd :sumList) {
+//				sigma += dd.getValue();
+//			}
+//
+//			deltaBetaList.add(Double.valueOf(-sigma));
 
 			// 経過年数それぞれのデルタbeta
 			for (int year = 0; year < yearRange; year++) {
@@ -222,80 +224,80 @@ public class GeneSurvDataEstimate {
 			List<List<Double>> delta2BetaList = new ArrayList<List<Double>>();
 
 			// beta0(全体)
+//
+//
+//			delta2BetaList.add(new ArrayList<Double>());
+//
+//			// beta0(全体) × beta0(全体)
+//			sumList.clear();
+//			for (int year = 0; year < yearRange; year++) {
+//				// 継続
+//				map = notRetireCountMeisaiList.get(year);
+//				makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, year, -1, -1);
+//
+//				map = retireCountMeisaiList.get(year);
+//				makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, year, -1, -1);
+//			}
+//
+//			// 昇順ソート
+//			Collections.sort(sumList);
+//			// パネルデータの総和部分
+//			sigma = 0;
+//			for (DDouble dd :sumList) {
+//				sigma += dd.getValue();
+//			}
+//			delta2BetaList.get(0).add(sigma);
 
+//			// beta0(全体) × 経過月
+//			for (int year = 0; year < yearRange; year++) {
+//				sumList.clear();
+//
+//				// 継続
+//				map = notRetireCountMeisaiList.get(year);
+//				makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, year, -1,-1);
+//
+//				map = retireCountMeisaiList.get(year);
+//				makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, year, -1,-1);
+//
+//				// 昇順ソート
+//				Collections.sort(sumList);
+//				// パネルデータの総和部分
+//				sigma = 0;
+//
+//				for (DDouble dd :sumList) {
+//					sigma += dd.getValue();
+//				}
+//
+//				delta2BetaList.get(0).add(sigma);
+//			}
 
-			delta2BetaList.add(new ArrayList<Double>());
-
-			// beta0(全体) × beta0(全体)
-			sumList.clear();
-			for (int year = 0; year < yearRange; year++) {
-				// 継続
-				map = notRetireCountMeisaiList.get(year);
-				makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, year, -1, -1);
-
-				map = retireCountMeisaiList.get(year);
-				makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, year, -1, -1);
-			}
-
-			// 昇順ソート
-			Collections.sort(sumList);
-			// パネルデータの総和部分
-			sigma = 0;
-			for (DDouble dd :sumList) {
-				sigma += dd.getValue();
-			}
-			delta2BetaList.get(0).add(sigma);
-
-			// beta0(全体) × 経過月
-			for (int year = 0; year < yearRange; year++) {
-				sumList.clear();
-
-				// 継続
-				map = notRetireCountMeisaiList.get(year);
-				makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, year, -1,-1);
-
-				map = retireCountMeisaiList.get(year);
-				makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, year, -1,-1);
-
-				// 昇順ソート
-				Collections.sort(sumList);
-				// パネルデータの総和部分
-				sigma = 0;
-
-				for (DDouble dd :sumList) {
-					sigma += dd.getValue();
-				}
-
-				delta2BetaList.get(0).add(sigma);
-			}
-
-			// beta0(全体) × 共変量
-			for (int xIndex = 0; xIndex < HazardConst.RETIRE_X_INDEX_NUM; xIndex++) {
-				sumList.clear();
-				// 年数
-				for (int year = 0; year < yearRange; year++) {
-					// 継続中のデータなのでY=0
-					int Y = 0;
-					// 継続
-					map = notRetireCountMeisaiList.get(year);
-					makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, year, xIndex, -1);
-
-					// 退職
-					Y = 1;
-					map = retireCountMeisaiList.get(year);
-					//	set = map.entrySet();
-					makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, year, xIndex, -1);
-				}
-
-				// 昇順ソート
-				Collections.sort(sumList);
-				// パネルデータの総和部分
-				sigma = 0;
-				for (DDouble dd :sumList) {
-					sigma += dd.getValue();
-				}
-				delta2BetaList.get(0).add(sigma);
-			}
+//			// beta0(全体) × 共変量
+//			for (int xIndex = 0; xIndex < HazardConst.RETIRE_X_INDEX_NUM; xIndex++) {
+//				sumList.clear();
+//				// 年数
+//				for (int year = 0; year < yearRange; year++) {
+//					// 継続中のデータなのでY=0
+//					int Y = 0;
+//					// 継続
+//					map = notRetireCountMeisaiList.get(year);
+//					makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, year, xIndex, -1);
+//
+//					// 退職
+//					Y = 1;
+//					map = retireCountMeisaiList.get(year);
+//					//	set = map.entrySet();
+//					makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, year, xIndex, -1);
+//				}
+//
+//				// 昇順ソート
+//				Collections.sort(sumList);
+//				// パネルデータの総和部分
+//				sigma = 0;
+//				for (DDouble dd :sumList) {
+//					sigma += dd.getValue();
+//				}
+//				delta2BetaList.get(0).add(sigma);
+//			}
 
 
 			// 経過年
@@ -304,15 +306,17 @@ public class GeneSurvDataEstimate {
 				delta2BetaList.add(new ArrayList<Double>());
 
 				// 経過年1×beta0
-				// =beta0×経過年1
-
-				delta2BetaList.get(nowYear+1).add(delta2BetaList.get(0).get(nowYear+1));
+//				// =beta0×経過年1
+//
+//				delta2BetaList.get(nowYear+1).add(delta2BetaList.get(0).get(nowYear+1));
 
 				// 経過
 				for (int year = 0; year < yearRange; year++) {
 
 					if (nowYear != year) { // 経過年が違うと0を設定する。
-						delta2BetaList.get(nowYear+1).add(Double.valueOf(0));
+						// delta2BetaList.get(nowYear+1).add(Double.valueOf(0));
+						delta2BetaList.get(nowYear).add(Double.valueOf(0));
+
 						continue;
 					}
 
@@ -333,7 +337,8 @@ public class GeneSurvDataEstimate {
 						sigma += dd.getValue();
 					}
 
-					delta2BetaList.get(nowYear+1).add(sigma);
+				//	delta2BetaList.get(nowYear+1).add(sigma);
+					delta2BetaList.get(nowYear).add(sigma);
 				}
 
 				// 経過年0×共変量x
@@ -359,7 +364,9 @@ public class GeneSurvDataEstimate {
 					for (DDouble dd :sumList) {
 						sigma += dd.getValue();
 					}
-					delta2BetaList.get(nowYear+1).add(sigma);
+					// delta2BetaList.get(nowYear+1).add(sigma);
+					delta2BetaList.get(nowYear).add(sigma);
+
 				}
 			}
 
@@ -367,16 +374,18 @@ public class GeneSurvDataEstimate {
 			for (int nowXIndex = 0; nowXIndex < HazardConst.RETIRE_X_INDEX_NUM; nowXIndex++) {
 
 				delta2BetaList.add(new ArrayList<Double>());
-				//x0
-				// 共変量x0×beta0
-				// =beta0×共変量x0
-				delta2BetaList.get(delta2BetaList.size() - 1).add(delta2BetaList.get(0).get(delta2BetaList.size() - 1));
+//				//x0
+//				// 共変量x0×beta0
+//				// =beta0×共変量x0
+//				delta2BetaList.get(delta2BetaList.size() - 1).add(delta2BetaList.get(0).get(delta2BetaList.size() - 1));
 
 				// 共変量x0×経過年
 				// =経過年×共変量x0
 				// 経過
 				for (int year = 0; year < yearRange; year++) {
-					delta2BetaList.get(delta2BetaList.size() - 1).add(delta2BetaList.get(year+1).get(delta2BetaList.size() - 1));
+//					delta2BetaList.get(delta2BetaList.size() - 1).add(delta2BetaList.get(year+1).get(delta2BetaList.size() - 1));
+					delta2BetaList.get(delta2BetaList.size() - 1).add(delta2BetaList.get(year).get(delta2BetaList.size() - 1));
+
 				}
 
 				// 共変量x×共変量x
@@ -521,7 +530,14 @@ public class GeneSurvDataEstimate {
 				pd  = culcPD(betaArr, year, yearRange, xList);
 				pdCacheList.get(year).put(entry.getKey(), Double.valueOf(pd));
 			} else {
+				try {
 				pd = pdCacheList.get(year).get(entry.getKey()).doubleValue();
+				}catch (Exception e) {
+
+					e.printStackTrace();
+					System.out.println("year = " + year);
+					System.out.println("key = " + entry.getKey());
+				}
 			}
 
 			//  共変量(経過年の場合は1)
@@ -563,7 +579,11 @@ public class GeneSurvDataEstimate {
 				pdCacheList.get(year).put(entry.getKey(), Double.valueOf(pd));
 			} else {
 
+				try {
 				pd = pdCacheList.get(year).get(entry.getKey()).doubleValue();
+				}catch (Exception e) {
+					e.printStackTrace();
+				}
 
 			}
 
@@ -622,12 +642,15 @@ public class GeneSurvDataEstimate {
 		// 絶対値が小さいほうから足す
 		List<DDouble> resultList = new ArrayList<DDouble>();
 
-		resultList.add(new DDouble(betaArr[0]));
+		//resultList.add(new DDouble(betaArr[0]));
+		resultList.add(new DDouble(1.0));
+//		resultList.add(new DDouble(betaArr[year + 1]));
+		resultList.add(new DDouble(betaArr[year]));
 
-		resultList.add(new DDouble(betaArr[year + 1]));
 
 		for (int i = 0; i < xlist.size(); i++) {
-			double v = betaArr[yearRange + 1 + i] * xlist.get(i).intValue();
+//			double v = betaArr[yearRange + 1 + i] * xlist.get(i).intValue();
+			double v = betaArr[yearRange + i] * xlist.get(i).intValue();
 			resultList.add(new DDouble(v));
 		}
 
@@ -643,54 +666,5 @@ public class GeneSurvDataEstimate {
 
 }
 
-//class DDouble implements Comparable<DDouble> {
-//
-//	public DDouble(double value)  {
-//		this.value = value;
-//		this.square = value * value;
-//	}
-//
-//	double square;
-//	double value;
-//
-//	public double getSquare() {
-//		return square;
-//	}
-//
-//	public void setSquare(double square) {
-//		this.square = square;
-//	}
-//
-//	public double getValue() {
-//		return value;
-//	}
-//
-//	public void setValue(double value) {
-//		this.value = value;
-//	}
-//
-//
-//	public boolean equals(Object anObject) {
-//		if (this == anObject) {
-//			return true;
-//		}
-//		if (anObject instanceof DDouble) {
-//			DDouble m = (DDouble)anObject;
-//			return m.square == this.square;
-//		}
-//		return false;
-//	}
-//
-//	public int compareTo(DDouble o) {
-//
-//		DDouble dd = (DDouble)o;
-//
-//		if (this.square < dd.square) {
-//			return -1;
-//		} else if ( this.square > dd.square) {
-//			return 1;
-//		} else {
-//			return 0;
-//		}
-//
-//	}
+
+

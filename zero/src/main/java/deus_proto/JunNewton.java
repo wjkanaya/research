@@ -66,7 +66,7 @@ public class JunNewton {
 			//
 //			    vectr = - H @ delta(nowp)
 			RealMatrix vectorMat =
-					hMat.multiply(MatrixUtils.createRealMatrix(delta(nowPMat.getData())))
+					hMat.multiply(delta(nowPMat))
 					.scalarMultiply(-1);
 
 
@@ -144,7 +144,9 @@ public class JunNewton {
 //		    end_sa = 0.00001
 			double end_sa = 0.00001;
 //		    for i in range(100):
+			nowI = 0;
 			for (int i = 0; i < 100; i++) {
+				nowI = i;
 				//
 //		        # 終末確認
 //		        sa = np.sqrt(((al_e - al_s) ** 2).sum())
@@ -165,17 +167,46 @@ public class JunNewton {
 				//
 //		        #中間点１を通る2次式の最小値
 //		        min_hokan_a = min(al_s,alf(al_s),al_a,alf(al_a),al_e,alf(al_e))
+				RealMatrix min_hokan_a =
+						min(al_s,alf(al_s.getData()),al_a,alf(al_a.getData()),al_e,alf(al_e.getData()));
 		//
 //		        #中間点２を通る2次式の最小値
 //		        min_hokan_b = min(al_s,alf(al_s),al_b,alf(al_b),al_e,alf(al_e))
+
+				RealMatrix min_hokan_b =
+						min(al_s,alf(al_s.getData()),al_b,alf(al_b.getData()),al_e,alf(al_e.getData()));
 		//
 //		        if alf(al_a) > alf(al_b):
 //		            al_s = al_a
 //		        else:
 //		            al_e = al_b
+				if (alf(al_a.getData()) > alf(al_b.getData())) {
+					al_s = al_a;
+				} else {
+					al_e = al_b;
+				}
 			}
 
+//		    #print(" 計算回数:" + str(i))
+//		    print("終点s：" + str(al_s) + " 値s:" + str(alf(al_s)) + " 計算回数:" + str(i))
+			System.out.println("終点s：" + al_s + " 値s:" + alf(al_s.getData()) + " 計算回数:" + nowI);
 
+
+//		    print("終点e：" + str(al_e) + " 値e:" + str(alf(al_e)) + " 計算回数:" + str(i))
+			System.out.println("終点e：" + al_e + " 値e:" + alf(al_e.getData()) + " 計算回数:" + nowI);
+		//
+		//
+//		    prep = nowp
+			RealMatrix prepMat = nowPMat.copy();
+
+//		    nowp = (al_s + al_e) / 2
+			nowPMat = al_s.subtract(al_e).scalarMultiply(0.5);
+
+		//
+		//
+//		    H =bfgs(nowp,prep,H)
+
+			hMat = bfgs(nowPMat,prepMat, hMat);
 		//
 
 		//
@@ -190,6 +221,46 @@ public class JunNewton {
 	}
 
 //
+
+//def bfgs(nowp,prep,preH):
+//  s = nowp - prep
+//  y = delta(nowp) - delta(prep)
+//  beta = s.T @ y
+//  gamma = y.T @ preH @ y
+//  H = preH - siki1(preH, y, s, beta) + siki2(beta, gamma, s)
+//  return H
+//
+
+	private static RealMatrix bfgs(RealMatrix nowPMat,RealMatrix prepMat,RealMatrix preHMat) {
+		RealMatrix s = nowPMat.subtract(prepMat);
+		RealMatrix y = delta(nowPMat).subtract(delta(prepMat));
+		double beta = s.transpose().multiply(y).getEntry(0, 0); // 1×1の行列になっているはず
+
+		double gamma = y.transpose().multiply(preHMat).multiply(y)
+				.getEntry(0, 0);// 1×1の行列になっているはず
+
+		RealMatrix H = prepMat.subtract(siki1(preHMat, y, s, beta)).add(siki2(beta, gamma, s));
+
+		return H;
+	}
+
+	//def siki1(preH,y,s, beta):
+//  return (preH @ y @ s.T + s @ y.T @ preH) / beta
+
+	private static RealMatrix siki1(RealMatrix preHMat,RealMatrix y,RealMatrix s,double beta) {
+
+		return preHMat.multiply(y).multiply(s.transpose()).add(s.multiply(y.transpose())
+				.multiply(preHMat)).scalarMultiply(1/beta);
+	}
+
+	//
+//def siki2(beta, gamma, s):
+//  return ((beta + gamma) / (beta ** 2))  * (s @ s.T)
+	private static RealMatrix siki2(double beta, double  gamma, RealMatrix s) {
+		return s.multiply(s.transpose()).scalarMultiply((beta + gamma)/ Math.pow(beta, 2));
+
+	}
+
 
 
 	//# 対象数式
@@ -224,12 +295,13 @@ public class JunNewton {
 	}
 
 
-	private static double[][] delta(double[][]  x) {
+	private static RealMatrix delta(RealMatrix  xMat) {
+		double[][] x = xMat.getData();
 		double[][] d = new double[2][1];
 		d[0][0] = 2*x[0][0] - x[1][0] + 1;
 		d[1][0] = 4*x[1][0] - x[0][0] - 2;
 
-		return d;
+		return MatrixUtils.createRealMatrix(d);
 	}
 
 	//# 3点を通る2次数式の最小値
@@ -245,8 +317,12 @@ public class JunNewton {
 				.add(MatUtil.matBroPow(al_s,2).subtract(MatUtil.matBroPow(al_m,2)).scalarMultiply(f_e));
 
 
+		RealMatrix mother = al_m.subtract(al_e).scalarMultiply(f_s).add(al_e.subtract(al_s).scalarMultiply(f_m)).
+				add(al_s.subtract(al_m).scalarMultiply(f_e)).scalarMultiply(2);
 
-		return null;
+		result = MatUtil.matBroDiv(child, mother);
+
+		return result;
 	}
 
 

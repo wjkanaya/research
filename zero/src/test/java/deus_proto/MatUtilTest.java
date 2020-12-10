@@ -15,8 +15,21 @@ public class MatUtilTest extends TestCase {
 
 	public void testMatSub() {
 //		fail("まだ実装されていません");
+
+		double[][] A = new double[2][1];
+
+		A[0][0] = 4;
+		A[1][0] = 6;
+		RealMatrix AMat = MatrixUtils.createRealMatrix(A);
+
+		System.out.println("sfad :" +AMat.multiply(AMat.transpose()));
+
+
 	}
 
+	
+	
+	
 	public void testMatMulti() {
 //		fail("まだ実装されていません");
 		double[][] A = new double[2][2];

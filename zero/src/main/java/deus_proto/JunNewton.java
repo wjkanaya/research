@@ -11,6 +11,11 @@ public class JunNewton {
 	public static void main(String[] args) throws Exception {
 
 
+		
+		
+		
+		
+		
 		//gpx = []
 		List<Double> gpx = new ArrayList<Double>();
 

@@ -18,14 +18,14 @@ import mybatis.dao.MemberHistInfoDAO;
 import sim.HazardConst;
 import sim.Util;
 
-public class GeneSurvDataEstimate {
+public class GeneSurvDataEstimateNewton {
 
 	public static void main(String[] args) {
 		// TODO 自動生成されたメソッド・スタブ
 
 		Util.startTransaction();
 		try {
-			GeneSurvDataEstimate gene = new GeneSurvDataEstimate();
+			GeneSurvDataEstimateNewton gene = new GeneSurvDataEstimateNewton();
 			gene.excute();
 
 		} finally {
@@ -611,7 +611,7 @@ public class GeneSurvDataEstimate {
 
 
 	private double culcPD(double[] betaArr, int year, int yearRange, List<Integer> xlist ) {
-		return 1 / ( 1  +  culcZ(betaArr, year, yearRange, xlist));
+		return 1 / ( 1  +  Math.exp(-culcZ(betaArr, year, yearRange, xlist)));
 
 	}
 

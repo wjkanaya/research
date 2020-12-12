@@ -3,7 +3,9 @@
 <Configuration status="OFF">
 	<Properties>
 	<!--	<Property name="ptn">%d{yyyy-MM-dd HH:mm:ss.SSS} p=%-5p c=%c t=%t C=%C F=%F M=%M L=%L m=%m %n</Property> -->
-		<Property name="ptn">%d{yyyy-MM-dd HH:mm:ss.SSS} :p=%-5p C=%C  m=%m %n</Property>
+		<!-- <Property name="ptn">%d{yyyy-MM-dd HH:mm:ss.SSS} :p=%-5p C=%C  m=%m %n</Property>-->
+			<Property name="ptn">p=%-5p C=%C  m=%m %n</Property>
+
 	</Properties>
 	<Appenders>
 		<Console name="console" target="SYSTEM_OUT">

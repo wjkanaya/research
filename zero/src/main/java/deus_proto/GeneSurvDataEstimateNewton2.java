@@ -18,14 +18,14 @@ import mybatis.dao.MemberHistInfoDAO;
 import sim.HazardConst;
 import sim.Util;
 
-public class GeneSurvDataEstimate2 {
+public class GeneSurvDataEstimateNewton2 {
 
 	public static void main(String[] args) {
 		// TODO 自動生成されたメソッド・スタブ
 
 		Util.startTransaction();
 		try {
-			GeneSurvDataEstimate2 gene = new GeneSurvDataEstimate2();
+			GeneSurvDataEstimateNewton2 gene = new GeneSurvDataEstimateNewton2();
 			gene.excute();
 
 		} finally {
@@ -113,6 +113,13 @@ public class GeneSurvDataEstimate2 {
 		int num = 0;
 		int max = 100000;
 		do {
+			// PD計算キャッシュ
+			// betaArrの値が変わるたびに更新してください。
+			List<Map<YearEstimateInfo, Double>> pdCacheList =
+					new ArrayList<Map<YearEstimateInfo, Double>>();
+			for (int year = 0; year < yearRange; year++) {
+				pdCacheList.add(new HashMap<YearEstimateInfo, Double>());
+			}
 
 			// 1階微分
 			//double[] deltaBetaArr = new double[betaSize];
@@ -120,53 +127,17 @@ public class GeneSurvDataEstimate2 {
 
 			// deltaBetaArr[0] = − （iが1からNまでの総和）(PDi−Yi)*1
 
-
-
-			// PD計算キャッシュ
-			// betaArrの値が変わるたびに更新してください。
-			List<Map<YearEstimateInfo, Double>> pdCacheList =
-					new ArrayList<Map<YearEstimateInfo, Double>>();
-
-			for (int year = 0; year < yearRange; year++) {
-				pdCacheList.add(new HashMap<YearEstimateInfo, Double>());
-			}
-
-
 			List<DDouble> sumList = new ArrayList<DDouble>();
-			Map<YearEstimateInfo, Integer> map = null;
-			Set<Entry<YearEstimateInfo, Integer>> set = null;
 
-// beta0は0と仮定
-//			// デルタbeta0 (全体)
-//			for (int year = 0; year < yearRange; year++) {
-//				// 継続中のデータなのでY=0
-//				int Y = 0;
-//				// 継続
-//				map = notRetireCountMeisaiList.get(year);
-//				makeSumList(yearRange, betaArr, pdCacheList, sumList, map, year, Y, -1);
-//
-//				// 退職
-//				Y = 1;
-//				map = retireCountMeisaiList.get(year);
-//				makeSumList(yearRange, betaArr, pdCacheList, sumList, map, year, Y, -1);
-//			}
-//
-//			// 昇順ソート
-//			Collections.sort(sumList);
 //			// パネルデータの総和部分
 			double sigma = 0;
-//
-//			for (DDouble dd :sumList) {
-//				sigma += dd.getValue();
-//			}
-//
-//			deltaBetaList.add(Double.valueOf(-sigma));
 
 			// 経過年数それぞれのデルタbeta
 			for (int year = 0; year < yearRange; year++) {
 				sumList.clear();
 				// 継続中のデータなのでY=0
 				int Y = 0;
+				Map<YearEstimateInfo, Integer> map = null;
 				// 継続
 				map = notRetireCountMeisaiList.get(year);
 				makeSumList(yearRange, betaArr, pdCacheList, sumList, map, year, Y, -1);
@@ -194,6 +165,7 @@ public class GeneSurvDataEstimate2 {
 				for (int year = 0; year < yearRange; year++) {
 					// 継続中のデータなのでY=0
 					int Y = 0;
+					Map<YearEstimateInfo, Integer> map = null;
 					// 継続
 					map = notRetireCountMeisaiList.get(year);
 					makeSumList(yearRange, betaArr, pdCacheList, sumList, map, year, Y, xIndex);
@@ -322,6 +294,7 @@ public class GeneSurvDataEstimate2 {
 
 					sumList.clear();
 					// 継続
+					Map<YearEstimateInfo, Integer> map = null;
 					map = notRetireCountMeisaiList.get(nowYear);
 					makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, nowYear, -1, -1);
 
@@ -347,6 +320,7 @@ public class GeneSurvDataEstimate2 {
 					// 経過
 					for (int year = 0; year < yearRange; year++) {
 						// 継続
+						Map<YearEstimateInfo, Integer> map = null;
 						map = notRetireCountMeisaiList.get(nowYear);
 						makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, nowYear, xIndex, -1);
 
@@ -393,6 +367,7 @@ public class GeneSurvDataEstimate2 {
 					sumList.clear();
 					for (int year = 0; year < yearRange; year++) {
 						// 継続
+						Map<YearEstimateInfo, Integer> map = null;
 						map = notRetireCountMeisaiList.get(year);
 						makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, year, nowXIndex, xIndex);
 
@@ -631,7 +606,7 @@ public class GeneSurvDataEstimate2 {
 
 
 	private double culcPD(double[] betaArr, int year, int yearRange, List<Integer> xlist ) {
-		return 1 / ( 1  +  culcZ(betaArr, year, yearRange, xlist));
+		return 1 / ( 1  +  Math.exp(-culcZ(betaArr, year, yearRange, xlist)));
 
 	}
 
@@ -643,7 +618,7 @@ public class GeneSurvDataEstimate2 {
 		List<DDouble> resultList = new ArrayList<DDouble>();
 
 		//resultList.add(new DDouble(betaArr[0]));
-		resultList.add(new DDouble(1.0));
+		//resultList.add(new DDouble(1.0));
 //		resultList.add(new DDouble(betaArr[year + 1]));
 		resultList.add(new DDouble(betaArr[year]));
 

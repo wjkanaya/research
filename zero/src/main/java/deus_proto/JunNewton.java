@@ -8,7 +8,7 @@ import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 
 public class JunNewton {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 
 
 		//gpx = []
@@ -36,7 +36,7 @@ public class JunNewton {
 		double[][] nowp = new double[2][1];
 
 		//nowp[0,0] = -10
-		nowp[0][0] = 10.0;
+		nowp[0][0] = -10.0;
 		//nowp[1,0] = 0
 		nowp[1][0] = 0;
 		RealMatrix nowPMat = MatrixUtils.createRealMatrix(nowp);
@@ -120,7 +120,9 @@ public class JunNewton {
 //		        p2 = p3
 		//
 //		        p3 = nowp + (i + 3) * vectr * h
-		        p3 = nowPMat.add(vectorMat.scalarMultiply((i + 3) * h));
+		        h *= 2;
+
+		        p3 = p3.add(vectorMat.scalarMultiply(h));
 		//
 
 			}
@@ -145,7 +147,7 @@ public class JunNewton {
 			double end_sa = 0.00001;
 //		    for i in range(100):
 			nowI = 0;
-			for (int i = 0; i < 100; i++) {
+			for (int i = 0; i < 1000; i++) {
 				nowI = i;
 				//
 //		        # 終末確認
@@ -200,10 +202,17 @@ public class JunNewton {
 			RealMatrix prepMat = nowPMat.copy();
 
 //		    nowp = (al_s + al_e) / 2
-			nowPMat = al_s.subtract(al_e).scalarMultiply(0.5);
+			nowPMat = al_s.add(al_e).scalarMultiply(0.5);
 
-		//
-		//
+
+			double sa = prepMat.subtract(nowPMat).getColumnVector(0).getNorm();
+	//
+//	        if sa < end_sa:
+//	            break
+			if(sa < end_sa) {
+				break;
+			}
+
 //		    H =bfgs(nowp,prep,H)
 
 			hMat = bfgs(nowPMat,prepMat, hMat);
@@ -211,12 +220,11 @@ public class JunNewton {
 
 		//
 
-
 		}
-
+		nowp = nowPMat.getData();
 		//print("最終点：" + str(nowp) + " 値:" + str(alf(nowp)))
-		System.out.println("最終点：" + str(nowp) + " 値:" + str(alf(nowp)));
-
+//		System.out.println("最終点：" + str(nowp) + " 値:" + str(alf(nowp)));
+		System.out.println("最終点：" + nowPMat + " 値:"  + alf(nowPMat.getData()));
 
 	}
 
@@ -234,12 +242,21 @@ public class JunNewton {
 	private static RealMatrix bfgs(RealMatrix nowPMat,RealMatrix prepMat,RealMatrix preHMat) {
 		RealMatrix s = nowPMat.subtract(prepMat);
 		RealMatrix y = delta(nowPMat).subtract(delta(prepMat));
+
+		System.out.println( "s:" + s  );
+		System.out.println( "y:" + y  );
+
+
 		double beta = s.transpose().multiply(y).getEntry(0, 0); // 1×1の行列になっているはず
 
 		double gamma = y.transpose().multiply(preHMat).multiply(y)
 				.getEntry(0, 0);// 1×1の行列になっているはず
+		System.out.println( "preHMat:" + preHMat  );
+		System.out.println( "siki1:" +   siki1(preHMat, y, s, beta)  );
 
-		RealMatrix H = prepMat.subtract(siki1(preHMat, y, s, beta)).add(siki2(beta, gamma, s));
+		System.out.println( "siki2:" +   siki2(beta, gamma, s)  )
+		;
+		RealMatrix H = preHMat.subtract(siki1(preHMat, y, s, beta)).add(siki2(beta, gamma, s));
 
 		return H;
 	}

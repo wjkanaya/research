@@ -11,11 +11,12 @@ public class JunNewton {
 	public static void main(String[] args) throws Exception {
 
 
-		
-		
-		
-		
-		
+		GeneSurvDataEstimate est = new GeneSurvDataEstimate();
+
+		est.getData();
+		est.makeData();
+
+
 		//gpx = []
 		List<Double> gpx = new ArrayList<Double>();
 
@@ -31,8 +32,8 @@ public class JunNewton {
 		I[0][0] = 1.0;
 		I[1][1] = 1.0;
 
-		double[][] H = I;
-		//
+	//	double[][] H = I;
+		RealMatrix hMat = MatrixUtils.createRealIdentityMatrix(est.getBetaSize());
 		//#定数、黄金比
 		double gold = 0.618034;
 		int h = 1;
@@ -44,7 +45,7 @@ public class JunNewton {
 		nowp[0][0] = -10.0;
 		//nowp[1,0] = 0
 		nowp[1][0] = 0;
-		RealMatrix nowPMat = MatrixUtils.createRealMatrix(nowp);
+		RealMatrix nowPMat = MatrixUtils.createRealMatrix(est.getBetaSize(), 1);
 
 		//for j in range(10):
 		for (int j = 0; j < 10; j++) {
@@ -58,7 +59,7 @@ public class JunNewton {
 			gpy.add(nowPMat.getEntry(1, 0));
 			//
 //			    w, v = LA.eig(H)
-			RealMatrix hMat = MatrixUtils.createRealMatrix(H);
+
 			EigenDecomposition hMatEd = new EigenDecomposition(hMat);
 
 			//			    print("固有値:" + str(w))
@@ -71,7 +72,7 @@ public class JunNewton {
 			//
 //			    vectr = - H @ delta(nowp)
 			RealMatrix vectorMat =
-					hMat.multiply(delta(nowPMat))
+					hMat.multiply(est.delta(nowPMat))
 					.scalarMultiply(-1);
 
 
@@ -89,15 +90,21 @@ public class JunNewton {
 //			    p1 = nowp + 0 * vectr * h
 
 			RealMatrix p1 = nowPMat.add(vectorMat.scalarMultiply(0*h));
+			double L1 = est.L(p1.getData());
+
 //		    p2 = nowp + 1 * vectr * h
 			RealMatrix p2 = nowPMat.add(vectorMat.scalarMultiply(1*h));
-//
+            double L2 = est.L(p2.getData());
+
 //		    p3 = nowp + 2 * vectr * h
 			RealMatrix p3 = nowPMat.add(vectorMat.scalarMultiply(2*h));
+			double L3 = est.L(p3.getData());
 
 
 			RealMatrix al_s = null;
 			RealMatrix al_e = null;
+			double alsL = 0;
+			double aleL = 0;
 
 			int nowI = 0;
 //		    for i in range(1000):
@@ -105,21 +112,27 @@ public class JunNewton {
 				nowI = i;
 				//
 //			        if alf(p1) < alf(p2):
-				if (alf(p1.getData()) < alf(p2.getData())) {
+				if (L1 < L2) {
 		            al_s = p1;
+		            alsL = L1;
 				    al_e = p2;
+				    aleL = L2;
 				    break;
 				}
 			//
 //			        if alf(p1) > alf(p2) and alf(p2) < alf(p3):
-				if (alf(p1.getData()) > alf(p2.getData()) && alf(p2.getData()) < alf(p3.getData())) {
+				if (L1 > L2 && L2 < L3) {
 		            al_s = p1;
+		            alsL = L1;
 		            al_e = p3;
+		            aleL = L3;
 		            break;
 				}
 
 		        p1 = p2;
+		        L1 = L2;
 		        p2 = p3;
+		        L2 = L3;
 
 //		        p1 = p2
 //		        p2 = p3
@@ -128,7 +141,8 @@ public class JunNewton {
 		        h *= 2;
 
 		        p3 = p3.add(vectorMat.scalarMultiply(h));
-		//
+		        L3 = est.L(p3.getData());
+		        //
 
 			}
 
@@ -168,26 +182,33 @@ public class JunNewton {
 //		        #中間点1,2を計算
 //		        al_a = al_s + (al_e - al_s) * (1-gold)
 				RealMatrix al_a = al_s.add(al_e.subtract(al_s).scalarMultiply(1-gold));
+				double alaL = est.L(al_a.getData());
 
 //		        al_b = al_s + (al_e - al_s) * gold
 				RealMatrix al_b = al_s.add(al_e.subtract(al_s).scalarMultiply(gold));
+				double albL = est.L(al_b.getData());
+
 				//
 //		        #中間点１を通る2次式の最小値
 //		        min_hokan_a = min(al_s,alf(al_s),al_a,alf(al_a),al_e,alf(al_e))
 				RealMatrix min_hokan_a =
-						min(al_s,alf(al_s.getData()),al_a,alf(al_a.getData()),al_e,alf(al_e.getData()));
+						min(al_s, alsL, al_a, alaL, al_e, aleL);
+//				min(al_s,alf(al_s.getData()),al_a,alf(al_a.getData()),al_e,alf(al_e.getData()));
 		//
 //		        #中間点２を通る2次式の最小値
 //		        min_hokan_b = min(al_s,alf(al_s),al_b,alf(al_b),al_e,alf(al_e))
 
 				RealMatrix min_hokan_b =
-						min(al_s,alf(al_s.getData()),al_b,alf(al_b.getData()),al_e,alf(al_e.getData()));
-		//
+						min(al_s, alsL, al_b, albL, al_e, aleL);
+//				min(al_s,alf(al_s.getData()),al_b,alf(al_b.getData()),al_e,alf(al_e.getData()));
+
+
+				//
 //		        if alf(al_a) > alf(al_b):
 //		            al_s = al_a
 //		        else:
 //		            al_e = al_b
-				if (alf(al_a.getData()) > alf(al_b.getData())) {
+				if (alaL > albL) {
 					al_s = al_a;
 				} else {
 					al_e = al_b;
@@ -196,11 +217,11 @@ public class JunNewton {
 
 //		    #print(" 計算回数:" + str(i))
 //		    print("終点s：" + str(al_s) + " 値s:" + str(alf(al_s)) + " 計算回数:" + str(i))
-			System.out.println("終点s：" + al_s + " 値s:" + alf(al_s.getData()) + " 計算回数:" + nowI);
+			System.out.println("終点s：" + al_s + " 値s:" +alsL + " 計算回数:" + nowI);
 
 
 //		    print("終点e：" + str(al_e) + " 値e:" + str(alf(al_e)) + " 計算回数:" + str(i))
-			System.out.println("終点e：" + al_e + " 値e:" + alf(al_e.getData()) + " 計算回数:" + nowI);
+			System.out.println("終点e：" + al_e + " 値e:" + aleL + " 計算回数:" + nowI);
 		//
 		//
 //		    prep = nowp
@@ -220,7 +241,7 @@ public class JunNewton {
 
 //		    H =bfgs(nowp,prep,H)
 
-			hMat = bfgs(nowPMat,prepMat, hMat);
+			hMat = bfgs(est, nowPMat,prepMat, hMat);
 		//
 
 		//
@@ -229,7 +250,7 @@ public class JunNewton {
 		nowp = nowPMat.getData();
 		//print("最終点：" + str(nowp) + " 値:" + str(alf(nowp)))
 //		System.out.println("最終点：" + str(nowp) + " 値:" + str(alf(nowp)));
-		System.out.println("最終点：" + nowPMat + " 値:"  + alf(nowPMat.getData()));
+		System.out.println("最終点：" + nowPMat + " 値:"  + est.L(nowPMat.getData()));
 
 	}
 
@@ -244,9 +265,9 @@ public class JunNewton {
 //  return H
 //
 
-	private static RealMatrix bfgs(RealMatrix nowPMat,RealMatrix prepMat,RealMatrix preHMat) {
+	private static RealMatrix bfgs(GeneSurvDataEstimate est, RealMatrix nowPMat,RealMatrix prepMat,RealMatrix preHMat) {
 		RealMatrix s = nowPMat.subtract(prepMat);
-		RealMatrix y = delta(nowPMat).subtract(delta(prepMat));
+		RealMatrix y = est.delta(nowPMat).subtract(est.delta(prepMat));
 
 		System.out.println( "s:" + s  );
 		System.out.println( "y:" + y  );
@@ -284,13 +305,13 @@ public class JunNewton {
 	}
 
 
-
-	//# 対象数式
-	private static double alf(double[][] al) {
-//	    #return 20 - al[0] - (10/(al[0]-10.9))
-//	    #return al[0,0]**2 + 2 * al[1,0]**2 - al[0,0]*al[1,0] + al[0,0] -2 * al[1,0]
-	    return al[0][0]*al[0][0] + 2 * al[1][0]*al[1][0] - al[0][0]*al[1][0] + al[0][0] -2 * al[1][0];
-	}
+//
+//	//# 対象数式
+//	private static double alf(double[][] al) {
+////	    #return 20 - al[0] - (10/(al[0]-10.9))
+////	    #return al[0,0]**2 + 2 * al[1,0]**2 - al[0,0]*al[1,0] + al[0,0] -2 * al[1,0]
+//	    return al[0][0]*al[0][0] + 2 * al[1][0]*al[1][0] - al[0][0]*al[1][0] + al[0][0] -2 * al[1][0];
+//	}
 
 	private static String str(double[][] al) {
 		StringBuilder sb = new StringBuilder();
@@ -317,14 +338,7 @@ public class JunNewton {
 	}
 
 
-	private static RealMatrix delta(RealMatrix  xMat) {
-		double[][] x = xMat.getData();
-		double[][] d = new double[2][1];
-		d[0][0] = 2*x[0][0] - x[1][0] + 1;
-		d[1][0] = 4*x[1][0] - x[0][0] - 2;
 
-		return MatrixUtils.createRealMatrix(d);
-	}
 
 	//# 3点を通る2次数式の最小値
 	//def min(al_s,f_s,al_m,f_m,al_e,f_e):

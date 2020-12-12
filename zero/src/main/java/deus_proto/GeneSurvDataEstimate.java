@@ -211,10 +211,15 @@ public class GeneSurvDataEstimate {
 	}
 
 	public RealMatrix delta(RealMatrix betaMat) {
+		clearCache();
 
 		double[][] betaData = betaMat.getData();
 
 		double[] betaArr = new double[betaData.length];
+
+		for (int i = 0; i < betaData.length; i++) {
+			betaArr[i] = betaData[i][0];
+		}
 
 		// 1階微分
 
@@ -299,7 +304,14 @@ public class GeneSurvDataEstimate {
 
 	}
 
-	public double L(double[] betaArr) {
+	public double L(double[][] beta) {
+		clearCache();
+
+		double[] betaArr = new double[beta.length];
+		for (int i = 0; i < beta.length; i++) {
+			betaArr[i] =  beta[i][0];
+		}
+
 		// 1階微分
 
 		List<DDouble> sumList = new ArrayList<DDouble>();

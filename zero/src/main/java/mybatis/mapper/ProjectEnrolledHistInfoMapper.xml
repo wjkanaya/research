@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+
+<mapper namespace="mybatis.ProjectEnrolledHistInfoMapper">
+
+  <insert id="insertProjectEnrolledHistInfo" useGeneratedKeys="true"
+    keyProperty="tblId">
+    insert into &quot;public&quot;.&quot;project_enrolled_hist_info&quot;
+     (&quot;enrolled_hist_id&quot;,
+     &quot;member_id&quot;,
+     &quot;project_id&quot;,
+      &quot;branch_num&quot;,
+      &quot;join_date&quot;,
+      &quot;join_member_months&quot;,
+      &quot;stop_date&quot;,
+      &quot;stop_member_months&quot;,
+      &quot;stop_type&quot;,
+     &quot;enrolled_status&quot;) values
+       (
+       #{enrolledHistId,jdbcType=VARCHAR},
+       #{memberId,jdbcType=VARCHAR},
+       #{projectId,jdbcType=VARCHAR},
+       #{branchNum,jdbcType=INTEGER},
+       #{joinDate,jdbcType=DATE},
+       #{joinMemberMonths,jdbcType=INTEGER},
+       #{stopDate,jdbcType=DATE},
+       #{stopMemberMonths,jdbcType=INTEGER},
+       #{stopType,jdbcType=INTEGER},
+       #{enrolledStatus,jdbcType=INTEGER})
+  </insert>
+
+  <resultMap id="memberProjectEnrolledHistAndPriceMap" type="MemberHistPriceInfo">
+   <id column="tbl_id"/>
+   <association property="memberHistInfo" javaType="MemberHistInfo">
+           <id property="tblId" column="tbl_id"/>
+           <result property="memberId" column="member_id" />
+           <result property="startDate" column="start_date" />
+           <result property="name" column="name" />
+           <result property="enterDate" column="enter_date" />
+           <result property="enterOld" column="enter_old" />
+           <result property="status" column="status" />
+           <result property="retirementDate" column="retirement_date" />
+           <result property="retirementType" column="retirement_type" />
+           <result property="sex" column="sex" />
+           <result property="fleshOrNot" column="flesh_or_not" />
+           <result property="department" column="department" />
+           <result property="position" column="position" />
+   </association>
+   <collection property="projectEnrolledHistInfoList" columnPrefix="hist_" resultMap="projectEnrolledHistAndPriceMap" />
+  </resultMap>
+
+    <resultMap id="projectEnrolledHistAndPriceMap" type="ProjectEnrolledHistInfo">
+    <id property="tblId" column="tbl_id"/>
+    <result property="enrolledHistId" column="enrolled_hist_id" />
+    <result property="memberId" column="member_id" />
+    <result property="projectId" column="project_id" />
+    <result property="branchNum" column="branch_num" />
+    <result property="joinDate" column="join_date" />
+    <result property="joinMemberMonths" column="join_member_months" />
+    <result property="stopDate" column="stop_date" />
+    <result property="stopMemberMonths" column="stop_member_months" />
+    <result property="stopType" column="stop_type" />
+    <result property="enrolledStatus" column="enrolled_status" />
+    <collection property="priceTransitionInfoList" ofType="PriceTransitionInfo">
+      <id property="tblId"  column="price_tbl_id"/>
+      <result property="menberMonths" column="price_menber_months"/>
+      <result property="enrolledHistId" column="price_enrolled_hist_id"/>
+      <result property="priceStartDate" column="price_price_start_date"/>
+      <result property="price" column="price_price"/>
+    </collection>
+  </resultMap>
+
+  <select id="selectAllMemberProjectEnrolledHistAndPrice" resultMap="memberProjectEnrolledHistAndPriceMap">
+    select
+    m.tbl_id,
+    m.member_id,
+    m.start_date,
+    m.name,
+    m.enter_date,
+    m.enter_old,
+    m.status,
+    m.retirement_date,
+    m.retirement_type,
+    m.sex,
+    m.flesh_or_not,
+    m.department,
+    m.position,
+    h.tbl_id as hist_tbl_id,
+    h.enrolled_hist_id as hist_enrolled_hist_id,
+    h.member_id as hist_member_id,
+    h.project_id as hist_project_id,
+    h.branch_num as hist_branch_num,
+    h.join_date as hist_join_date,
+    h.join_member_months as hist_join_member_months,
+    h.stop_date as hist_stop_date,
+    h.stop_member_months as hist_stop_member_months,
+    h.stop_type as hist_stop_type,
+    h.enrolled_status as hist_enrolled_status,
+    p.tbl_id as hist_price_tbl_id,
+    p.menber_months as hist_price_menber_months,
+    p.enrolled_hist_id as hist_price_enrolled_hist_id,
+    p.price_start_date as hist_price_price_start_date,
+    p.price as hist_price_price
+    from
+    member_hist_info m
+    INNER JOIN project_enrolled_hist_info h
+       ON m.member_id = h.member_id
+       INNER JOIN price_transition_info p
+    ON h.enrolled_hist_id = p.enrolled_hist_id
+    order by hist_member_id,join_date,price_start_date
+  </select>
+
+
+  <select id="selectAllProjectEnrolledHistInfo" resultType="ProjectEnrolledHistInfo">
+    select * from project_enrolled_hist_info
+    where member_id = #{memberId}  and project_id = #{projectId}
+  </select>
+
+
+  <select id="selectAllProjectEnrolledHistInfoCount" resultType="Integer">
+    select count(*) from project_enrolled_hist_info
+  </select>
+
+
+
+  <select id="selectAllProjectEnrolledHistYearMonthsInfo" resultType="ProjectEnrolledHistYearMonthsInfo">
+    SELECT enrolled_hist_id,member_id,project_id,branch_num,
+    join_date,COALESCE(stop_date,CAST(DATE_TRUNC('month', now()) as DATE)) as stop_date,
+ 	EXTRACT(year from AGE(COALESCE(stop_date,CAST(DATE_TRUNC('month', now()) as DATE)),join_date )) * 12 +
+    EXTRACT(month from AGE(COALESCE(stop_date,CAST(DATE_TRUNC('month', now()) as DATE)),join_date )) as year_months ,
+    COALESCE(stop_type,'-1') as stop_type from project_enrolled_hist_info
+    order by year_months
+  </select>
+
+
+
+
+  <select id="selectAllProjectEnrolledHistYearMonthsCountInfo" resultType="YearMonthsCensorCount">
+  select t.year_months,
+    count(t.stop_type='2' or null) as count,
+    count(*) - count(t.stop_type='2' or null) as censored
+    from (
+    SELECT
+ 	cast(EXTRACT(year from AGE(COALESCE(stop_date,CAST(DATE_TRUNC('month', now()) as DATE)),join_date )) * 12 +
+    EXTRACT(month from AGE(COALESCE(stop_date,CAST(DATE_TRUNC('month', now()) as DATE)),join_date ))as integer)
+    as year_months,stop_type
+    from project_enrolled_hist_info
+        ) t
+
+
+    group by t.year_months
+    order by year_months
+  </select>
+
+
+  <select id="selectCountProjectEnrolledHistInfo" resultType="Integer">
+    select count(*) as count from project_enrolled_hist_info
+    where member_id = #{memberId}  and project_id = #{projectId}
+  </select>
+
+  <select id="selectProjectEnrolledHistId" resultType="String">
+    select max(enrolled_hist_id) as enrolled_hist_id from project_enrolled_hist_info
+    where member_id = #{memberId}  and project_id = #{projectId}
+  </select>
+
+  <select id="selectProjectEnrolledHistInfoBranchNum" resultType="Integer">
+    select max(branch_num) as branch_num from project_enrolled_hist_info
+    where member_id = #{memberId}  and project_id = #{projectId}
+  </select>
+
+
+ <update id="updateProjectEnrolledHistInfo">
+  update project_enrolled_hist_info set
+    stop_date = #{stopDate,jdbcType=DATE},
+    stop_member_months = #{stopMemberMonths,jdbcType=INTEGER},
+    stop_type = #{stopType,jdbcType=INTEGER},
+    enrolled_status = #{enrolledStatus,jdbcType=INTEGER}
+    where project_enrolled_hist_info.member_id  = #{memberId} AND
+        project_enrolled_hist_info.project_id = #{projectId} AND
+        project_enrolled_hist_info.branch_num = (select max(branch_num) as branch_num
+        from project_enrolled_hist_info
+    where member_id = #{memberId,jdbcType=VARCHAR} and project_id = #{projectId,jdbcType=VARCHAR})
+</update>
+
+  <delete id="truncateProjectEnrolledHistInfo">
+ 	 truncate table &quot;public&quot;.&quot;project_enrolled_hist_info&quot;
+	</delete>
+
+  <delete id="cleanProjectEnrolledHistInfoTblId">
+ 	 select setval(&apos;project_enrolled_hist_info_tbl_id_seq&apos;, 1, false)
+  </delete>
+
+
+</mapper>

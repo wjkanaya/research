@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+
+<mapper namespace="mybatis.PriceTransitionInfoMapper">
+
+  <select id="selectCountPriceTransitionInfo" resultType="Integer">
+   select count(*) from price_transition_info
+    where enrolled_hist_id = #{enrolledHistId}
+  </select>
+
+   <select id="selectNowPrice" resultType="Integer">
+   select price from price_transition_info
+    where enrolled_hist_id = #{enrolledHistId}
+     and price_start_date = (
+    select max(distinct price_start_date) from price_transition_info
+    where enrolled_hist_id = #{enrolledHistId})
+  </select>
+
+  <insert id="insertPriceTransitionInfo" useGeneratedKeys="true"
+    keyProperty="tblId">
+    insert into &quot;public&quot;.&quot;price_transition_info&quot;
+     (&quot;member_id&quot;,&quot;menber_months&quot;,&quot;enrolled_hist_id&quot;,
+      &quot;price_start_date&quot;,&quot;price&quot;) values
+       (#{memberId,jdbcType=VARCHAR},#{menberMonths,jdbcType=INTEGER},#{enrolledHistId,jdbcType=VARCHAR},
+        #{priceStartDate,jdbcType=DATE},#{price,jdbcType=INTEGER})
+  </insert>
+
+  <delete id="truncatePriceTransitionInfo">
+ 	 truncate table &quot;public&quot;.&quot;price_transition_info&quot;
+	</delete>
+
+  <delete id="cleanPriceTransitionInfoTblId">
+ 	 select setval(&apos;price_transition_info_tbl_id_seq&apos;, 1, false)
+  </delete>
+
+</mapper>

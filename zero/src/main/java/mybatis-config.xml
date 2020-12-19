@@ -23,6 +23,13 @@
   </environments>
 
   <mappers>
-    <mapper resource="DeusMapper.xml"/>
+    <mapper resource="mybatis/mapper/DeusMapper.xml"/>
+    <mapper resource="mybatis/mapper/MemberHistInfoMapper.xml"/>
+    <mapper resource="mybatis/mapper/ClientInfoMapper.xml"/>
+    <mapper resource="mybatis/mapper/ProjectInfoMapper.xml"/>
+    <mapper resource="mybatis/mapper/ProjectEnrolledHistInfoMapper.xml"/>
+    <mapper resource="mybatis/mapper/PriceTransitionInfoMapper.xml"/>
+    <mapper resource="mybatis/mapper/ProjectMemberNumInfoMapper.xml"/>
+
   </mappers>
 </configuration>

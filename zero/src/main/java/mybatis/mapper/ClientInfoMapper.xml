@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+
+<mapper namespace="mybatis.ClientInfoMapper">
+
+  <insert id="insertClientInfo" useGeneratedKeys="true"    keyProperty="tblId">
+    insert into &quot;public&quot;.&quot;client_info&quot;
+    (&quot;client_id&quot;,&quot;client_name&quot;) values
+    (#{clientId,jdbcType=VARCHAR},#{clientName,jdbcType=VARCHAR})
+  </insert>
+
+  <delete id="truncateClientInfo">
+ 	 truncate table &quot;public&quot;.&quot;client_info&quot;
+	</delete>
+
+  <delete id="cleanClientInfoTblId">
+ 	 select setval(&apos;client_info_tbl_id_seq&apos;, 1, false)
+  </delete>
+
+
+</mapper>

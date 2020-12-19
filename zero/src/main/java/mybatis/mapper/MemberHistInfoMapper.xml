@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mybatis.MemberHistInfoMapper">
+  <select id="selectMemberHistInfo" resultType="MemberHistInfo">
+    select * from member_hist_info where tbl_id = #{tblId}
+  </select>
+
+  <select id="selectAllMemberHistInfo" resultType="MemberHistInfo">
+    select * from member_hist_info
+  </select>
+
+  <select id="selectAllMemberHistInfoCount" resultType="Integer">
+    select count(*) from member_hist_info
+  </select>
+
+  <select id="selectAllMemberYearCount" resultType="YearCount">
+    select to_char(enter_date, &apos;YYYY&apos;) as year,count(*) as count
+    from &quot;member_hist_info&quot; where status = &apos;0&apos; group by year order by year
+  </select>
+
+  <select id="selectAllMemberHistYearMonthsCountInfo" resultType="YearMonthsCensorCount">
+    select t.year_months,count(t.status='1' or null) as count,count(t.status='0' or null) as censored
+    from (
+      SELECT
+ 	  cast(EXTRACT(year from AGE(COALESCE(retirement_date,CAST(DATE_TRUNC('month', now()) as DATE)),
+ 	  enter_date )) * 12 +
+      EXTRACT(month from AGE(COALESCE(retirement_date,CAST(DATE_TRUNC('month', now()) as DATE)),
+      enter_date ))as integer)
+      as year_months,status
+    from member_hist_info
+        ) t
+    group by t.year_months
+    order by year_months
+  </select>
+
+  <select id="selectMemberHistYearEstimateInfo" resultType="YearEstimateInfo">
+    select t.years,t.sex as x0,
+      count(t.status='1' or null) as count,
+      count(t.status='0' or null) as censored
+      from (
+        SELECT
+          sex,cast(EXTRACT(year from AGE(COALESCE(retirement_date,CAST(DATE_TRUNC('month', now()) as DATE)),enter_date )) * 12 +
+          EXTRACT(month from AGE(COALESCE(retirement_date,CAST(DATE_TRUNC('month', now()) as DATE)),enter_date ))as integer) /12
+          as years,status
+        from member_hist_info   ) t
+      group by t.years,t.sex
+     order by years,x0
+  </select>
+
+  <insert id="insertMemberHistInfo" useGeneratedKeys="true"
+    keyProperty="tblId">
+    insert into &quot;public&quot;.&quot;member_hist_info&quot;
+     (&quot;project_id&quot;, &quot;project_name&quot;, &quot;start_date&quot;, &quot;name&quot;, &quot;enter_date&quot;, &quot;enter_old&quot;,
+     &quot;status&quot;, &quot;retirement_date&quot;, &quot;retirement_type&quot;, &quot;sex&quot;,
+     &quot;flesh_or_not&quot;, &quot;department&quot;, &quot;position&quot;) values
+       (#{memberId,jdbcType=VARCHAR},#{startDate,jdbcType=DATE},#{name,jdbcType=VARCHAR},#{enterDate,jdbcType=DATE},
+       #{enterOld,jdbcType=INTEGER},#{status,jdbcType=INTEGER},#{retirementDate,jdbcType=DATE},
+       #{retirementType,jdbcType=INTEGER},#{sex,jdbcType=INTEGER},#{fleshOrNot,jdbcType=INTEGER},
+       #{department,jdbcType=INTEGER},#{position,jdbcType=INTEGER})
+  </insert>
+
+  <insert id="insertManyMemberHistInfo" useGeneratedKeys="true"
+    keyProperty="tblId">
+    insert into &quot;public&quot;.&quot;member_hist_info&quot;
+     (&quot;member_id&quot;, &quot;start_date&quot;, &quot;name&quot;, &quot;enter_date&quot;, &quot;enter_old&quot;,
+     &quot;status&quot;, &quot;retirement_date&quot;, &quot;retirement_type&quot;, &quot;sex&quot;,
+     &quot;flesh_or_not&quot;, &quot;department&quot;, &quot;position&quot;) values
+    <foreach item="item" collection="list" separator=",">
+       (#{item.memberId,jdbcType=VARCHAR},#{item.startDate,jdbcType=DATE},#{item.name,jdbcType=VARCHAR},
+       #{item.enterDate,jdbcType=DATE},#{item.enterOld,jdbcType=INTEGER},#{item.status,jdbcType=INTEGER},
+       #{item.retirementDate,jdbcType=DATE},#{item.retirementType,jdbcType=INTEGER},
+       #{item.sex,jdbcType=INTEGER},#{item.fleshOrNot,jdbcType=INTEGER},
+       #{item.department,jdbcType=INTEGER},#{item.position,jdbcType=INTEGER})
+    </foreach>
+  </insert>
+
+  <update id="updateMemberHistInfo">
+    update member_hist_info set
+    status = #{status},
+    retirement_date = #{retirementDate},
+    retirement_type = #{retirementType}
+    where member_id = #{memberId}
+  </update>
+
+  <delete id="truncateMemberHistInfo">
+ 	 truncate table &quot;public&quot;.&quot;member_hist_info&quot;
+  </delete>
+  <delete id="cleanMemberHistInfoTblId">
+ 	 select setval(&apos;member_hist_info_tbl_id_seq&apos;, 1, false)
+  </delete>
+
+</mapper>

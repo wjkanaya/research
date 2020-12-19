@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+
+<mapper namespace="mybatis.ProjectMemberNumInfoMapper">
+
+  <insert id="insertProjectMemberNumInfo" useGeneratedKeys="true"
+    keyProperty="tblId">
+    insert into &quot;public&quot;.&quot;project_member_num_info&quot;
+     (&quot;project_id&quot;, &quot;project_months&quot;, &quot;member_num&quot;) values
+       (#{projectId,jdbcType=VARCHAR},#{projectMonths,jdbcType=INTEGER},#{memberNum,jdbcType=INTEGER})
+  </insert>
+
+  <insert id="insertSabunProjectMemberNumInfo" useGeneratedKeys="true"
+    keyProperty="tblId">
+    insert into project_member_num_info (project_id,project_months,member_num)
+    select &apos;${projectId,jdbcType=VARCHAR}&apos; as project_id,
+    &apos;${projectMonths,jdbcType=INTEGER}&apos; as project_months,
+    member_num + (${memberNum,jdbcType=INTEGER}) as member_num from
+    project_member_num_info where
+    project_months = (select max(project_months) from project_member_num_info
+    where project_id = #{projectId,jdbcType=VARCHAR})
+    project_id = #{projectId,jdbcType=VARCHAR}
+  </insert>
+
+  <select id="selectLastProjectMemberNumInfo" resultType="ProjectMemberNumInfo">
+    select * from
+    project_member_num_info where
+    project_months = (select max(project_months) from project_member_num_info
+    where project_id = #{projectId,jdbcType=VARCHAR})
+    and project_id = #{projectId,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectCountProjectMemberNumInfo" resultType="Integer">
+    select count(*) as count from &quot;public&quot;.&quot;project_member_num_info&quot; where project_id = #{projectId}
+  </select>
+
+  <delete id="truncateProjectMemberNumInfo">
+ 	 truncate table &quot;public&quot;.&quot;project_member_num_info&quot;
+	</delete>
+
+  <delete id="cleanProjectMemberNumInfoTblId">
+ 	 select setval(&apos;project_member_num_info_tbl_id_seq&apos;, 1, false)
+  </delete>
+
+
+</mapper>

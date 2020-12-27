@@ -3,7 +3,7 @@ package sim;
 public class HazardConst {
 
 	// 計算期間(単位月)
-	public static final int KIKAN_CONST = 36;
+	public static final int KIKAN_CONST = 360;
 
 	// 退職率操作定数
 	public static final double YAMERITU_CONST = 0.0000001;

@@ -13,7 +13,7 @@ import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 
-import mybaits.vo.YearEstimateInfo;
+import mybaits.vo.YearEstimateInfoPre;
 import mybatis.dao.MemberHistInfoDAO;
 import sim.HazardConst;
 import sim.Util;
@@ -39,28 +39,28 @@ public class GeneSurvDataEstimateNewton2 {
 
 		MemberHistInfoDAO dao = new MemberHistInfoDAO();
 
-		List<YearEstimateInfo> list = dao.selectMemberHistYearEstimateInfo();
+		List<YearEstimateInfoPre> list = dao.selectMemberHistYearEstimateInfo();
 
 		System.out.println(list.size());
 
 		List<Integer> retireCountList = new ArrayList<Integer>();
-		List<Map<YearEstimateInfo, Integer>> retireCountMeisaiList
-		= new ArrayList<Map<YearEstimateInfo, Integer>>();
+		List<Map<YearEstimateInfoPre, Integer>> retireCountMeisaiList
+		= new ArrayList<Map<YearEstimateInfoPre, Integer>>();
 
 
 		List<Integer> notRetireCountList = new ArrayList<Integer>();
-		List<Map<YearEstimateInfo, Integer>> notRetireCountMeisaiList
-		= new ArrayList<Map<YearEstimateInfo, Integer>>();
+		List<Map<YearEstimateInfoPre, Integer>> notRetireCountMeisaiList
+		= new ArrayList<Map<YearEstimateInfoPre, Integer>>();
 
-		for (YearEstimateInfo info :list ) {
+		for (YearEstimateInfoPre info :list ) {
 
 			int years = info.getYears();
 
 			while (retireCountList.size() <= years) {
 				retireCountList.add(Integer.valueOf(0));
-				retireCountMeisaiList.add(new TreeMap<YearEstimateInfo, Integer>());
+				retireCountMeisaiList.add(new TreeMap<YearEstimateInfoPre, Integer>());
 				notRetireCountList.add(Integer.valueOf(0));
-				notRetireCountMeisaiList.add(new TreeMap<YearEstimateInfo, Integer>());
+				notRetireCountMeisaiList.add(new TreeMap<YearEstimateInfoPre, Integer>());
 			}
 
 			for (int i = 0; i < years; i++) {
@@ -115,10 +115,10 @@ public class GeneSurvDataEstimateNewton2 {
 		do {
 			// PD計算キャッシュ
 			// betaArrの値が変わるたびに更新してください。
-			List<Map<YearEstimateInfo, Double>> pdCacheList =
-					new ArrayList<Map<YearEstimateInfo, Double>>();
+			List<Map<YearEstimateInfoPre, Double>> pdCacheList =
+					new ArrayList<Map<YearEstimateInfoPre, Double>>();
 			for (int year = 0; year < yearRange; year++) {
-				pdCacheList.add(new HashMap<YearEstimateInfo, Double>());
+				pdCacheList.add(new HashMap<YearEstimateInfoPre, Double>());
 			}
 
 			// 1階微分
@@ -137,7 +137,7 @@ public class GeneSurvDataEstimateNewton2 {
 				sumList.clear();
 				// 継続中のデータなのでY=0
 				int Y = 0;
-				Map<YearEstimateInfo, Integer> map = null;
+				Map<YearEstimateInfoPre, Integer> map = null;
 				// 継続
 				map = notRetireCountMeisaiList.get(year);
 				makeSumList(yearRange, betaArr, pdCacheList, sumList, map, year, Y, -1);
@@ -165,7 +165,7 @@ public class GeneSurvDataEstimateNewton2 {
 				for (int year = 0; year < yearRange; year++) {
 					// 継続中のデータなのでY=0
 					int Y = 0;
-					Map<YearEstimateInfo, Integer> map = null;
+					Map<YearEstimateInfoPre, Integer> map = null;
 					// 継続
 					map = notRetireCountMeisaiList.get(year);
 					makeSumList(yearRange, betaArr, pdCacheList, sumList, map, year, Y, xIndex);
@@ -294,7 +294,7 @@ public class GeneSurvDataEstimateNewton2 {
 
 					sumList.clear();
 					// 継続
-					Map<YearEstimateInfo, Integer> map = null;
+					Map<YearEstimateInfoPre, Integer> map = null;
 					map = notRetireCountMeisaiList.get(nowYear);
 					makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, nowYear, -1, -1);
 
@@ -320,7 +320,7 @@ public class GeneSurvDataEstimateNewton2 {
 					// 経過
 					for (int year = 0; year < yearRange; year++) {
 						// 継続
-						Map<YearEstimateInfo, Integer> map = null;
+						Map<YearEstimateInfoPre, Integer> map = null;
 						map = notRetireCountMeisaiList.get(nowYear);
 						makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, nowYear, xIndex, -1);
 
@@ -367,7 +367,7 @@ public class GeneSurvDataEstimateNewton2 {
 					sumList.clear();
 					for (int year = 0; year < yearRange; year++) {
 						// 継続
-						Map<YearEstimateInfo, Integer> map = null;
+						Map<YearEstimateInfoPre, Integer> map = null;
 						map = notRetireCountMeisaiList.get(year);
 						makeSumList2(yearRange, betaArr, pdCacheList, sumList, map, year, nowXIndex, xIndex);
 
@@ -486,11 +486,11 @@ public class GeneSurvDataEstimateNewton2 {
 
 
 
-	private void makeSumList(int yearRange, double[] betaArr, List<Map<YearEstimateInfo, Double>> pdCacheList,
-			List<DDouble> sumList, Map<YearEstimateInfo, Integer> map, int year, int Y, int xIndex) {
-		Set<Entry<YearEstimateInfo, Integer>> set;
+	private void makeSumList(int yearRange, double[] betaArr, List<Map<YearEstimateInfoPre, Double>> pdCacheList,
+			List<DDouble> sumList, Map<YearEstimateInfoPre, Integer> map, int year, int Y, int xIndex) {
+		Set<Entry<YearEstimateInfoPre, Integer>> set;
 		set = map.entrySet();
-		for (Entry<YearEstimateInfo, Integer> entry  :set) {
+		for (Entry<YearEstimateInfoPre, Integer> entry  :set) {
 
 			List<Integer> xList = getXList(entry.getKey());
 
@@ -530,11 +530,11 @@ public class GeneSurvDataEstimateNewton2 {
 		}
 	}
 
-	private void makeSumList2(int yearRange, double[] betaArr, List<Map<YearEstimateInfo, Double>> pdCacheList,
-			List<DDouble> sumList, Map<YearEstimateInfo, Integer> map, int year, int xIndex0, int xIndex1) {
-		Set<Entry<YearEstimateInfo, Integer>> set;
+	private void makeSumList2(int yearRange, double[] betaArr, List<Map<YearEstimateInfoPre, Double>> pdCacheList,
+			List<DDouble> sumList, Map<YearEstimateInfoPre, Integer> map, int year, int xIndex0, int xIndex1) {
+		Set<Entry<YearEstimateInfoPre, Integer>> set;
 		set = map.entrySet();
-		for (Entry<YearEstimateInfo, Integer> entry  :set) {
+		for (Entry<YearEstimateInfoPre, Integer> entry  :set) {
 
 			List<Integer> xList = getXList(entry.getKey());
 
@@ -582,7 +582,7 @@ public class GeneSurvDataEstimateNewton2 {
 			sumList.add(new DDouble(v));
 		}
 	}
-	private List<Integer> getXList(YearEstimateInfo info) {
+	private List<Integer> getXList(YearEstimateInfoPre info) {
 		List<Integer> result = new ArrayList<Integer>();
 		if (info.getX0() != null) {
 			result.add(info.getX0());

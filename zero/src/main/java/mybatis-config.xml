@@ -30,6 +30,6 @@
     <mapper resource="mybatis/mapper/ProjectEnrolledHistInfoMapper.xml"/>
     <mapper resource="mybatis/mapper/PriceTransitionInfoMapper.xml"/>
     <mapper resource="mybatis/mapper/ProjectMemberNumInfoMapper.xml"/>
-
+    <mapper resource="mybatis/mapper/CovariatesMstMapper.xml"/>
   </mappers>
 </configuration>

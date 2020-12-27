@@ -12,37 +12,36 @@ import java.util.TreeMap;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 
-import deus_proto.util.OneHotMaker;
-import mybaits.vo.ConvariateData;
+import mybaits.vo.YearEstimateInfoPre;
 import mybaits.vo.YearEstimateInfo;
-//import mybaits.vo.YearEstimateInfoPre;
 import mybatis.dao.MemberHistInfoDAO;
+import sim.HazardConst;
 import sim.Util;
 
-public class GeneSurvDataEstimate {
+public class GeneSurvDataEstimatePre {
 
 
-	public List<YearEstimateInfo> getList() {
+	public List<YearEstimateInfoPre> getList() {
 		return list;
 	}
 
-	public void setList(List<YearEstimateInfo> list) {
+	public void setList(List<YearEstimateInfoPre> list) {
 		this.list = list;
 	}
 
-	public List<Map<YearEstimateInfo, Integer>> getRetireCountMeisaiList() {
+	public List<Map<YearEstimateInfoPre, Integer>> getRetireCountMeisaiList() {
 		return retireCountMeisaiList;
 	}
 
-	public void setRetireCountMeisaiList(List<Map<YearEstimateInfo, Integer>> retireCountMeisaiList) {
+	public void setRetireCountMeisaiList(List<Map<YearEstimateInfoPre, Integer>> retireCountMeisaiList) {
 		this.retireCountMeisaiList = retireCountMeisaiList;
 	}
 
-	public List<Map<YearEstimateInfo, Integer>> getNotRetireCountMeisaiList() {
+	public List<Map<YearEstimateInfoPre, Integer>> getNotRetireCountMeisaiList() {
 		return notRetireCountMeisaiList;
 	}
 
-	public void setNotRetireCountMeisaiList(List<Map<YearEstimateInfo, Integer>> notRetireCountMeisaiList) {
+	public void setNotRetireCountMeisaiList(List<Map<YearEstimateInfoPre, Integer>> notRetireCountMeisaiList) {
 		this.notRetireCountMeisaiList = notRetireCountMeisaiList;
 	}
 
@@ -62,15 +61,15 @@ public class GeneSurvDataEstimate {
 		this.betaSize = betaSize;
 	}
 
-	public List<Map<YearEstimateInfo, Double>> getPdCacheList() {
+	public List<Map<YearEstimateInfoPre, Double>> getPdCacheList() {
 		return pdCacheList;
 	}
 
-	public void setPdCacheList(List<Map<YearEstimateInfo, Double>> pdCacheList) {
+	public void setPdCacheList(List<Map<YearEstimateInfoPre, Double>> pdCacheList) {
 		this.pdCacheList = pdCacheList;
 	}
 
-	List<YearEstimateInfo> list = null;
+	List<YearEstimateInfoPre> list = null;
 
 	public List<YearEstimateInfo> getMapList() {
 		return mapList;
@@ -83,11 +82,11 @@ public class GeneSurvDataEstimate {
 	List<YearEstimateInfo> mapList = null;
 
 
-	List<Map<YearEstimateInfo, Integer>> retireCountMeisaiList = null;
-	List<Map<YearEstimateInfo, Integer>> notRetireCountMeisaiList = null;
+	List<Map<YearEstimateInfoPre, Integer>> retireCountMeisaiList = null;
+	List<Map<YearEstimateInfoPre, Integer>> notRetireCountMeisaiList = null;
     int yearRange = 0;
     int betaSize = 0;
-    List<Map<YearEstimateInfo, Double>> pdCacheList = null;
+    List<Map<YearEstimateInfoPre, Double>> pdCacheList = null;
 
 
 //	public static void main(String[] args) {
@@ -112,9 +111,9 @@ public class GeneSurvDataEstimate {
 		try {
 		MemberHistInfoDAO dao = new MemberHistInfoDAO();
 
-		//this.list = dao.selectMemberHistYearEstimateInfo();
+		this.list = dao.selectMemberHistYearEstimateInfo();
 
-		list = dao.selectMemberHistYearEstimateInfoMap();
+		this.mapList = dao.selectMemberHistYearEstimateInfoMap();
 
 		} finally {
 			Util.endTransaction();;
@@ -126,22 +125,22 @@ public class GeneSurvDataEstimate {
 
 	public void makeData() {
 		//	List<Integer> retireCountList = new ArrayList<Integer>();
-		List<Map<YearEstimateInfo, Integer>> retireCountMeisaiList
-		= new ArrayList<Map<YearEstimateInfo, Integer>>();
+		List<Map<YearEstimateInfoPre, Integer>> retireCountMeisaiList
+		= new ArrayList<Map<YearEstimateInfoPre, Integer>>();
 
 
 //		List<Integer> notRetireCountList = new ArrayList<Integer>();
-		List<Map<YearEstimateInfo, Integer>> notRetireCountMeisaiList
-		= new ArrayList<Map<YearEstimateInfo, Integer>>();
+		List<Map<YearEstimateInfoPre, Integer>> notRetireCountMeisaiList
+		= new ArrayList<Map<YearEstimateInfoPre, Integer>>();
 
-		for (YearEstimateInfo info :list ) {
+		for (YearEstimateInfoPre info :list ) {
 
 			int years = info.getYears();
 
 			while (retireCountMeisaiList.size() <= years) {
 
-				retireCountMeisaiList.add(new TreeMap<YearEstimateInfo, Integer>());
-				notRetireCountMeisaiList.add(new TreeMap<YearEstimateInfo, Integer>());
+				retireCountMeisaiList.add(new TreeMap<YearEstimateInfoPre, Integer>());
+				notRetireCountMeisaiList.add(new TreeMap<YearEstimateInfoPre, Integer>());
 			}
 
 			for (int i = 0; i < years; i++) {
@@ -179,10 +178,10 @@ public class GeneSurvDataEstimate {
 
 		// PD計算キャッシュ
 		// betaArrの値が変わるたびに更新してください。
-		List<Map<YearEstimateInfo, Double>> pdCacheList =
-				new ArrayList<Map<YearEstimateInfo, Double>>();
+		List<Map<YearEstimateInfoPre, Double>> pdCacheList =
+				new ArrayList<Map<YearEstimateInfoPre, Double>>();
 		for (int year = 0; year < yearRange; year++) {
-			pdCacheList.add(new HashMap<YearEstimateInfo, Double>());
+			pdCacheList.add(new HashMap<YearEstimateInfoPre, Double>());
 		}
 
 		this.pdCacheList = pdCacheList;
@@ -190,7 +189,7 @@ public class GeneSurvDataEstimate {
 
 
 	public void clearCache() {
-		for (Map<YearEstimateInfo, Double> map :this.pdCacheList) {
+		for (Map<YearEstimateInfoPre, Double> map :this.pdCacheList) {
 			map.clear();
 		}
 	}
@@ -252,7 +251,7 @@ public class GeneSurvDataEstimate {
 		// 経過年数それぞれのデルタbeta
 		for (int year = 0; year < yearRange; year++) {
 			sumList.clear();
-			Map<YearEstimateInfo, Integer> map = null;
+			Map<YearEstimateInfoPre, Integer> map = null;
 			// 継続中のデータなのでY=0
 			int Y = 0;
 			// 継続
@@ -277,16 +276,14 @@ public class GeneSurvDataEstimate {
 			deltaBetaList.add(Double.valueOf(sigma));
 		}
 
-		int xRange = betaArr.length - yearRange;
-
 		// 経過年数それぞれのデルタbeta
-		for (int xIndex = 0; xIndex < xRange; xIndex++) {
+		for (int xIndex = 0; xIndex < HazardConst.RETIRE_X_INDEX_NUM; xIndex++) {
 			sumList.clear();
 			// 年数
 			for (int year = 0; year < yearRange; year++) {
 				// 継続中のデータなのでY=0
 				int Y = 0;
-				Map<YearEstimateInfo, Integer> map = null;
+				Map<YearEstimateInfoPre, Integer> map = null;
 				// 継続
 				map = notRetireCountMeisaiList.get(year);
 				makeSumList(yearRange, betaArr, pdCacheList, sumList, map, year, Y, xIndex);
@@ -340,7 +337,7 @@ public class GeneSurvDataEstimate {
 		// 経過年数それぞれのデルタbeta
 		for (int year = 0; year < yearRange; year++) {
 
-			Map<YearEstimateInfo, Integer> map = null;
+			Map<YearEstimateInfoPre, Integer> map = null;
 			// 継続中のデータなのでY=0
 			int Y = 0;
 			// 継続
@@ -367,11 +364,11 @@ public class GeneSurvDataEstimate {
 	}
 
 
-	private void makeSumList(int yearRange, double[] betaArr, List<Map<YearEstimateInfo, Double>> pdCacheList,
-			List<DDouble> sumList, Map<YearEstimateInfo, Integer> map, int year, int Y, int xIndex) {
-		Set<Entry<YearEstimateInfo, Integer>> set;
+	private void makeSumList(int yearRange, double[] betaArr, List<Map<YearEstimateInfoPre, Double>> pdCacheList,
+			List<DDouble> sumList, Map<YearEstimateInfoPre, Integer> map, int year, int Y, int xIndex) {
+		Set<Entry<YearEstimateInfoPre, Integer>> set;
 		set = map.entrySet();
-		for (Entry<YearEstimateInfo, Integer> entry  :set) {
+		for (Entry<YearEstimateInfoPre, Integer> entry  :set) {
 
 			List<Integer> xList = getXList(entry.getKey());
 
@@ -412,11 +409,11 @@ public class GeneSurvDataEstimate {
 	}
 
 
-	private void makeSumListL(int yearRange, double[] betaArr, List<Map<YearEstimateInfo, Double>> pdCacheList,
-			List<DDouble> sumList, Map<YearEstimateInfo, Integer> map, int year, int Y) {
-		Set<Entry<YearEstimateInfo, Integer>> set;
+	private void makeSumListL(int yearRange, double[] betaArr, List<Map<YearEstimateInfoPre, Double>> pdCacheList,
+			List<DDouble> sumList, Map<YearEstimateInfoPre, Integer> map, int year, int Y) {
+		Set<Entry<YearEstimateInfoPre, Integer>> set;
 		set = map.entrySet();
-		for (Entry<YearEstimateInfo, Integer> entry  :set) {
+		for (Entry<YearEstimateInfoPre, Integer> entry  :set) {
 
 			List<Integer> xList = getXList(entry.getKey());
 
@@ -447,19 +444,25 @@ public class GeneSurvDataEstimate {
 	}
 
 
-	private List<Integer> getXList(YearEstimateInfo info) {
-
-		List<ConvariateData> list = OneHotMaker.getConvariateDataList(info.getCovariatesMap());
-
-		List<Integer> resultList = new ArrayList<Integer>();
-
-		for (ConvariateData data :list) {
-			resultList.add(data.getValue().intValue());
+	private List<Integer> getXList(YearEstimateInfoPre info) {
+		List<Integer> result = new ArrayList<Integer>();
+		if (info.getX0() != null) {
+			result.add(info.getX0());
+		}
+		if (info.getX1() != null) {
+			result.add(info.getX1());
+		}
+		if (info.getX2() != null) {
+			result.add(info.getX2());
+		}
+		if (info.getX3() != null) {
+			result.add(info.getX3());
+		}
+		if (info.getX4() != null) {
+			result.add(info.getX4());
 		}
 
-		return resultList;
-
-
+		return result;
 	}
 
 

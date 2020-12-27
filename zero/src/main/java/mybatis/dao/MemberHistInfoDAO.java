@@ -9,6 +9,7 @@ import deus.enums.RetirementType;
 import mybaits.vo.MemberHistInfo;
 import mybaits.vo.MemberHistPriceInfo;
 import mybaits.vo.YearCount;
+import mybaits.vo.YearEstimateInfoPre;
 import mybaits.vo.YearEstimateInfo;
 import mybaits.vo.YearMonthsCensorCount;
 import sim.Util;
@@ -38,6 +39,9 @@ public class MemberHistInfoDAO {
 
     public static final String SELECT_MEMBER_HIST_YEAR_ESTIMATE_INFO = "selectMemberHistYearEstimateInfo";
 
+    public static final String SELECT_MEMBER_HIST_YEAR_ESTIMATE_INFO_MAP = "selectMemberHistYearEstimateInfoMap";
+
+
     public void trancateMemberHistInfo() {
     	SqlSession session = Util.getSqlSession();
     	session.delete(TRUNCATE_MEMBER_HIST_INFO);
@@ -50,9 +54,16 @@ public class MemberHistInfoDAO {
 		return count.intValue();
 	}
 
-	public List<YearEstimateInfo> selectMemberHistYearEstimateInfo() {
+	public List<YearEstimateInfoPre> selectMemberHistYearEstimateInfo() {
 		SqlSession session = Util.getSqlSession();
-		List<YearEstimateInfo> list = session.selectList(SELECT_MEMBER_HIST_YEAR_ESTIMATE_INFO);
+		List<YearEstimateInfoPre> list = session.selectList(SELECT_MEMBER_HIST_YEAR_ESTIMATE_INFO);
+		return list;
+	}
+
+
+	public List<YearEstimateInfo> selectMemberHistYearEstimateInfoMap() {
+		SqlSession session = Util.getSqlSession();
+		List<YearEstimateInfo> list = session.selectList(SELECT_MEMBER_HIST_YEAR_ESTIMATE_INFO_MAP);
 		return list;
 	}
 

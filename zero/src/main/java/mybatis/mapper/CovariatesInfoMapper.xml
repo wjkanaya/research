@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+
+<mapper namespace="mybatis.CovariatesInfoMapper">
+
+  <delete id="deleteCovariatesInfo">
+   delete from &quot;public&quot;.&quot;covariates_info&quot;
+   where culc_target_code = #{culcTargetCode}
+    and covariates_code = #{covariatesCode}
+  </delete>
+
+  <insert id="insertCovariatesInfo" keyProperty="culcTargetCode,covariatesCode,covariatesLabelNum">
+    insert into &quot;public&quot;.&quot;covariates_info&quot;
+     (&quot;culc_target_code&quot;,
+      &quot;covariates_code&quot;,
+      &quot;covariates_label_num&quot;,
+      &quot;effect_start_time&quot;,
+      &quot;culc_id&quot;,
+      &quot;covariates_value&quot;
+    ) values
+       (#{culcTargetCode,jdbcType=VARCHAR},
+       #{covariatesCode,jdbcType=VARCHAR},
+       #{covariatesLabelNum,jdbcType=INTEGER},
+       #{effectStartTime,jdbcType=TIMESTAMP},
+       #{culcId,jdbcType=VARCHAR},
+       #{covariatesValue,jdbcType=DECIMAL})
+  </insert>
+
+  <delete id="truncateCovariatesInfo">
+ 	 truncate table &quot;public&quot;.&quot;covariates_info&quot;
+  </delete>
+
+  <delete id="cleanCovariatesInfoTblId">
+ 	 select setval(&apos;covariates_info_tbl_id_seq&apos;, 1, false)
+  </delete>
+
+</mapper>

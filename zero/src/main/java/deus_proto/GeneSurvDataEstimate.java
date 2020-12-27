@@ -90,22 +90,6 @@ public class GeneSurvDataEstimate {
     List<Map<YearEstimateInfo, Double>> pdCacheList = null;
 
 
-//	public static void main(String[] args) {
-//		// TODO 自動生成されたメソッド・スタブ
-//
-//		Util.startTransaction();
-//		try {
-//			GeneSurvDataEstimate2Jun gene = new GeneSurvDataEstimate2Jun();
-//			gene.excute();
-//
-//		} finally {
-//			Util.endTransaction();;
-//		}
-//
-//	}
-
-
-
 	public void getData() {
 		Util.startTransaction();
 

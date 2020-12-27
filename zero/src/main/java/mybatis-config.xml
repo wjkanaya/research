@@ -31,5 +31,7 @@
     <mapper resource="mybatis/mapper/PriceTransitionInfoMapper.xml"/>
     <mapper resource="mybatis/mapper/ProjectMemberNumInfoMapper.xml"/>
     <mapper resource="mybatis/mapper/CovariatesMstMapper.xml"/>
+    <mapper resource="mybatis/mapper/CovariatesEffectiveInfoMapper.xml"/>
+    <mapper resource="mybatis/mapper/CovariatesInfoMapper.xml"/>
   </mappers>
 </configuration>

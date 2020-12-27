@@ -33,5 +33,15 @@ public class DeusConst {
 	// 退プロ(会社都合)
 	public static final String CT0203 = "CT0203";
 
+	// 共変量コード
+	// 経過年数
+	public static final String C00001 = "C00001";
+	//	性別
+	public static final String C00002 = "C00002";
+	// 経過月数
+	public static final String C00003	 = "C00003";
+
+
+
 
 }

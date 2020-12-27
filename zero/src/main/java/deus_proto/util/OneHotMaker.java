@@ -12,7 +12,6 @@ import deus_proto.DeusConst;
 import mybaits.vo.ConvariateData;
 import mybaits.vo.CovariatesMst;
 import mybatis.dao.CovariatesMstDAO;
-import sim.Util;
 
 public class OneHotMaker {
 
@@ -23,19 +22,13 @@ public class OneHotMaker {
 	//		範囲終了	range_end	decimal
 	static Map<String, Integer> rangeEndMap = new HashMap<String, Integer>();
 
-
 	public static List<ConvariateData> getConvariateDataList(Map<String, BigDecimal> map ) {
 
 		synchronized(convariatesTypeMap) {
 			if (convariatesTypeMap.isEmpty()) {
 				List<CovariatesMst>   mstList = null;
-				Util.startTransaction();
-				try {
-					CovariatesMstDAO dao = new CovariatesMstDAO();
-					mstList = dao.selectAllCovariatesMst();
-				} finally {
-					Util.endTransaction();
-				}
+				CovariatesMstDAO dao = new CovariatesMstDAO();
+				mstList = dao.selectAllCovariatesMst();
 
 				for (CovariatesMst mst :mstList) {
 					convariatesTypeMap.put(mst.getCovariatesCode(), mst.getCovariatesType());

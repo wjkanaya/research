@@ -1,15 +1,27 @@
 package deus_proto;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 
+import sim.Util;
+
 public class JunNewton {
+
 	public static void main(String[] args) throws Exception {
 
+		Util.startTransaction();
+		try {
+			JunNewton jn = new JunNewton();
+			jn.execute();
+
+		} finally {
+			Util.endTransaction();;
+		}
+
+	}
+
+	private void execute() {
 
 		GeneSurvDataEstimate est = new GeneSurvDataEstimate();
 
@@ -17,13 +29,7 @@ public class JunNewton {
 		est.makeData();
 
 
-		//gpx = []
-		List<Double> gpx = new ArrayList<Double>();
 
-		//gpy = []
-		List<Double> gpy = new ArrayList<Double>();
-
-		//
 		//
 		//I = np.zeros((2,2))
 		//I[0,0] = 1.0
@@ -52,12 +58,7 @@ public class JunNewton {
 
 //		    print("現点：" + str(nowp))
 			System.out.println("現点：" + nowPMat);
-			//
-//			    gpx.append(nowp[0])
-			gpx.add(nowPMat.getEntry(0, 0));
-//			    gpy.append(nowp[1])
-			gpy.add(nowPMat.getEntry(1, 0));
-			//
+			//			//
 //			    w, v = LA.eig(H)
 
 			EigenDecomposition hMatEd = new EigenDecomposition(hMat);
@@ -242,9 +243,6 @@ public class JunNewton {
 //		    H =bfgs(nowp,prep,H)
 
 			hMat = bfgs(est, nowPMat,prepMat, hMat);
-		//
-
-		//
 
 		}
 		nowp = nowPMat.getData();
@@ -252,7 +250,11 @@ public class JunNewton {
 //		System.out.println("最終点：" + str(nowp) + " 値:" + str(alf(nowp)));
 		System.out.println("最終点：" + nowPMat + " 値:"  + est.L(nowPMat.getData()));
 
+		est.setCovariatesValue(nowPMat);
+
 	}
+
+
 
 //
 

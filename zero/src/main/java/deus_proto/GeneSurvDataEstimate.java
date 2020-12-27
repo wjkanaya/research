@@ -1,7 +1,9 @@
 package deus_proto;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,10 +16,13 @@ import org.apache.commons.math3.linear.RealMatrix;
 
 import deus_proto.util.OneHotMaker;
 import mybaits.vo.ConvariateData;
+import mybaits.vo.CovariatesEffectiveInfo;
+import mybaits.vo.CovariatesInfo;
 import mybaits.vo.YearEstimateInfo;
+import mybatis.dao.CovariatesEffectiveInfoDAO;
+import mybatis.dao.CovariatesInfoDAO;
 //import mybaits.vo.YearEstimateInfoPre;
 import mybatis.dao.MemberHistInfoDAO;
-import sim.Util;
 
 public class GeneSurvDataEstimate {
 
@@ -89,22 +94,11 @@ public class GeneSurvDataEstimate {
     int betaSize = 0;
     List<Map<YearEstimateInfo, Double>> pdCacheList = null;
 
+    List<ConvariateData> convariateDataList = null;
 
 	public void getData() {
-		Util.startTransaction();
-
-		try {
 		MemberHistInfoDAO dao = new MemberHistInfoDAO();
-
-		//this.list = dao.selectMemberHistYearEstimateInfo();
-
 		list = dao.selectMemberHistYearEstimateInfoMap();
-
-		} finally {
-			Util.endTransaction();;
-		}
-//	}
-
 		System.out.println(list.size());
 	}
 
@@ -112,18 +106,13 @@ public class GeneSurvDataEstimate {
 		//	List<Integer> retireCountList = new ArrayList<Integer>();
 		List<Map<YearEstimateInfo, Integer>> retireCountMeisaiList
 		= new ArrayList<Map<YearEstimateInfo, Integer>>();
-
-
 //		List<Integer> notRetireCountList = new ArrayList<Integer>();
 		List<Map<YearEstimateInfo, Integer>> notRetireCountMeisaiList
 		= new ArrayList<Map<YearEstimateInfo, Integer>>();
 
-		for (YearEstimateInfo info :list ) {
-
+		for (YearEstimateInfo info :list) {
 			int years = info.getYears();
-
 			while (retireCountMeisaiList.size() <= years) {
-
 				retireCountMeisaiList.add(new TreeMap<YearEstimateInfo, Integer>());
 				notRetireCountMeisaiList.add(new TreeMap<YearEstimateInfo, Integer>());
 			}
@@ -131,13 +120,9 @@ public class GeneSurvDataEstimate {
 			for (int i = 0; i < years; i++) {
 				Integer addCount = Integer.valueOf(info.getCount().intValue()
 						+ info.getCensored().intValue());
-
 				notRetireCountMeisaiList.get(i).put(info, addCount);
-
 			}
 			retireCountMeisaiList.get(years).put(info, info.getCount().intValue());
-
-
 		}
 
 		// 冗長削除
@@ -157,9 +142,13 @@ public class GeneSurvDataEstimate {
 		// 何か年か？
 		this.yearRange = retireCountMeisaiList.size();
 
+		// 共変量リスト
+		this.convariateDataList = OneHotMaker.getConvariateDataList(list.get(0).getCovariatesMap());
+
+
 		// beta0は0と仮定
 		//int betaSize = 1 + retireCountList.size() + getXList(list.get(0)).size();
-		this.betaSize = retireCountMeisaiList.size() + getXList(list.get(0)).size();
+		this.betaSize = this.yearRange  + convariateDataList.size();
 
 		// PD計算キャッシュ
 		// betaArrの値が変わるたびに更新してください。
@@ -177,37 +166,6 @@ public class GeneSurvDataEstimate {
 		for (Map<YearEstimateInfo, Double> map :this.pdCacheList) {
 			map.clear();
 		}
-	}
-
-
-	private void excute() {
-
-		getData() ;
-		makeData() ;
-
-		double[] betaArr = new double[betaSize];
-		for (int i = 0; i < betaArr.length; i++) {
-			betaArr[i] = 1;
-		}
-
-		double sa = 1000;
-		int num = 0;
-		int max = 100000;
-		do {
-
-			delta(null);
-
-
-			num++;
-		} while (sa >= 1);
-
-		System.out.println("なんと1よりさがったよ！");
-
-		//		for (int i = 0; i < retireCountList.size(); i++) {
-		//			System.out.println("" + i+":" + notRetireCountList.get(i) +
-		//					":" + retireCountList.get(i));
-		//		}
-
 	}
 
 	public RealMatrix delta(RealMatrix betaMat) {
@@ -350,6 +308,85 @@ public class GeneSurvDataEstimate {
 		return -sigma;
 	}
 
+	public void setCovariatesValue(RealMatrix lastBetaMat) {
+
+		CovariatesEffectiveInfoDAO covariatesEffectiveInfoDAO = new CovariatesEffectiveInfoDAO();
+		CovariatesInfoDAO covariatesInfoDAO = new CovariatesInfoDAO();
+
+		Date nowDate = new Date();
+
+		// 経過年
+		// 共変量有効情報
+		covariatesEffectiveInfoDAO.deleteCovariatesEffectiveInfo(DeusConst.CT0001, DeusConst.C00001);
+
+		CovariatesEffectiveInfo ceInfo = new CovariatesEffectiveInfo();
+		// 退職
+		ceInfo.setCulcTargetCode(DeusConst.CT0001);
+		// 経過年数
+		ceInfo.setCovariatesCode(DeusConst.C00001);
+		ceInfo.setEffectStartTime(nowDate);
+		ceInfo.setEffectFlg(Boolean.valueOf(true));
+		covariatesEffectiveInfoDAO.insertCovariatesEffectiveInfo(ceInfo);
+
+		covariatesInfoDAO.deleteCovariatesInfo(DeusConst.CT0001, DeusConst.C00001);
+
+		List<CovariatesInfo> list = new ArrayList<CovariatesInfo>();
+
+
+		for (int i =0; i < yearRange;i++) {
+			CovariatesInfo covInfo = new CovariatesInfo();
+			covInfo.setCulcTargetCode(DeusConst.CT0001);
+			covInfo.setCovariatesCode(DeusConst.C00001);
+			covInfo.setEffectStartTime(nowDate);
+			covInfo.setCovariatesLabelNum(Integer.valueOf(i));
+			covInfo.setCovariatesValue(BigDecimal.valueOf(lastBetaMat.getEntry(i, 0)));
+
+			covariatesInfoDAO.insertCovariatesInfo(covInfo);
+
+			//list.add(covInfo);
+		}
+
+
+
+		String nowCovariatesCode = "";
+
+		int i = yearRange;
+		// 共変量情報
+		for (ConvariateData convData :convariateDataList) {
+			if (!nowCovariatesCode.equals(convData.getConvariateCode())) {
+				nowCovariatesCode = convData.getConvariateCode();
+				covariatesEffectiveInfoDAO.deleteCovariatesEffectiveInfo(DeusConst.CT0001, nowCovariatesCode);
+				ceInfo = new CovariatesEffectiveInfo();
+
+				// 退職
+				ceInfo.setCulcTargetCode(DeusConst.CT0001);
+				// 経過年数
+				ceInfo.setCovariatesCode(nowCovariatesCode);
+				ceInfo.setEffectStartTime(nowDate);
+				ceInfo.setEffectFlg(Boolean.valueOf(true));
+				covariatesEffectiveInfoDAO.insertCovariatesEffectiveInfo(ceInfo);
+
+				covariatesInfoDAO.deleteCovariatesInfo(DeusConst.CT0001, nowCovariatesCode);
+
+			}
+
+
+			CovariatesInfo covInfo = new CovariatesInfo();
+			covInfo.setCulcTargetCode(DeusConst.CT0001);
+			covInfo.setCovariatesCode(convData.getConvariateCode());
+			covInfo.setEffectStartTime(nowDate);
+			covInfo.setCovariatesLabelNum(Integer.valueOf(convData.getConvariateLabel()));
+			covInfo.setCovariatesValue(BigDecimal.valueOf(lastBetaMat.getEntry(i, 0)));
+			covariatesInfoDAO.insertCovariatesInfo(covInfo);
+
+			i++;
+		}
+
+		//covariatesInfoDAO.insertManyCovariatesInfo(list);
+
+
+	}
+
 
 	private void makeSumList(int yearRange, double[] betaArr, List<Map<YearEstimateInfo, Double>> pdCacheList,
 			List<DDouble> sumList, Map<YearEstimateInfo, Integer> map, int year, int Y, int xIndex) {
@@ -460,10 +497,7 @@ public class GeneSurvDataEstimate {
 		// 絶対値が小さいほうから足す
 		List<DDouble> resultList = new ArrayList<DDouble>();
 
-		//resultList.add(new DDouble(betaArr[0]));
-//		resultList.add(new DDouble(betaArr[year + 1]));
 		resultList.add(new DDouble(betaArr[year]));
-
 
 		for (int i = 0; i < xlist.size(); i++) {
 //			double v = betaArr[yearRange + 1 + i] * xlist.get(i).intValue();

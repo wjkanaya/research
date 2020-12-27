@@ -1,5 +1,7 @@
 package mybatis.dao;
 
+import java.util.List;
+
 import org.apache.ibatis.session.SqlSession;
 
 import mybaits.vo.CovariatesInfo;
@@ -9,6 +11,7 @@ public class CovariatesInfoDAO {
 
 	public static final String DELETE_COVARIATES_INFO = "deleteCovariatesInfo";
 	public static final String INSERT_COVARIATES_INFO ="insertCovariatesInfo";
+    public static final String INSERT_MANY_COVARIATES_INFO = "insertManyCovariatesInfo";
 	public static final String TRUNCATE_COVARIATES_INFO = "truncateCovariatesInfo";
 	public static final String CLEAN_COVARIATES_INFO_TBL_ID = "cleanCovariatesInfoTblId";
 
@@ -23,6 +26,13 @@ public class CovariatesInfoDAO {
 		int count = session.insert(DELETE_COVARIATES_INFO, info);
 		return count;
 	}
+
+    public int insertManyCovariatesInfo(List<CovariatesInfo> list) {
+    	SqlSession session = Util.getSqlSession();
+    	int count = session.insert(INSERT_MANY_COVARIATES_INFO, list);
+    	return count;
+    }
+
 
 	public int insertCovariatesInfo(CovariatesInfo info) {
 		SqlSession session = Util.getSqlSession();

@@ -30,6 +30,28 @@
        #{covariatesValue,jdbcType=DECIMAL})
   </insert>
 
+<!--
+  <insert id="insertManyCovariatesInfo"  keyProperty="culcTargetCode,covariatesCode,covariatesLabelNum">
+     insert into &quot;public&quot;.&quot;covariates_info&quot;
+     (&quot;culc_target_code&quot;,
+      &quot;covariates_code&quot;,
+      &quot;covariates_label_num&quot;,
+      &quot;effect_start_time&quot;,
+      &quot;culc_id&quot;,
+      &quot;covariates_value&quot;
+    ) values
+    <foreach item="item" collection="list" separator=",">
+       (#{list.culcTargetCode,jdbcType=VARCHAR},
+       #{list.covariatesCode,jdbcType=VARCHAR},
+       #{list.covariatesLabelNum,jdbcType=INTEGER},
+       #{list.effectStartTime,jdbcType=TIMESTAMP},
+       #{list.culcId,jdbcType=VARCHAR},
+       #{list.covariatesValue,jdbcType=DECIMAL})
+    </foreach>
+
+   </insert>
+-->
+
   <delete id="truncateCovariatesInfo">
  	 truncate table &quot;public&quot;.&quot;covariates_info&quot;
   </delete>

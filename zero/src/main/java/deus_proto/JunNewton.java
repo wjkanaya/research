@@ -8,6 +8,7 @@ import sim.Util;
 
 public class JunNewton {
 
+	// <<退職圧要因一覧情報>>
 	public static void main(String[] args) throws Exception {
 
 		Util.startTransaction();

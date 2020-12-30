@@ -50,17 +50,128 @@
      order by years,x0
   </select>
 
+  <select id="selectMemberHistYearEstimateInfoMap2" resultMap="memberHistYearEstimateInfoMap">
+    select
+        *
+    from
+        (
+            select
+                *,
+                COALESCE(sum(count + censored) OVER(
+                        PARTITION BY
+                            &quot;c_C00002&quot;
+                            ORDER BY
+                                years desc ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+                    ), 0) AS live
+            from
+                (
+                    select
+                        years,
+                        &quot;c_C00002&quot;,
+                        COALESCE(count, 0) as count,
+                        COALESCE(censored, 0) as censored
+                    from
+                        (
+                            select
+                                *
+                            from
+                                (
+                                    SELECT
+                                        generate_series((
+                                                select
+                                                    range_start
+                                                from
+                                                    covariates_mst
+                                                where
+                                                    covariates_code = 'C00001'
+                                            ),(
+                                                select
+                                                    range_end
+                                                from
+                                                    covariates_mst
+                                                where
+                                                    covariates_code = 'C00001'
+                                            )) as years
+                                ) g CROSS
+                                JOIN
+                                    (
+                                        SELECT
+                                            generate_series((
+                                                    select
+                                                        range_start
+                                                    from
+                                                        covariates_mst
+                                                    where
+                                                        covariates_code = 'C00002'
+                                                ),(
+                                                    select
+                                                        range_end
+                                                    from
+                                                        covariates_mst
+                                                    where
+                                                        covariates_code = 'C00002'
+                                                )) as &quot;c_C00002&quot;
+                                    ) c_C00002_t
+                        ) cj
+                        left join
+                            (
+                                select
+                                    t.years,
+                                    t.sex as &quot;c_C00002&quot;,
+                                    count(
+                                        t.status = '1'
+                                    or  null
+                                    ) as count,
+                                    count(
+                                        t.status = '0'
+                                    or  null
+                                    ) as censored
+                                from
+                                    (
+                                        SELECT
+                                            sex,
+                                            cast(EXTRACT(
+                                                    year
+                                                    from
+                                                        AGE(COALESCE(retirement_date, CAST(DATE_TRUNC('month', now()) as DATE)), enter_date)
+                                                ) * 12 + EXTRACT(
+                                                    month
+                                                    from
+                                                        AGE(COALESCE(retirement_date, CAST(DATE_TRUNC('month', now()) as DATE)), enter_date)
+                                                ) as integer) / 12 as years,
+                                            status
+                                        from
+                                            member_hist_info
+                                    ) t
+                                group by
+                                    t.years,
+                                    &quot;c_C00002&quot;
+                            ) cc
+                        using
+                            (years, &quot;c_C00002&quot;)
+                ) a
+        ) b
+    where
+        live > 0
+    or  count > 0
+    order by
+        years,
+        &quot;c_C00002&quot;
+  </select>
+
+
   <select id="selectMemberHistYearEstimateInfoMap" resultMap="memberHistYearEstimateInfoMap">
     select t.years,t.sex as &quot;c_C00002&quot;,
       count(t.status='1' or null) as count,
-      count(t.status='0' or null) as censored
+      count(t.status='0' or null) as censored,
+      0 as live
       from (
         SELECT
           sex,cast(EXTRACT(year from AGE(COALESCE(retirement_date,CAST(DATE_TRUNC('month', now()) as DATE)),enter_date )) * 12 +
           EXTRACT(month from AGE(COALESCE(retirement_date,CAST(DATE_TRUNC('month', now()) as DATE)),enter_date ))as integer) /12
           as years,status
         from member_hist_info   ) t
-      group by t.years,t.sex
+      group by t.years,&quot;c_C00002&quot;
      order by years,&quot;c_C00002&quot;
   </select>
 
@@ -69,6 +180,7 @@
    <result property="years" column="years"/>
    <result property="count" column="count"/>
    <result property="censored" column="censored"/>
+   <result property="live" column="live"/>
    <association property="covariatesMap" columnPrefix="c_"  resultMap="covariatesMap"/>
   </resultMap>
 

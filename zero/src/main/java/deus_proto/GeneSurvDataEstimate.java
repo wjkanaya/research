@@ -76,6 +76,7 @@ public class GeneSurvDataEstimate {
 	}
 
 	List<YearEstimateInfo> list = null;
+	List<YearEstimateInfo> list2 = null;
 
 	public List<YearEstimateInfo> getMapList() {
 		return mapList;
@@ -99,6 +100,8 @@ public class GeneSurvDataEstimate {
 	public void getData() {
 		MemberHistInfoDAO dao = new MemberHistInfoDAO();
 		list = dao.selectMemberHistYearEstimateInfoMap();
+		list2 = dao.selectMemberHistYearEstimateInfoMap2();
+
 		System.out.println(list.size());
 	}
 

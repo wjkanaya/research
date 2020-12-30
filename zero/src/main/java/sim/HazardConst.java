@@ -19,7 +19,7 @@ public class HazardConst {
 	public static final double FEMALE_RITU_CONST = 0.5;
 
 	// 女性のやめやすさ
-	public static final double FEMALE_RTIR_CONST = 5;
+	public static final double FEMALE_RTIR_CONST = 0.1;
 
     // 退職に絡む経過年以外の共変量数
 	public static final int RETIRE_X_INDEX_NUM = 1;

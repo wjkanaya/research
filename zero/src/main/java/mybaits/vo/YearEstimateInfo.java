@@ -14,6 +14,17 @@ public class YearEstimateInfo implements Comparable{
 
 	Integer censored;
 
+	public Integer getLive() {
+		return live;
+	}
+
+	public void setLive(Integer live) {
+		this.live = live;
+	}
+
+	Integer live;
+
+
 	Map<String, BigDecimal>  covariatesMap;
 
 	public Map<String, BigDecimal> getCovariatesMap() {

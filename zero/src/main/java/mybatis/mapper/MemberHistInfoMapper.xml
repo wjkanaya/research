@@ -52,7 +52,7 @@
 
   <select id="selectMemberHistYearEstimateInfoMap2" resultMap="memberHistYearEstimateInfoMap">
     select
-        *
+         *
     from
         (
             select

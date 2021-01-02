@@ -7,18 +7,17 @@ import deus_proto.Member;
 public class MakeHazard {
 
     // proラムダ
-	public static final double PRO_LAMBDA = 0.1;
+	public static final double PRO_LAMBDA =HazardConst.PRO_LAMBDA;
 
     // メンバーラムダ
-	public static final double MEM_LAMBDA = 150;
+	public static final double MEM_LAMBDA = HazardConst.MEM_LAMBDA;
 
 	// メンバー✖プロジェクトラムダ
-	public static final double PRO_MEM_LAMBDA = 0.01;
+	public static final double PRO_MEM_LAMBDA = HazardConst.PRO_MEM_LAMBDA;
 
     //S(t) = e−(λt)p = 5年と6月　5*12+6 で 0.5 0.25
     // メンバーp
-	public static final double MEM_P = 0.9;
-
+	public static final double MEM_P = HazardConst.MEM_P;
 
     // プロジェクト内で何かがおこる。
 	public void  makeStress(Project pro) {
@@ -45,9 +44,9 @@ public class MakeHazard {
 	public double culcTaiProhazard(Member mem, Project pro) {
 
 
-		double h = PRO_MEM_LAMBDA * Math.exp(- mem.tanosisajyuusi * mem.eikyoudo * pro.kyaku.tanosi
-				                                 - mem.seityousitai * pro.kyaku.sodatu);
-		return h;
+		// double h = PRO_MEM_LAMBDA * Math.exp(- mem.tanosisajyuusi * mem.eikyoudo * pro.kyaku.tanosi
+		//		                                 - mem.seityousitai * pro.kyaku.sodatu);
+		return 0;
 
 	}
 

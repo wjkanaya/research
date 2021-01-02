@@ -71,6 +71,18 @@ public class ProPool {
 				list,
 				new Comparator<Transaction>() {
 					public int compare(Transaction obj1, Transaction obj2) {
+
+//						if (!obj1.pro.kyaku.name.endsWith("(悪魔)") && obj2.pro.kyaku.name.endsWith("(悪魔)")) {
+//							return -1;
+//
+//						}
+//
+//						if (obj1.pro.kyaku.name.endsWith("(悪魔)") && !obj2.pro.kyaku.name.endsWith("(悪魔)")) {
+//							return 1;
+//
+//						}
+
+
 						return (spanFinal - obj2.getItukara(nowJikiFinal))  *  obj2.pro.tankin -
 								(spanFinal - obj1.getItukara(nowJikiFinal))  *  obj1.pro.tankin;
 					}

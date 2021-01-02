@@ -263,7 +263,7 @@ public class DoProcess {
 					double proh =  mh.culcprohzard(pro);
 					if (random.nextDouble() < proh) { // プロジェクト終了する確率
 						int ituowaru =  MakePoasonRandom.getPoisson(random,
-								(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 12));
+								(double)MakePoasonRandom.senkeiNormalToInt(random.nextGaussian(), 1, 12));
 
 						if (ituowaru == 0) { // さすがに0はない。
 							ituowaru = 1;
@@ -334,7 +334,7 @@ public class DoProcess {
 							double h = mh.culcTaiProhazard(mem, pro);
 							if (random.nextDouble() < h) { // プロジェクト終了する確率
 								int ituowaru =  MakePoasonRandom.getPoisson(random,
-										(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 3));
+										(double)MakePoasonRandom.senkeiNormalToInt(random.nextGaussian(), 1, 3));
 								logger.debug(mem.name + "プロジェクトやめたい!! ：" + pro.name + ":" + (jiki + ituowaru) + "に終了");
 
 								akiMember.itukara = jiki + ituowaru;
@@ -359,7 +359,16 @@ public class DoProcess {
 			List<Transaction> yuusenJunList = proPool.moukaruJun(jiki, 6);
 
 			logger.debug("-儲かる順--");
-			for (int i = 0; i < 15 ; i++) {
+
+
+
+			int yuusenJunListSize = 15;
+
+			if (yuusenJunListSize> yuusenJunList.size()) {
+				yuusenJunListSize = yuusenJunList.size();
+			}
+
+			for (int i = 0; i < yuusenJunListSize ; i++) {
 				Transaction tran = yuusenJunList.get(i);
 				Project pro = tran.pro;
 				int n1 = tran.nannin- tran.juutounin;

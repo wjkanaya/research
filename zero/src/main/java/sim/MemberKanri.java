@@ -89,7 +89,7 @@ public class MemberKanri {
 						Project pro = eigyouKanri.getMemberProject(mem);
 
 						int ituowaru =  MakePoasonRandom.getPoisson(random,
-								(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 3));
+								(double)MakePoasonRandom.senkeiNormalToInt(random.nextGaussian(), 1, 3));
 
 						if (ituowaru == 0) {
 							ituowaru = 1;

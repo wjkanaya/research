@@ -40,16 +40,16 @@ public class GeneFreshMembers {
 				  member.kisonouryoku = random.nextGaussian() ;
 
 				  // 楽しくなかったらプロジェクトを辞めたい
-				  member.tanosisajyuusi = MakePoasonRandom.senkeiNormalToInto( random.nextGaussian(), 0,1);
+				  member.tanosisajyuusi = MakePoasonRandom.senkeiNormalToInt( random.nextGaussian(), 0,1);
 
 				  // 成長できなかったらプロジェクトを辞めたい
-				  member.seityousitai = MakePoasonRandom.senkeiNormalToInto( random.nextGaussian(), 0,1);
+				  member.seityousitai = MakePoasonRandom.senkeiNormalToInt( random.nextGaussian(), 0,1);
 
 
-				  member.eikyoudo = MakePoasonRandom.senkeiNormalToInto( random.nextGaussian(), 0,1);
+				  member.eikyoudo = MakePoasonRandom.senkeiNormalToInt( random.nextGaussian(), 0,1);
 				  // 楽しさに影響の受けやすさ [0-1] 正規分布
 
-				  member.seityoudo = MakePoasonRandom.senkeiNormalToInto( random.nextGaussian(), 0,1);
+				  member.seityoudo = MakePoasonRandom.senkeiNormalToInt( random.nextGaussian(), 0,1);
 				  // 成長しやすさ [0-1] 正規分布
 
 				  member.entT = j; // 入社時期

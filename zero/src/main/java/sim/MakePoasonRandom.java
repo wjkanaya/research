@@ -24,7 +24,7 @@ public class MakePoasonRandom {
 
 	}
 
-	public static int senkeiNormalToInto(double nran, int start,int haba) {
+	public static int senkeiNormalToInt(double nran, int start,int haba) {
 
 
 		int heikin = (start + (start + haba)) /2;

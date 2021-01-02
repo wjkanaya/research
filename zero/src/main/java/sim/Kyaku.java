@@ -7,6 +7,13 @@ public class Kyaku implements Comparable<Kyaku>  {
 	// 客コード
 	public String kyakuCd;
 
+
+	// 引き合いの強さ
+	public double hikiaiDo;
+
+	// お得意先になりやすさ度
+	public int otokuiDo;
+
     // 要求技術平易度(信頼度の高まりやすさ)
 	public double heiiDo; //
 

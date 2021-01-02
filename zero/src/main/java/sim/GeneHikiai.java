@@ -11,7 +11,7 @@ public class GeneHikiai {
 	public static int KYAKKU_SU = 10000;
 
 
-	public  static double SIKIITI= 0.0015;
+	public  static double SIKIITI= 0.0001;
 	// 客リスト
 
 	public List<Kyaku> list = null;
@@ -69,10 +69,11 @@ public class GeneHikiai {
 
 		List<Transaction> prolist = new ArrayList<Transaction>();
 		for (int i=0; i<list.size();i++) {
-			if  ((list.get(i).torinin ==0  &&  random.nextDouble() < SIKIITI) ||
-					(list.get(i).torinin >0  &&  random.nextDouble() < SIKIITI*50 * (1 + list.get(i).torinin/12) ) ) {
+
+			if  ((list.get(i).torinin ==0  &&  random.nextDouble() < list.get(i).hikiaiDo) ||
+					(list.get(i).torinin >0  &&  random.nextDouble() < list.get(i).hikiaiDo*list.get(i).otokuiDo * (1 + list.get(i).torinin/12) ) ) {
 				int nannin = MakePoasonRandom.getPoisson(random,
-						(double)MakePoasonRandom.senkeiNormalToInto(list.get(i).ooi, 1, 15));
+						(double)MakePoasonRandom.senkeiNormalToInt(list.get(i).ooi, 1, 15));
 				if (nannin > 0) {
 					//　来客
 
@@ -86,7 +87,7 @@ public class GeneHikiai {
 
 
 					tran.nannkagetugo = MakePoasonRandom.getPoisson(random,
-							(double)MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 1, 12));
+							(double)MakePoasonRandom.senkeiNormalToInt(random.nextGaussian(), 1, 12));
 
 					pro.name = Util.getGeneProName(random, list.get(i).name, jiki);
 					pro.nexEigyouJiki = tran.jiki + tran.nannkagetugo +1;
@@ -94,7 +95,7 @@ public class GeneHikiai {
 					pro.kyaku= list.get(i);
 					pro.maxnannin = nannin;
 					pro.tankin =  MakePoasonRandom.getPoisson(random,
-							(double)MakePoasonRandom.senkeiNormalToInto(list.get(i).takai, 40, 60));
+							(double)MakePoasonRandom.senkeiNormalToInt(list.get(i).takai, 40, 60));
 					prolist.add(tran);
 
 //				    // 増減周期
@@ -150,7 +151,14 @@ public class GeneHikiai {
 			for (int i=0; i<KYAKKU_SU;i++) {
 				Kyaku k = new Kyaku();
 
-				k.name = "株式会社"+ i + "興業";
+
+				k.hikiaiDo = SIKIITI * MakePoasonRandom.getPoisson(random,
+						(double)MakePoasonRandom.senkeiNormalToInt(random.nextGaussian(), 1, 15));
+
+
+				k.otokuiDo = MakePoasonRandom.getPoisson(random,
+						(double)MakePoasonRandom.senkeiNormalToInt(random.nextGaussian(), 1, 100));
+
 				k.kyakuCd = String.format("K%05d", i);
 				k.heiiDo = random.nextGaussian();
 				k.ooi = random.nextGaussian();
@@ -159,7 +167,28 @@ public class GeneHikiai {
 				k.maxtakai = random.nextGaussian();
 				k.nagai = random.nextGaussian();
 				k.tanosi = random.nextGaussian();
-				k.sodatu = MakePoasonRandom.senkeiNormalToInto(random.nextGaussian(), 0, 1) ;
+				double unmei = 1;
+				if (HazardConst.KAKYU_ANGEL_DEVIL) {
+					unmei =  random.nextDouble();
+				}
+
+				if (unmei < HazardConst.ANGEL_RITU) {
+					k.name = "株式会社"+ i + "興業(天使)";
+					k.sodatu = 1;
+					k.tanosi = 2;
+
+				} else if (unmei < HazardConst.ANGEL_RITU + HazardConst.DEVIL_RITU) {
+					k.name = "株式会社"+ i + "興業(悪魔)";
+					k.sodatu = 0;
+					k.tanosi = -2000;
+
+				} else {
+					k.name = "株式会社"+ i + "興業";
+					k.sodatu = MakePoasonRandom.senkeiNormalToInt(random.nextGaussian(), 0, 1) ;
+					k.tanosi = random.nextGaussian();
+				}
+
+
 				list.add(k);
 				//			random.nextGaussian()
 

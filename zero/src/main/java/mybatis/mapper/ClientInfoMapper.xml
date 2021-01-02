@@ -22,7 +22,7 @@
   </delete>
 
   <select id="selectClientEarningsInfo" resultType="hashmap">
-    select client_id,sum(earnings_view.earnings) as sum_earnings,
+    select client_info.client_id, sum(earnings_view.earnings) as sum_earnings,
       sum(earnings_view.biz_months) as sum_biz_months,
       sum(earnings_view.earnings) / sum(earnings_view.biz_months) as earmings_per_month
     from  project_info
@@ -30,8 +30,10 @@
         on project_info.project_id = project_enrolled_hist_info.project_id
       inner join  earnings_view
         on earnings_view.enrolled_hist_id = project_enrolled_hist_info.enrolled_hist_id
-    group by  client_id
-    order by earmings_per_month desc
+            inner join  client_info
+        on client_info.client_id = project_info.client_id
+    group by  client_info.client_id
+    order by sum_earnings desc
   </select>
 
 

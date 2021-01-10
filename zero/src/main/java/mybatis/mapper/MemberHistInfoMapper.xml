@@ -184,6 +184,441 @@
    <association property="covariatesMap" columnPrefix="c_"  resultMap="covariatesMap"/>
   </resultMap>
 
+  <select id="selectMemberHistYearCovariatesInfoClientMap" resultMap="memberHistYearCovariatesInfoMap">
+with member_last_year as(
+    SELECT
+        member_id,
+        sex as  &quot;C00002&quot;,
+        cast(EXTRACT(
+                year
+                from
+                    AGE(COALESCE(retirement_date, CAST(DATE_TRUNC('month', now()) as DATE)), enter_date)
+            ) * 12 + EXTRACT(
+                month
+                from
+                    AGE(COALESCE(retirement_date, CAST(DATE_TRUNC('month', now()) as DATE)), enter_date)
+            ) as integer) / 12 as last_year,
+        status
+    from
+        member_hist_info
+)
+select
+    years,
+    event,
+ &quot;C00002&quot;,
+&quot;K08031&quot;,
+&quot;K05994&quot;,
+&quot;K07927&quot;,
+&quot;K05979&quot;,
+&quot;K04496&quot;,
+&quot;K08147&quot;,
+&quot;K01691&quot;,
+&quot;K09933&quot;,
+&quot;K04473&quot;,
+&quot;K01497&quot;,
+&quot;K01221&quot;,
+&quot;K08289&quot;,
+&quot;K09295&quot;,
+&quot;K09024&quot;,
+&quot;K04421&quot;,
+&quot;K02836&quot;,
+&quot;K05863&quot;,
+&quot;K02361&quot;,
+&quot;K06128&quot;,
+&quot;K08392&quot;,
+&quot;K09282&quot;,
+&quot;K07205&quot;,
+&quot;K04919&quot;,
+&quot;K05782&quot;,
+&quot;K07572&quot;,
+&quot;KXXXXX&quot;,
+ COUNT(*) as count
+    from (
+select
+    member_id,
+    years,
+    event,
+    &quot;C00002&quot;,
+    max(&quot;K08031&quot;) as &quot;K08031&quot;,
+    max(&quot;K05994&quot;) as &quot;K05994&quot;,
+    max(&quot;K07927&quot;) as &quot;K07927&quot;,
+    max(&quot;K05979&quot;) as &quot;K05979&quot;,
+    max(&quot;K04496&quot;) as &quot;K04496&quot;,
+    max(&quot;K08147&quot;) as &quot;K08147&quot;,
+    max(&quot;K01691&quot;) as &quot;K01691&quot;,
+    max(&quot;K09933&quot;) as &quot;K09933&quot;,
+    max(&quot;K04473&quot;) as &quot;K04473&quot;,
+    max(&quot;K01497&quot;) as &quot;K01497&quot;,
+    max(&quot;K01221&quot;) as &quot;K01221&quot;,
+    max(&quot;K08289&quot;) as &quot;K08289&quot;,
+    max(&quot;K09295&quot;) as &quot;K09295&quot;,
+    max(&quot;K09024&quot;) as &quot;K09024&quot;,
+    max(&quot;K04421&quot;) as &quot;K04421&quot;,
+    max(&quot;K02836&quot;) as &quot;K02836&quot;,
+    max(&quot;K05863&quot;) as &quot;K05863&quot;,
+    max(&quot;K02361&quot;) as &quot;K02361&quot;,
+    max(&quot;K06128&quot;) as &quot;K06128&quot;,
+    max(&quot;K08392&quot;) as &quot;K08392&quot;,
+    max(&quot;K09282&quot;) as &quot;K09282&quot;,
+    max(&quot;K07205&quot;) as &quot;K07205&quot;,
+    max(&quot;K04919&quot;) as &quot;K04919&quot;,
+    max(&quot;K05782&quot;) as &quot;K05782&quot;,
+    max(&quot;K07572&quot;) as &quot;K07572&quot;,
+    max(&quot;KXXXXX&quot;) as &quot;KXXXXX&quot;
+from
+    (
+        select
+            member_id,
+            &quot;C00002&quot;,
+            years,
+            event,
+            CASE
+                WHEN client_id = 'K08031' THEN ruiseki
+                ELSE 0
+            END AS &quot;K08031&quot;,
+            case
+                when client_id = 'K05994' Then ruiseki
+                Else 0
+            end as &quot;K05994&quot;,
+            case
+                when client_id = 'K07927' Then ruiseki
+                Else 0
+            end as &quot;K07927&quot;,
+            case
+                when client_id = 'K05979' Then ruiseki
+                Else 0
+            end as &quot;K05979&quot;,
+            case
+                when client_id = 'K04496' Then ruiseki
+                Else 0
+            end as &quot;K04496&quot;,
+            case
+                when client_id = 'K08147' Then ruiseki
+                Else 0
+            end as &quot;K08147&quot;,
+            case
+                when client_id = 'K01691' Then ruiseki
+                Else 0
+            end as &quot;K01691&quot;,
+            case
+                when client_id = 'K09933' Then ruiseki
+                Else 0
+            end as &quot;K09933&quot;,
+            case
+                when client_id = 'K04473' Then ruiseki
+                Else 0
+            end as &quot;K04473&quot;,
+            case
+                when client_id = 'K01497' Then ruiseki
+                Else 0
+            end as &quot;K01497&quot;,
+            case
+                when client_id = 'K01221' Then ruiseki
+                Else 0
+            end as &quot;K01221&quot;,
+            case
+                when client_id = 'K08289' Then ruiseki
+                Else 0
+            end as &quot;K08289&quot;,
+            case
+                when client_id = 'K09295' Then ruiseki
+                Else 0
+            end as &quot;K09295&quot;,
+            case
+                when client_id = 'K09024' Then ruiseki
+                Else 0
+            end as &quot;K09024&quot;,
+            case
+                when client_id = 'K04421' Then ruiseki
+                Else 0
+            end as &quot;K04421&quot;,
+            case
+                when client_id = 'K02836' Then ruiseki
+                Else 0
+            end as &quot;K02836&quot;,
+            case
+                when client_id = 'K05863' Then ruiseki
+                Else 0
+            end as &quot;K05863&quot;,
+            case
+                when client_id = 'K02361' Then ruiseki
+                Else 0
+            end as &quot;K02361&quot;,
+            case
+                when client_id = 'K06128' Then ruiseki
+                Else 0
+            end as &quot;K06128&quot;,
+            case
+                when client_id = 'K08392' Then ruiseki
+                Else 0
+            end as &quot;K08392&quot;,
+            case
+                when client_id = 'K09282' Then ruiseki
+                Else 0
+            end as &quot;K09282&quot;,
+            case
+                when client_id = 'K07205' Then ruiseki
+                Else 0
+            end as &quot;K07205&quot;,
+            case
+                when client_id = 'K04919' Then ruiseki
+                Else 0
+            end as &quot;K04919&quot;,
+            case
+                when client_id = 'K05782' Then ruiseki
+                Else 0
+            end as &quot;K05782&quot;,
+            case
+                when client_id = 'K07572' Then ruiseki
+                Else 0
+            end as &quot;K07572&quot;,
+            '0' as &quot;KXXXXX&quot;
+        From
+            (
+                select
+                    *,
+                    CASE
+                        WHEN last_year = years
+                    AND status = '1' THEN 1
+                        ELSE 0
+                    END AS event,
+                    sum(client_count) over(PARTITION BY member_id, client_id order by years) as ruiseki
+                from
+                    member_last_year
+                    inner join
+                        (
+                            Select
+                                months / 12 as years,
+                                client_id,
+                                member_id,
+                                count(
+                                    CASE
+                                        WHEN months &gt;= join_member_months
+                                    AND months &lt;= stop_member_months THEN 1
+                                        ELSE 0
+                                    END = '1'
+                                or  null
+                                ) AS client_count
+                            from
+                                generate_series(0, 480) As months cross
+                                join
+                                    (
+                                        select
+                                            pp.client_id,
+                                            peh.member_id,
+                                            peh.join_member_months,
+                                            peh.stop_member_months
+                                        from
+                                            project_enrolled_hist_info peh
+                                            inner join
+                                                project_info pp
+                                            using
+                                                (project_id)
+                                        where
+                                            pp.client_id IN('K08031', 'K05994', 'K07927', 'K05979', 'K04496', 'K08147', 'K01691', 'K09933', 'K04473', 'K01497', 'K01221', 'K08289', 'K09295', 'K09024', 'K04421', 'K02836', 'K05863', 'K02361', 'K06128', 'K08392', 'K09282', 'K07205', 'K04919', 'K05782', 'K07572')
+                                    ) a
+                            group by
+                                client_id,
+                                member_id,
+                                years
+                        ) cc
+                    using
+                        (member_id)
+                where
+                    cc.years &lt;= last_year
+            ) test01
+        union all
+        select
+            member_id,
+            &quot;C00002&quot;,
+            years,
+            CASE
+                WHEN last_year = years
+            AND status = '1' THEN 1
+                ELSE 0
+            END AS event,
+            '0' as &quot;K08031&quot;,
+            '0' as &quot;K05994&quot;,
+            '0' as &quot;K07927&quot;,
+            '0' as &quot;K05979&quot;,
+            '0' as &quot;K04496&quot;,
+            '0' as &quot;K08147&quot;,
+            '0' as &quot;K01691&quot;,
+            '0' as &quot;K09933&quot;,
+            '0' as &quot;K04473&quot;,
+            '0' as &quot;K01497&quot;,
+            '0' as &quot;K01221&quot;,
+            '0' as &quot;K08289&quot;,
+            '0' as &quot;K09295&quot;,
+            '0' as &quot;K09024&quot;,
+            '0' as &quot;K04421&quot;,
+            '0' as &quot;K02836&quot;,
+            '0' as &quot;K05863&quot;,
+            '0' as &quot;K02361&quot;,
+            '0' as &quot;K06128&quot;,
+            '0' as &quot;K08392&quot;,
+            '0' as &quot;K09282&quot;,
+            '0' as &quot;K07205&quot;,
+            '0' as &quot;K04919&quot;,
+            '0' as &quot;K05782&quot;,
+            '0' as &quot;K07572&quot;,
+            sum(client_count) over(PARTITION BY member_id, client_id order by years) as &quot;KXXXXX&quot;
+        from
+            member_last_year
+            inner join
+                (
+                    Select
+                        months / 12 as years,
+                        client_id,
+                        member_id,
+                        count(
+                            CASE
+                                WHEN months &gt;= join_member_months
+                            AND months &lt;= stop_member_months THEN 1
+                                ELSE 0
+                            END = '1'
+                        or  null
+                        ) AS client_count
+                    from
+                        generate_series(0, 480) As months cross
+                        join
+                            (
+                                select
+                                    'KXXXXX' as client_id,
+                                    peh.member_id,
+                                    peh.join_member_months,
+                                    peh.stop_member_months
+                                from
+                                    project_enrolled_hist_info peh
+                                    inner join
+                                        project_info pp
+                                    using
+                                        (project_id)
+                                where
+                                    pp.client_id not IN('K08031', 'K05994', 'K07927', 'K05979', 'K04496', 'K08147', 'K01691', 'K09933', 'K04473', 'K01497', 'K01221', 'K08289', 'K09295', 'K09024', 'K04421', 'K02836', 'K05863', 'K02361', 'K06128', 'K08392', 'K09282', 'K07205', 'K04919', 'K05782', 'K07572')
+                            ) a
+                    group by
+                        client_id,
+                        member_id,
+                        years
+                ) cc
+            using
+                (member_id)
+        where
+            cc.years &lt;= last_year
+    ) test02
+group by
+    member_id,
+    &quot;C00002&quot;,
+    years,
+    event
+) test03
+group by
+    years,
+    event,
+ &quot;C00002&quot;,
+&quot;K08031&quot;,
+&quot;K05994&quot;,
+&quot;K07927&quot;,
+&quot;K05979&quot;,
+&quot;K04496&quot;,
+&quot;K08147&quot;,
+&quot;K01691&quot;,
+&quot;K09933&quot;,
+&quot;K04473&quot;,
+&quot;K01497&quot;,
+&quot;K01221&quot;,
+&quot;K08289&quot;,
+&quot;K09295&quot;,
+&quot;K09024&quot;,
+&quot;K04421&quot;,
+&quot;K02836&quot;,
+&quot;K05863&quot;,
+&quot;K02361&quot;,
+&quot;K06128&quot;,
+&quot;K08392&quot;,
+&quot;K09282&quot;,
+&quot;K07205&quot;,
+&quot;K04919&quot;,
+&quot;K05782&quot;,
+&quot;K07572&quot;,
+&quot;KXXXXX&quot;
+
+order by
+    years, event
+
+  </select>
+  <select id="selectMemberHistYearCovariatesInfoMap" resultMap="memberHistYearCovariatesInfoMap">
+    select
+    years,
+     <if test="sex == true">
+    &quot;C00002&quot; as &quot;c_C00002&quot;,
+    </if>
+    event,
+    COUNT(*) as count
+    from
+    (
+        select
+            member_id,
+            years,
+            CASE
+                WHEN last_year = years
+            AND status = '1' THEN 1
+                ELSE 0
+            END AS event
+             <if test="sex == true">
+            ,&quot;C00002&quot;
+            </if>
+        from
+            (
+                SELECT
+                    member_id,
+                    <if test="sex == true">
+                    sex as &quot;C00002&quot;,
+                    </if>
+                    cast(EXTRACT(
+                            year
+                            from
+                                AGE(COALESCE(retirement_date, CAST(DATE_TRUNC('month', now()) as DATE)), enter_date)
+                        ) * 12 + EXTRACT(
+                            month
+                            from
+                                AGE(COALESCE(retirement_date, CAST(DATE_TRUNC('month', now()) as DATE)), enter_date)
+                        ) as integer) / 12 as last_year,
+                    status,
+                    years
+                from
+                    member_hist_info cross
+                    join
+                        generate_series(0, 100) As years
+            ) aa
+        where
+            years &lt;= last_year
+    ) bb
+    group by
+    years,
+    event
+     <if test="sex == true">
+    ,&quot;c_C00002&quot;
+    </if>
+    order by
+    years,
+    event
+     <if test="sex == true">
+    ,&quot;c_C00002&quot;
+    </if>
+
+  </select>
+
+  <resultMap id="memberHistYearCovariatesInfoMap" type="YearCovariatesInfo">
+   <id column="tbl_id"/>
+   <result property="years" column="years"/>
+   <result property="event" column="event"/>
+   <result property="count" column="count"/>
+   <association property="covariatesMap" columnPrefix="c_"  resultMap="covariatesMap"/>
+  </resultMap>
+
+
   <resultMap id="covariatesMap" type="hashmap" autoMapping="true"/>
 
   <insert id="insertMemberHistInfo" useGeneratedKeys="true"

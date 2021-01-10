@@ -1,5 +1,8 @@
 package mybatis.dao;
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.session.SqlSession;
 
 import mybaits.vo.ClientInfo;
@@ -12,6 +15,16 @@ public class ClientInfoDAO {
 	public static final String TRUNCATE_CLIENT_INFO = "truncateClientInfo";
 
 	public static final String CLEAN_CLIENT_INFO_TBL_ID = "cleanClientInfoTblId";
+
+	public static final String SELECT_GREY_CLIENT_INFO = "selectGreyClientInfo";
+
+
+
+	public List<Map> selectGreyClientInfo() {
+		SqlSession session = Util.getSqlSession();
+		List<Map> list = session.selectList(SELECT_GREY_CLIENT_INFO);
+		return list;
+	}
 
 	public int insertClientInfo(ClientInfo info) {
 		SqlSession session = Util.getSqlSession();

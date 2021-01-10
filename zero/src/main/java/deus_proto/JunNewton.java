@@ -4,6 +4,7 @@ import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 
+import deus_proto.util.CulcUtil;
 import sim.Util;
 
 public class JunNewton {
@@ -249,7 +250,8 @@ public class JunNewton {
 		nowp = nowPMat.getData();
 		//print("最終点：" + str(nowp) + " 値:" + str(alf(nowp)))
 //		System.out.println("最終点：" + str(nowp) + " 値:" + str(alf(nowp)));
-		System.out.println("最終点：" + nowPMat + " 値:"  + est.L(nowPMat.getData()));
+		System.out.println("最終点：" + nowPMat + " 値:"  + est.L(nowPMat.getData())+
+				" AIC:" + CulcUtil.culcAIC( est.L(nowPMat.getData()), est.getBetaSize())) ;
 
 		est.setCovariatesValue(nowPMat);
 

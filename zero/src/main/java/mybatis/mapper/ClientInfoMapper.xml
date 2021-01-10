@@ -69,7 +69,8 @@
 
 
  <select id="selectGreyClientInfo" resultType="hashmap">
-    select *,t1.sum_earnings * 1.0 / r_count as earnings_per_r_count from (
+
+  select *,t1.sum_earnings * 1.0 / r_count as earnings_per_r_count from (
     select ci1.client_id, sum(v1.earnings) as sum_earnings,
       sum(v1.biz_months) as sum_biz_months,
       sum(v1.earnings) * 1.0 / sum(v1.biz_months) as earmings_per_month
@@ -92,9 +93,11 @@
         using (client_id)
     where v2.status = '1'
     group by ci2.client_id
+    having r_count > 5
  ) t2
      using (client_id)
      order by earnings_per_r_count
+     offset 0 limit 25
 
   </select>
 

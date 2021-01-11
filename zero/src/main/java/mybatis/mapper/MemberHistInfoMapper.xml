@@ -205,18 +205,18 @@
     select
         years,
         event,
-     &quot;C00002&quot;,
-    <foreach item="item" collection="target.clientList">
+     &quot;C00002&quot; as &quot;c_C00002&quot;,
+    <foreach item="item" collection="clientList">
      &quot;${item.clientId}&quot; as  &quot;c_${item.clientId}&quot;,
     </foreach>
-    &quot;KXXXXX&quot; as &quot;c_KXXXXX&quot;,,
+    &quot;KXXXXX&quot; as &quot;c_KXXXXX&quot;,
      COUNT(*) as count
         from (
     select
         member_id,
         years,
         &quot;C00002&quot;,
-        <foreach item="item" collection="target.clientList">
+        <foreach item="item" collection="clientList">
             max(&quot;${item.clientId}&quot;) as &quot;${item.clientId}&quot;,
         </foreach>
         max(&quot;KXXXXX&quot;) as &quot;KXXXXX&quot;,
@@ -228,7 +228,7 @@
                 &quot;C00002&quot;,
                 years,
                 event,
-                <foreach item="item" collection="target.clientList">
+                <foreach item="item" collection="clientList">
                 CASE
                     WHEN client_id = '${item.clientId}' THEN ruiseki
                     ELSE 0
@@ -278,7 +278,7 @@
                                                     (project_id)
                                             where
                                                 pp.client_id IN(
-                                                <foreach item="item" collection="target.clientList" separator=",">
+                                                <foreach item="item" collection="clientList" separator=",">
                                                     '${item.clientId}'
                                                 </foreach>
                                                 )
@@ -303,7 +303,7 @@
                 AND status = '1' THEN 1
                     ELSE 0
                 END AS event,
-                <foreach item="item" collection="target.clientList">
+                <foreach item="item" collection="clientList">
                 '0' as &quot;{item.clientId}&quot;,
                 </foreach>
                 sum(client_count) over(PARTITION BY member_id, client_id order by years) as &quot;KXXXXX&quot;
@@ -340,7 +340,7 @@
                                             (project_id)
                                     where
                                         pp.client_id not IN(
-                                                 <foreach item="item" collection="target.clientList" separator=",">
+                                                 <foreach item="item" collection="clientList" separator=",">
                                                     '${item.clientId}'
                                                 </foreach>
                                         )
@@ -365,9 +365,9 @@
         years,
         event,
 
-     &quot;C00002&quot;,
+     &quot;c_C00002&quot;,
 
-    <foreach item="item" collection="target.clientList">
+    <foreach item="item" collection="clientList">
     &quot;${item.clientId}&quot;,
     </foreach>
     &quot;KXXXXX&quot;

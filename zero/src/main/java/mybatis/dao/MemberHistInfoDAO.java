@@ -9,6 +9,8 @@ import deus.enums.RetirementType;
 import mybaits.vo.MemberHistInfo;
 import mybaits.vo.MemberHistPriceInfo;
 import mybaits.vo.YearCount;
+import mybaits.vo.YearCovariatesInfo;
+import mybaits.vo.YearCovariatesInfoParam;
 import mybaits.vo.YearEstimateInfo;
 import mybaits.vo.YearEstimateInfoPre;
 import mybaits.vo.YearMonthsCensorCount;
@@ -43,6 +45,12 @@ public class MemberHistInfoDAO {
 
     public static final String SELECT_MEMBER_HIST_YEAR_ESTIMATE_INFO_MAP2 = "selectMemberHistYearEstimateInfoMap2";
 
+    public static final String  SELECT_MEMBER_HIST_YEAR_COVARIATES_INFO_CLIENT_MAP
+    	= "selectMemberHistYearCovariatesInfoClientMap";
+
+    public static final String SELECT_MEMBER_HIST_YEAR_COVARIATES_INFO_MAP = "selectMemberHistYearCovariatesInfoMap";
+
+
 
     public void trancateMemberHistInfo() {
     	SqlSession session = Util.getSqlSession();
@@ -59,6 +67,18 @@ public class MemberHistInfoDAO {
 	public List<YearEstimateInfoPre> selectMemberHistYearEstimateInfo() {
 		SqlSession session = Util.getSqlSession();
 		List<YearEstimateInfoPre> list = session.selectList(SELECT_MEMBER_HIST_YEAR_ESTIMATE_INFO);
+		return list;
+	}
+
+	public List<YearCovariatesInfo> selectMemberHistYearCovariatesInfoMap(YearCovariatesInfoParam target) {
+		SqlSession session = Util.getSqlSession();
+		List<YearCovariatesInfo> list = session.selectList(SELECT_MEMBER_HIST_YEAR_COVARIATES_INFO_MAP, target);
+		return list;
+	}
+
+	public List<YearCovariatesInfo> selectMemberHistYearCovariatesInfoClientMap(YearCovariatesInfoParam target) {
+		SqlSession session = Util.getSqlSession();
+		List<YearCovariatesInfo> list = session.selectList(SELECT_MEMBER_HIST_YEAR_COVARIATES_INFO_CLIENT_MAP, target);
 		return list;
 	}
 

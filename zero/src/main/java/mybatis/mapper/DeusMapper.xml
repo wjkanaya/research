@@ -7,4 +7,5 @@
 
 <mapper namespace="mybatis.DeusMapper">
 
+
 </mapper>

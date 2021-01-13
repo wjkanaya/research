@@ -87,9 +87,9 @@ public class Util {
 	}
 
 
-	public static String getGeneProName(SimRandom random,String kyakuName, int jiki) {
+	public static String getGeneProName(int idex,String kyakuName, int jiki) {
 
-		return kyakuName +"_" + jiki + "_" + random.nextInt(10);
+		return kyakuName +"_" + jiki + "_" + idex;
 	}
 
 

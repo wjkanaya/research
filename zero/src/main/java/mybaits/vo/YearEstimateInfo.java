@@ -6,6 +6,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
+import deus_proto.util.CovariatesCodeComparator;
+
 public class YearEstimateInfo implements Comparable{
 
 	Integer years;
@@ -34,7 +36,7 @@ public class YearEstimateInfo implements Comparable{
 	public void setCovariatesMap(Map<String, Object> covariatesMap) {
 
 		Set<Entry<String, Object>> set = covariatesMap.entrySet();
-		Map<String, BigDecimal>  map = new TreeMap<String, BigDecimal>();
+		Map<String, BigDecimal>  map = new TreeMap<String, BigDecimal>(new CovariatesCodeComparator());
 
 
 		for (Entry<String, Object> ent :set) {

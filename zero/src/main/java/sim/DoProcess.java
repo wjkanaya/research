@@ -404,7 +404,7 @@ public class DoProcess {
 						pro.startJiki = tran.jiki + tran.nannkagetugo;
 
 						ProjectInfo proInfo = new ProjectInfo();
-						proInfo.setProjectId(pro.name);
+						proInfo.setProjectId(pro.id);
 						proInfo.setProjectName(pro.name);
 
 						proInfo.setClientId(pro.kyaku.kyakuCd);

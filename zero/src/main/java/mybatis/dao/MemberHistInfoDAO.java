@@ -50,13 +50,19 @@ public class MemberHistInfoDAO {
 
     public static final String SELECT_MEMBER_HIST_YEAR_COVARIATES_INFO_MAP = "selectMemberHistYearCovariatesInfoMap";
 
-
+    public static final String  SELECT_MAX_LAST_YEAR = "selectMaxLastYear";
 
     public void trancateMemberHistInfo() {
     	SqlSession session = Util.getSqlSession();
     	session.delete(TRUNCATE_MEMBER_HIST_INFO);
     	session.delete(CLEAN_MEMBER_HIST_INFO_TBL_ID);
     }
+
+	public int selectMaxLastYear() {
+		SqlSession session = Util.getSqlSession();
+		Integer year = session.selectOne(SELECT_MAX_LAST_YEAR);
+		return year.intValue();
+	}
 
 	public int selectAllMemberHistInfoCount() {
 		SqlSession session = Util.getSqlSession();

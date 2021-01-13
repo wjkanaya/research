@@ -89,7 +89,9 @@ public class GeneHikiai {
 					tran.nannkagetugo = MakePoasonRandom.getPoisson(random,
 							(double)MakePoasonRandom.senkeiNormalToInt(random.nextGaussian(), 1, 12));
 
-					pro.name = Util.getGeneProName(random, list.get(i).name, jiki);
+					int indx = random.nextInt(10);
+					pro.name = Util.getGeneProName(indx, list.get(i).name, jiki);
+					pro.id =  "P_" + list.get(i).kyakuCd + "_" + jiki + "_" + indx;
 					pro.nexEigyouJiki = tran.jiki + tran.nannkagetugo +1;
 
 					pro.kyaku= list.get(i);

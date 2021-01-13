@@ -34,7 +34,7 @@ public class GeneFreshMembers {
 					  member.name = namecnt + "郎";
 					  member.sex = 0;
 				  }
-				  member.memberId = String.format("%04d", namecnt);
+				  member.memberId = String.format("M%04d", namecnt);
 				  member.retire = 0;
 				  member.yameritu = random.nextGaussian() ;
 				  member.kisonouryoku = random.nextGaussian() ;

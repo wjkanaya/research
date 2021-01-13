@@ -38,37 +38,53 @@ public class OneHotMaker {
 			}
 		}
 
-		Set<Entry<String, BigDecimal>> set = map.entrySet();
-
 		List<ConvariateData> resultList = new ArrayList<ConvariateData>();
+
+		if (map == null) {
+			return resultList;
+		}
+
+		Set<Entry<String, BigDecimal>> set = map.entrySet();
 
 		for (Entry<String, BigDecimal> entry : set) {
 
-			int type = convariatesTypeMap.get(entry.getKey()).intValue();
-			switch (type) {
-			case DeusConst.COV_TYPE_BOOL: // boolean
-			case DeusConst.COV_TYPE_CATE: // カテゴリ
-			case DeusConst.COV_TYPE_ORDR: // 順序
-				int start =  rangeStartMap.get(entry.getKey());
-				int end   =  rangeEndMap.get(entry.getKey());
-				for (int i = start; i <=  end; i++) {
+			if (convariatesTypeMap.get(entry.getKey()) != null) {
+				int type = convariatesTypeMap.get(entry.getKey()).intValue();
+				switch (type) {
+				case DeusConst.COV_TYPE_BOOL: // boolean
+				case DeusConst.COV_TYPE_CATE: // カテゴリ
+				case DeusConst.COV_TYPE_ORDR: // 順序
+					int start =  rangeStartMap.get(entry.getKey());
+					int end   =  rangeEndMap.get(entry.getKey());
+					for (int i = start; i <=  end; i++) {
+						ConvariateData data = new ConvariateData();
+						data.setConvariateCode(entry.getKey());
+						data.setConvariateLabel(i);
+						if (i == entry.getValue().intValue()) {
+							data.setValue(BigDecimal.valueOf(1));
+						} else {
+							data.setValue(BigDecimal.valueOf(0));
+						}
+						resultList.add(data);
+					}
+					break;
+				default:
 					ConvariateData data = new ConvariateData();
 					data.setConvariateCode(entry.getKey());
-					data.setConvariateLabel(i);
-					if (i == entry.getValue().intValue()) {
-						data.setValue(BigDecimal.valueOf(1));
-					} else {
-						data.setValue(BigDecimal.valueOf(0));
-					}
+					data.setConvariateLabel(0);
+					data.setValue(entry.getValue());
 					resultList.add(data);
+
 				}
-				break;
-			default:
+			} else {
 				ConvariateData data = new ConvariateData();
 				data.setConvariateCode(entry.getKey());
 				data.setConvariateLabel(0);
 				data.setValue(entry.getValue());
+				resultList.add(data);
+
 			}
+
 		}
 
 		return resultList;

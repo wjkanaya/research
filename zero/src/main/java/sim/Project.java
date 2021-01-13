@@ -14,6 +14,9 @@ public class Project  implements Comparable<Project>  {
 //
 //	}
 
+	// プロジェクトID
+	public String id;
+
 	// 状態0引き合い、1、実行中、2プロジェクト終了
 	public int status;
 
@@ -31,7 +34,6 @@ public class Project  implements Comparable<Project>  {
 //
 //	//  提案時期  + 開始時期
 //	public int nannkagetugo;
-
 
 	// 名前
 	public String name;

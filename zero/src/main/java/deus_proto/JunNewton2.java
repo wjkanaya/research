@@ -3,11 +3,16 @@ package deus_proto;
 import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import deus_proto.util.CulcUtil;
 import sim.Util;
 
 public class JunNewton2 {
+
+	static Logger logger = LogManager.getLogger(JunNewton2.class);
+
 
 	// <<退職圧要因一覧情報>>
 	public static void main(String[] args) throws Exception {
@@ -44,7 +49,7 @@ public class JunNewton2 {
 		for (int j = 0; j < 10; j++) {
 
 //		    print("現点：" + str(nowp))
-			System.out.println("現点：" + nowPMat);
+			logger.debug("現点：" + nowPMat);
 			//			//
 //			    w, v = LA.eig(H)
 			EigenDecomposition hMatEd = new EigenDecomposition(hMat);
@@ -52,8 +57,8 @@ public class JunNewton2 {
 			//			    print("固有値:" + str(w))
 			double[] eigens = hMatEd.getRealEigenvalues();
 			for(int i=0; i<eigens.length; i++) {
-				System.out.println("固有値: " + str(eigens[i]));
-				//	System.out.println("固有ベクトル: " + ed.getEigenvector(i));
+				logger.debug("固有値: " + str(eigens[i]));
+				//	logger.debug("固有ベクトル: " + ed.getEigenvector(i));
 			}
 
 			//
@@ -68,10 +73,9 @@ public class JunNewton2 {
 			vectorMat =
 					vectorMat.scalarMultiply(1 / vectorMat.getColumnVector(0).getNorm());
 
-
 			//
 //			    print("ベクトル：" + str(vectr))
-			System.out.println("ベクトル：" + vectorMat);
+			logger.debug("ベクトル：" + vectorMat);
 			//
 
 //			    p1 = nowp + 0 * vectr * h
@@ -134,13 +138,13 @@ public class JunNewton2 {
 			}
 
 //		    print("i：" + str(i))
-			System.out.println("i：" + nowI);
+			logger.debug("i：" + nowI);
 
 //		    print("s：" + str(al_s))
-			System.out.println("s：" + al_s);
+			logger.debug("s：" + al_s);
 
 			//		    print("e：" + str(al_e))
-			System.out.println("e：" + al_e);
+			logger.debug("e：" + al_e);
 
 					//
 //		    # 初期設定
@@ -204,11 +208,11 @@ public class JunNewton2 {
 
 //		    #print(" 計算回数:" + str(i))
 //		    print("終点s：" + str(al_s) + " 値s:" + str(alf(al_s)) + " 計算回数:" + str(i))
-			System.out.println("終点s：" + al_s + " 値s:" +alsL + " 計算回数:" + nowI);
+			logger.debug("終点s：" + al_s + " 値s:" +alsL + " 計算回数:" + nowI);
 
 
 //		    print("終点e：" + str(al_e) + " 値e:" + str(alf(al_e)) + " 計算回数:" + str(i))
-			System.out.println("終点e：" + al_e + " 値e:" + aleL + " 計算回数:" + nowI);
+			logger.debug("終点e：" + al_e + " 値e:" + aleL + " 計算回数:" + nowI);
 		//
 		//
 //		    prep = nowp
@@ -233,8 +237,8 @@ public class JunNewton2 {
 		}
 		nowp = nowPMat.getData();
 		//print("最終点：" + str(nowp) + " 値:" + str(alf(nowp)))
-//		System.out.println("最終点：" + str(nowp) + " 値:" + str(alf(nowp)));
-		System.out.println("最終点：" + nowPMat + " 対数尤度値:"  + -est.L(nowPMat.getData())+
+//		logger.debug("最終点：" + str(nowp) + " 値:" + str(alf(nowp)));
+		logger.debug("最終点：" + nowPMat + " 対数尤度値:"  + -est.L(nowPMat.getData())+
 				" AIC:" + CulcUtil.culcAIC( -est.L(nowPMat.getData()), est.getBetaSize())) ;
 
 		est.setCovariatesValue(nowPMat);
@@ -258,18 +262,18 @@ public class JunNewton2 {
 		RealMatrix s = nowPMat.subtract(prepMat);
 		RealMatrix y = est.delta(nowPMat).subtract(est.delta(prepMat));
 
-		System.out.println( "s:" + s  );
-		System.out.println( "y:" + y  );
+		logger.debug( "s:" + s  );
+		logger.debug( "y:" + y  );
 
 
 		double beta = s.transpose().multiply(y).getEntry(0, 0); // 1×1の行列になっているはず
 
 		double gamma = y.transpose().multiply(preHMat).multiply(y)
 				.getEntry(0, 0);// 1×1の行列になっているはず
-		System.out.println( "preHMat:" + preHMat  );
-		System.out.println( "siki1:" +   siki1(preHMat, y, s, beta)  );
+		logger.debug( "preHMat:" + preHMat  );
+		logger.debug( "siki1:" +   siki1(preHMat, y, s, beta)  );
 
-		System.out.println( "siki2:" +   siki2(beta, gamma, s)  )
+		logger.debug( "siki2:" +   siki2(beta, gamma, s)  )
 		;
 		RealMatrix H = preHMat.subtract(siki1(preHMat, y, s, beta)).add(siki2(beta, gamma, s));
 

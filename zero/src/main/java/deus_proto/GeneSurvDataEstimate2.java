@@ -281,7 +281,6 @@ public class GeneSurvDataEstimate2 {
 
 			}
 
-
 			CovariatesInfo covInfo = new CovariatesInfo();
 			covInfo.setCulcTargetCode(DeusConst.CT0001);
 			covInfo.setCovariatesCode(convData.getConvariateCode());
@@ -293,11 +292,6 @@ public class GeneSurvDataEstimate2 {
 			i++;
 		}
 	}
-
-//	private double culcPDold(double[] betaArr, int year, int yearRange, Map<String, ConvariateData> convariateDataListMap) {
-//		return 1.0 / ( 1.0  +  Math.exp(-culcZ(betaArr, year, yearRange, convariateDataListMap)));
-//
-//	}
 
 	private double culcPD(double[] betaArr, int yearRange, YearCovariatesInfo info) {
 		return 1.0 / ( 1.0  +  Math.exp(-culcZ(betaArr, yearRange, info)));
@@ -323,23 +317,6 @@ public class GeneSurvDataEstimate2 {
 		}
 		return zCacheMap.get(info);
 	}
-
-
-//	private double culcZ(double[] betaArr, int year, int yearRange, Map<String, ConvariateData> convariateDataListMap) {
-//
-//
-//
-//		ConvariateData[] dataArr = convariateDataListMap.values().toArray(new ConvariateData[0]);
-//
-//		TotalCounter tc = new TotalCounter();
-//		tc.set(betaArr[year]);
-//		for (int i = 0; i < dataArr.length; i++) {
-//			double v = betaArr[yearRange + i] * dataArr[i].getValue().intValue();
-//			tc.set(v);
-//		}
-//
-//		return tc.getTotal();
-//	}
 
 
 }

@@ -319,7 +319,7 @@
                     ELSE 0
                 END AS event,
                 <foreach item="item" collection="clientList">
-                '0' as &quot;{item.clientId}&quot;,
+                '0' as &quot;${item.clientId}&quot;,
                 </foreach>
                 sum(client_count) over(PARTITION BY member_id, client_id order by years) as &quot;KXXXXX&quot;
             from
@@ -389,6 +389,8 @@
 
     order by
         years, event
+
+
   </select>
   <select id="selectMemberHistYearCovariatesInfoMap" resultMap="memberHistYearCovariatesInfoMap">
     select

@@ -2,7 +2,9 @@ package deus_proto;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,6 +17,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import deus_proto.util.OneHotMaker;
+import mybaits.vo.ClientInfo;
 import mybaits.vo.ConvariateData;
 import mybaits.vo.CovariatesEffectiveInfo;
 import mybaits.vo.CovariatesInfo;
@@ -28,16 +31,6 @@ import mybatis.dao.MemberHistInfoDAO;
 public class GeneSurvDataEstimate2 {
 
 	static Logger logger = LogManager.getLogger(GeneSurvDataEstimate2.class);
-//	est.getData();
-//	est.makeData();
-//est.getBetaSize()
-//est.delta(nowPMat)
-//est.L
-//
-//est.setCovariatesValue(nowPMat);
-
-
-
 
 	public int getBetaSize() {
 		return betaSize;
@@ -47,7 +40,6 @@ public class GeneSurvDataEstimate2 {
 		this.betaSize = betaSize;
 	}
 
-
 	List<YearCovariatesInfo> convList = null;
 
 	int yearRange = 0;
@@ -56,10 +48,12 @@ public class GeneSurvDataEstimate2 {
 
     List<List<YearCovariatesInfo>> yearConvList = null;
 
-
     TreeMap<String, List<YearCovariatesInfo>> convTreeMap = null;
 
-    Map<YearCovariatesInfo,List<ConvariateData>> convariateDataListMap = null;
+    Map<YearCovariatesInfo,Map<String,ConvariateData>> convariateDataListMap = null;
+
+
+
 
 	public void getData() {
 		MemberHistInfoDAO dao = new MemberHistInfoDAO();
@@ -69,8 +63,18 @@ public class GeneSurvDataEstimate2 {
 
 		YearCovariatesInfoParam param = new YearCovariatesInfoParam();
 		param.setSex(true);
-        convList = dao.selectMemberHistYearCovariatesInfoMap(param);
+        // convList = dao.selectMemberHistYearCovariatesInfoMap(param);
 
+        ClientInfo cinfo = new ClientInfo();
+
+        cinfo.setClientId("K07927");
+
+        List<ClientInfo> list = new ArrayList<ClientInfo>();
+
+        list.add(cinfo);
+        param.setClientList(list);
+
+        convList = dao.selectMemberHistYearCovariatesInfoClientMap(param);
 
         logger.debug(convList.size());
 	}
@@ -79,12 +83,9 @@ public class GeneSurvDataEstimate2 {
 
 		// 何か年か？
 		int convariateDataListSize =
-				OneHotMaker.getConvariateDataList(convList.get(0).getCovariatesMap()).size();
+				OneHotMaker.getConvariateDataListMap(convList.get(0).getCovariatesMap()).size();
+		convariateDataListMap = new TreeMap<YearCovariatesInfo,Map<String, ConvariateData>>();
 
-		// 共変量リスト
-		for (YearCovariatesInfo info :convList) {
-			convariateDataListMap.put(info, OneHotMaker.getConvariateDataList(info.getCovariatesMap()));
-		}
 
 		// beta0は0と仮定
 		//int betaSize = 1 + retireCountList.size() + getXList(list.get(0)).size();
@@ -102,10 +103,16 @@ public class GeneSurvDataEstimate2 {
 
 			yearConvList.get(info.getYears().intValue()).add(info);
 
-			// 共変量リスト
-			 List<ConvariateData> cvDataList = convariateDataListMap.get(info);
+			 if (convariateDataListMap.get(info) == null) {
+			 // 共変量リスト
+					convariateDataListMap.put(info, OneHotMaker.getConvariateDataListMap(info.getCovariatesMap()));
+			 }
 
-			 for (ConvariateData cdata: cvDataList) {
+
+			// 共変量リスト
+			 Collection<ConvariateData> cvDataListMap = convariateDataListMap.get(info).values();
+
+			 for (ConvariateData cdata: cvDataListMap) {
 				 if (!BigDecimal.valueOf(0).equals(cdata.getValue())) {
 					 String key = cdata.getConvariateCode() + "_" + cdata.getConvariateLabel();
 					 if (convTreeMap.get(key) == null) {
@@ -119,11 +126,10 @@ public class GeneSurvDataEstimate2 {
 
 	}
 
+	Map<YearCovariatesInfo, Double> zCacheMap = new HashMap<YearCovariatesInfo, Double>();
 
 	public void clearCache() {
-//		for (Map<YearEstimateInfo, Double> map :this.pdCacheList) {
-//			map.clear();
-//		}
+		zCacheMap.clear();
 	}
 
 	public RealMatrix delta(RealMatrix betaMat) {
@@ -148,7 +154,7 @@ public class GeneSurvDataEstimate2 {
 			for (YearCovariatesInfo info:infoList) {
 				// キャッシュに値がない
 				// PD計算
-				double pd  = culcPD(betaArr, year, yearRange, convariateDataListMap.get(info));
+				double pd  = culcPD(betaArr, yearRange, info);
 				double v = (pd - info.getEvent())  * info.getCount();
 				tc.set(v);
 			}
@@ -164,8 +170,8 @@ public class GeneSurvDataEstimate2 {
 			for (YearCovariatesInfo info:infoList) {
 				// キャッシュに値がない
 				// PD計算
-				double pd  = culcPD(betaArr, info.getYears(), yearRange, convariateDataListMap.get(info));
-				double v = (pd - info.getEvent()) * info.getCovariatesMap().get(entry.getKey()).intValue() * info.getCount();
+				double pd  = culcPD(betaArr, yearRange, info);
+				double v = (pd - info.getEvent()) * convariateDataListMap.get(info).get(entry.getKey()).getValue().intValue()* info.getCount();
 				tc.set(v);
 			}
 			deltaBetaList.add(tc.getTotal());
@@ -199,10 +205,10 @@ public class GeneSurvDataEstimate2 {
 			for (YearCovariatesInfo info:infoList) {
 				// キャッシュに値がない
 				// PD計算
-				double pd  = culcPD(betaArr, year, yearRange, convariateDataListMap.get(info));
+				double pd  = culcPD(betaArr, yearRange, info);
 				//				double v = (pd - info.getEvent())  * info.getCount();
 				//=∑i=1N(log(PDi)+(1−Yi)・(−β0−∑p=1KβpXi,p)
-				double v = (Math.log(pd) - (1 - info.getEvent()) * culcZ(betaArr, year, yearRange, convariateDataListMap.get(info))) * info.getCount() ;
+				double v = (Math.log(pd) - (1 - info.getEvent()) * culcZ(betaArr, yearRange, info)) * info.getCount() ;
 				tc.set(v);
 			}
 		}
@@ -249,13 +255,15 @@ public class GeneSurvDataEstimate2 {
 			//list.add(covInfo);
 		}
 
-		List<ConvariateData> convariateDataList = OneHotMaker.getConvariateDataList(convList.get(0).getCovariatesMap());
+		Map<String, ConvariateData> convariateDataListMap = OneHotMaker.getConvariateDataListMap(convList.get(0).getCovariatesMap());
 
 		String nowCovariatesCode = "";
 
+		Collection<ConvariateData> col =  convariateDataListMap.values();
+
 		int i = yearRange;
 		// 共変量情報
-		for (ConvariateData convData :convariateDataList) {
+		for (ConvariateData convData :col) {
 			if (!nowCovariatesCode.equals(convData.getConvariateCode())) {
 				nowCovariatesCode = convData.getConvariateCode();
 				covariatesEffectiveInfoDAO.deleteCovariatesEffectiveInfo(DeusConst.CT0001, nowCovariatesCode);
@@ -286,26 +294,52 @@ public class GeneSurvDataEstimate2 {
 		}
 	}
 
-	private double culcPD(double[] betaArr, int year, int yearRange, List<ConvariateData> convariateDataList) {
-		return 1.0 / ( 1.0  +  Math.exp(-culcZ(betaArr, year, yearRange, convariateDataList)));
+//	private double culcPDold(double[] betaArr, int year, int yearRange, Map<String, ConvariateData> convariateDataListMap) {
+//		return 1.0 / ( 1.0  +  Math.exp(-culcZ(betaArr, year, yearRange, convariateDataListMap)));
+//
+//	}
+
+	private double culcPD(double[] betaArr, int yearRange, YearCovariatesInfo info) {
+		return 1.0 / ( 1.0  +  Math.exp(-culcZ(betaArr, yearRange, info)));
 
 	}
 
-	private double culcZ(double[] betaArr, int year, int yearRange, List<ConvariateData> convariateDataList) {
 
-		TotalCounter tc = new TotalCounter();
-		tc.set(betaArr[year]);
-		for (int i = 0; i < convariateDataList.size(); i++) {
-			double v = betaArr[yearRange + i] * convariateDataList.get(i).getValue().intValue();
-			tc.set(v);
+	private double culcZ(double[] betaArr, int yearRange, YearCovariatesInfo info) {
+		if (!zCacheMap.containsKey(info)) {
+
+			Map<String, ConvariateData> map = convariateDataListMap.get(info);
+			ConvariateData[] dataArr = map.values().toArray(new ConvariateData[0]);
+
+			int year = info.getYears().intValue();
+
+			TotalCounter tc = new TotalCounter();
+			tc.set(betaArr[year]);
+			for (int i = 0; i < dataArr.length; i++) {
+				double v = betaArr[yearRange + i] * dataArr[i].getValue().intValue();
+				tc.set(v);
+			}
+			zCacheMap.put(info, Double.valueOf(tc.getTotal()));
 		}
-
-		return tc.getTotal();
+		return zCacheMap.get(info);
 	}
 
 
-
-
+//	private double culcZ(double[] betaArr, int year, int yearRange, Map<String, ConvariateData> convariateDataListMap) {
+//
+//
+//
+//		ConvariateData[] dataArr = convariateDataListMap.values().toArray(new ConvariateData[0]);
+//
+//		TotalCounter tc = new TotalCounter();
+//		tc.set(betaArr[year]);
+//		for (int i = 0; i < dataArr.length; i++) {
+//			double v = betaArr[yearRange + i] * dataArr[i].getValue().intValue();
+//			tc.set(v);
+//		}
+//
+//		return tc.getTotal();
+//	}
 
 
 }

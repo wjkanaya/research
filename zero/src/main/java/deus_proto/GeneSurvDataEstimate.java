@@ -2,6 +2,7 @@ package deus_proto;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -99,7 +100,7 @@ public class GeneSurvDataEstimate {
     int betaSize = 0;
     List<Map<YearEstimateInfo, Double>> pdCacheList = null;
 
-    List<ConvariateData> convariateDataList = null;
+    Map<String, ConvariateData> convariateDataListMap = null;
 
 	public void getData() {
 		MemberHistInfoDAO dao = new MemberHistInfoDAO();
@@ -156,12 +157,12 @@ public class GeneSurvDataEstimate {
 		this.yearRange = retireCountMeisaiList.size();
 
 		// 共変量リスト
-		this.convariateDataList = OneHotMaker.getConvariateDataList(list.get(0).getCovariatesMap());
+		this.convariateDataListMap = OneHotMaker.getConvariateDataListMap(list.get(0).getCovariatesMap());
 
 
 		// beta0は0と仮定
 		//int betaSize = 1 + retireCountList.size() + getXList(list.get(0)).size();
-		this.betaSize = this.yearRange  + convariateDataList.size();
+		this.betaSize = this.yearRange  + convariateDataListMap.size();
 
 		// PD計算キャッシュ
 		// betaArrの値が変わるたびに更新してください。
@@ -359,13 +360,14 @@ public class GeneSurvDataEstimate {
 			//list.add(covInfo);
 		}
 
+		Collection<ConvariateData> col =  convariateDataListMap.values();
 
 
 		String nowCovariatesCode = "";
 
 		int i = yearRange;
 		// 共変量情報
-		for (ConvariateData convData :convariateDataList) {
+		for (ConvariateData convData :col) {
 			if (!nowCovariatesCode.equals(convData.getConvariateCode())) {
 				nowCovariatesCode = convData.getConvariateCode();
 				covariatesEffectiveInfoDAO.deleteCovariatesEffectiveInfo(DeusConst.CT0001, nowCovariatesCode);
@@ -483,11 +485,14 @@ public class GeneSurvDataEstimate {
 
 	private List<Integer> getXList(YearEstimateInfo info) {
 
-		List<ConvariateData> list = OneHotMaker.getConvariateDataList(info.getCovariatesMap());
+		Map<String, ConvariateData> map = OneHotMaker.getConvariateDataListMap(info.getCovariatesMap());
+		Collection<ConvariateData> coll =   map.values();
+
+
 
 		List<Integer> resultList = new ArrayList<Integer>();
 
-		for (ConvariateData data :list) {
+		for (ConvariateData data :coll) {
 			resultList.add(data.getValue().intValue());
 		}
 

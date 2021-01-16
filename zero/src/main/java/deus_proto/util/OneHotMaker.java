@@ -1,8 +1,8 @@
 package deus_proto.util;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -22,7 +22,7 @@ public class OneHotMaker {
 	//		範囲終了	range_end	decimal
 	static Map<String, Integer> rangeEndMap = new HashMap<String, Integer>();
 
-	public static List<ConvariateData> getConvariateDataList(Map<String, BigDecimal> map ) {
+	public static Map<String,ConvariateData> getConvariateDataListMap(Map<String, BigDecimal> map ) {
 
 		synchronized(convariatesTypeMap) {
 			if (convariatesTypeMap.isEmpty()) {
@@ -38,10 +38,10 @@ public class OneHotMaker {
 			}
 		}
 
-		List<ConvariateData> resultList = new ArrayList<ConvariateData>();
+		Map<String, ConvariateData> resultMap = new LinkedHashMap<String, ConvariateData>();
 
 		if (map == null) {
-			return resultList;
+			return resultMap;
 		}
 
 		Set<Entry<String, BigDecimal>> set = map.entrySet();
@@ -65,7 +65,9 @@ public class OneHotMaker {
 						} else {
 							data.setValue(BigDecimal.valueOf(0));
 						}
-						resultList.add(data);
+
+						resultMap.put(entry.getKey() + "_" + i, data);
+
 					}
 					break;
 				default:
@@ -73,7 +75,8 @@ public class OneHotMaker {
 					data.setConvariateCode(entry.getKey());
 					data.setConvariateLabel(0);
 					data.setValue(entry.getValue());
-					resultList.add(data);
+					resultMap.put(entry.getKey() + "_" + 0, data);
+
 
 				}
 			} else {
@@ -81,13 +84,13 @@ public class OneHotMaker {
 				data.setConvariateCode(entry.getKey());
 				data.setConvariateLabel(0);
 				data.setValue(entry.getValue());
-				resultList.add(data);
+				resultMap.put(entry.getKey() + "_" + 0, data);
 
 			}
 
 		}
 
-		return resultList;
+		return resultMap;
 	}
 
 

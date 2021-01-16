@@ -149,7 +149,7 @@ public class DoProcess {
 						logger.debug(pro.name + ":"+ mem.name + "売上:" + uri);
 
 						String enrolledHistId =
-								projectEnrolledHistInfoDAO.selectProjectEnrolledHistId(mem.memberId, pro.name);
+								projectEnrolledHistInfoDAO.selectProjectEnrolledHistId(mem.memberId, pro.id);
 
 						int count  = priceTransitionDAO.selectCountPriceTransitionInfo(enrolledHistId);
 
@@ -271,7 +271,7 @@ public class DoProcess {
 
 						logger.debug("プロジェクト終了!! ：" + pro.name + ":時期=" + jiki + "+" + ituowaru);
 
-						projectInfoDAO.updateProjectInfo(pro.name, ProjectStatus.KAN.getInteger(), simCal.getJikiDate(jiki + ituowaru));
+						projectInfoDAO.updateProjectInfo(pro.id, ProjectStatus.KAN.getInteger(), simCal.getJikiDate(jiki + ituowaru));
 
 						pro.endJiki = jiki + ituowaru;
 

@@ -363,7 +363,7 @@ public class SankakuRidatuYoteiKanri {
 		yotei.pro.memberSet.remove(yotei.mem.member);
 
 		projectEnrolledHistInfoDAO.updateProjectEnrolledHistInfo(
-			yotei.mem.member.memberId, yotei.pro.name, simCal.getJikiDate(jiki),jiki - yotei.mem.member.entT,
+			yotei.mem.member.memberId, yotei.pro.id, simCal.getJikiDate(jiki),jiki - yotei.mem.member.entT,
 			yotei.stopType.getInteger(), EnrolledStatus.DAT.getInteger());
 
 		logger.debug(yotei.mem.member.name + "君が"+ yotei.pro.name + "から離脱しました。");
@@ -374,11 +374,11 @@ public class SankakuRidatuYoteiKanri {
 
 		yotei.pro.memberSet.add(yotei.mem.member); //
 		Integer count =
-				projectEnrolledHistInfoDAO.selectCountProjectEnrolledHistInfo(yotei.mem.member.memberId, yotei.pro.name);
+				projectEnrolledHistInfoDAO.selectCountProjectEnrolledHistInfo(yotei.mem.member.memberId, yotei.pro.id);
 
 		int branchNum = 0;
 		if (count > 0) {
-			branchNum = projectEnrolledHistInfoDAO.selectProjectEnrolledHistInfoBranchNum(yotei.mem.member.memberId, yotei.pro.name);
+			branchNum = projectEnrolledHistInfoDAO.selectProjectEnrolledHistInfoBranchNum(yotei.mem.member.memberId, yotei.pro.id);
 			branchNum++;
 		}
 
@@ -386,7 +386,7 @@ public class SankakuRidatuYoteiKanri {
 
 		info.setEnrolledHistId(yotei.mem.member.memberId + "_" + yotei.pro.name + "_" + branchNum);
 		info.setMemberId(yotei.mem.member.memberId);
-		info.setProjectId( yotei.pro.name);
+		info.setProjectId( yotei.pro.id);
 		info.setBranchNum(Integer.valueOf(branchNum));
 		info.setJoinDate(simCal.getJikiDate(jiki));
 		info.setJoinMemberMonths(jiki - yotei.mem.member.entT);
@@ -400,19 +400,18 @@ public class SankakuRidatuYoteiKanri {
 	private void insertProjectMemberNumInfo(int jiki, ProjectMemberNumInfoDAO projectMemberNumInfoDAO,
 			Project kahenPro) {
 		// レコード数
-		int recCount = projectMemberNumInfoDAO.selectCountProjectMemberNumInfo(kahenPro.name);
+		int recCount = projectMemberNumInfoDAO.selectCountProjectMemberNumInfo(kahenPro.id);
 
 		if (recCount > 0) {
 			ProjectMemberNumInfo projectMemberNumInfo
-			    = projectMemberNumInfoDAO.selectLastProjectMemberNumInfo(kahenPro.name);
+			    = projectMemberNumInfoDAO.selectLastProjectMemberNumInfo(kahenPro.id);
 
 			if (projectMemberNumInfo.getMemberNum().intValue() == kahenPro.memberSet.size()) {
-				return ;
 			}
 		}
 
 		ProjectMemberNumInfo projectMemberNumInfo = new ProjectMemberNumInfo();
-		projectMemberNumInfo.setProjectId(kahenPro.name);
+		projectMemberNumInfo.setProjectId(kahenPro.id);
 		projectMemberNumInfo.setProjectMonths(jiki - kahenPro.startJiki);
 		projectMemberNumInfo.setMemberNum(Integer.valueOf(kahenPro.memberSet.size()));
 		projectMemberNumInfoDAO.insertProjectMemberNumInfo(projectMemberNumInfo);

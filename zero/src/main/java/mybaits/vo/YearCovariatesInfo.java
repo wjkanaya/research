@@ -149,7 +149,7 @@ public class YearCovariatesInfo implements Comparable {
 			}
 		}
 
-     	return sb.hashCode();
+     	return sb.toString().hashCode();
 
     }
 

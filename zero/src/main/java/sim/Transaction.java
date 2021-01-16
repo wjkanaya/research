@@ -37,7 +37,7 @@ public class Transaction implements Comparable<Transaction> {
 
 
     public int hashCode() {
-        return (this.pro.name + this.jiki).hashCode();
+        return (this.pro.id + this.jiki).hashCode();
     }
 
 	public boolean equals(Object anObject) {
@@ -46,7 +46,7 @@ public class Transaction implements Comparable<Transaction> {
 		}
 		if (anObject instanceof Transaction) {
 			Transaction t = (Transaction)anObject;
-			return t.pro.name.equals(this.pro.name) && t.jiki == this.jiki;
+			return t.pro.id.equals(this.pro.id) && t.jiki == this.jiki;
 		}
 		return false;
 	}
@@ -54,7 +54,7 @@ public class Transaction implements Comparable<Transaction> {
 	public int compareTo(Transaction o) {
 		// TODO 自動生成されたメソッド・スタブ
 
-		int result = this.pro.name.compareTo(o.pro.name);
+		int result = this.pro.id.compareTo(o.pro.id);
 
 		if (result == 0) {
 			result = this.jiki  - o.jiki;

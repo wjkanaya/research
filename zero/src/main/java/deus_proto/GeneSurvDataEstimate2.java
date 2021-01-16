@@ -67,7 +67,7 @@ public class GeneSurvDataEstimate2 {
 
         ClientInfo cinfo = new ClientInfo();
 
-        cinfo.setClientId("K07927");
+        cinfo.setClientId("K01812");
 
         List<ClientInfo> list = new ArrayList<ClientInfo>();
 

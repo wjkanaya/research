@@ -199,206 +199,7 @@
    <association property="covariatesMap" columnPrefix="c_"  resultMap="covariatesMap"/>
   </resultMap>
 
-  <select id="selectMemberHistYearCovariatesInfoClientMapold" resultMap="memberHistYearCovariatesInfoMap">
-    with member_last_year as(
-        SELECT
-            member_id,
-            sex as  &quot;C00002&quot;,
-            cast(EXTRACT(
-                    year
-                    from
-                        AGE(COALESCE(retirement_date, CAST(DATE_TRUNC('month', now()) as DATE)), enter_date)
-                ) * 12 + EXTRACT(
-                    month
-                    from
-                        AGE(COALESCE(retirement_date, CAST(DATE_TRUNC('month', now()) as DATE)), enter_date)
-                ) as integer) / 12 as last_year,
-            status
-        from
-            member_hist_info
-    )
-    select
-        years,
-        event,
-     &quot;C00002&quot; as &quot;c_C00002&quot;,
-    <foreach item="item" collection="clientList">
-     &quot;${item.clientId}&quot; as  &quot;c_${item.clientId}&quot;,
-    </foreach>
-    &quot;KXXXXX&quot; as &quot;c_KXXXXX&quot;,
-     COUNT(*) as count
-        from (
-    select
-        member_id,
-        years,
-        &quot;C00002&quot;,
-        <foreach item="item" collection="clientList">
-            max(&quot;${item.clientId}&quot;) as &quot;${item.clientId}&quot;,
-        </foreach>
-        max(&quot;KXXXXX&quot;) as &quot;KXXXXX&quot;,
-        event
-    from
-        (
-            select
-                member_id,
-                &quot;C00002&quot;,
-                years,
-                event,
-                <foreach item="item" collection="clientList">
-                CASE
-                    WHEN client_id = '${item.clientId}' THEN ruiseki
-                    ELSE 0
-                END AS &quot;${item.clientId}&quot;,
-                </foreach>
-                '0' as &quot;KXXXXX&quot;
-            From
-                (
-                    select
-                        *,
-                        CASE
-                            WHEN last_year = years
-                        AND status = '1' THEN 1
-                            ELSE 0
-                        END AS event,
-                        sum(client_count) over(PARTITION BY member_id, client_id order by years) as ruiseki
-                    from
-                        member_last_year
-                        inner join
-                            (
-                                Select
-                                    months / 12 as years,
-                                    client_id,
-                                    member_id,
-                                    count(
-                                        CASE
-                                   		    WHEN stop_member_months is not null
-                                		        AND months &gt;= join_member_months
-                                		        AND months &lt;= stop_member_months THEN 1
-                                            WHEN stop_member_months is null
-                                	        	AND months &gt;= join_member_months THEN 1
-                                            ELSE 0
-                                        END = '1'
-                                    or  null
-                                    ) AS client_count
-                                from
-                                    generate_series(0, 480) As months cross
-                                    join
-                                        (
-                                            select
-                                                pp.client_id,
-                                                peh.member_id,
-                                                peh.join_member_months,
-                                                peh.stop_member_months
-                                            from
-                                                project_enrolled_hist_info peh
-                                                inner join
-                                                    project_info pp
-                                                using
-                                                    (project_id)
-                                            where
-                                                pp.client_id IN(
-                                                <foreach item="item" collection="clientList" separator=",">
-                                                    '${item.clientId}'
-                                                </foreach>
-                                                )
-                                        ) a
-                                group by
-                                    client_id,
-                                    member_id,
-                                    years
-                            ) cc
-                        using
-                            (member_id)
-                    where
-                        cc.years &lt;= last_year
-                ) test01
-            union all
-            select
-                member_id,
-                &quot;C00002&quot;,
-                years,
-                CASE
-                    WHEN last_year = years
-                AND status = '1' THEN 1
-                    ELSE 0
-                END AS event,
-                <foreach item="item" collection="clientList">
-                '0' as &quot;${item.clientId}&quot;,
-                </foreach>
-                sum(client_count) over(PARTITION BY member_id, client_id order by years) as &quot;KXXXXX&quot;
-            from
-                member_last_year
-                inner join
-                    (
-                        Select
-                            months / 12 as years,
-                            client_id,
-                            member_id,
-                            count(
-                                CASE
-                                    WHEN stop_member_months is not null
-                                		AND months &gt;= join_member_months
-                                		AND months &lt;= stop_member_months THEN 1
-                                    WHEN stop_member_months is null
-                                		AND months &gt;= join_member_months THEN 1
-                                    ELSE 0
-                                END = '1'
-                            or  null
-                            ) AS client_count
-                        from
-                            generate_series(0, 480) As months cross
-                            join
-                                (
-                                    select
-                                        'KXXXXX' as client_id,
-                                        peh.member_id,
-                                        peh.join_member_months,
-                                        peh.stop_member_months
-                                    from
-                                        project_enrolled_hist_info peh
-                                        inner join
-                                            project_info pp
-                                        using
-                                            (project_id)
-                                    where
-                                        pp.client_id not IN(
-                                                 <foreach item="item" collection="clientList" separator=",">
-                                                    '${item.clientId}'
-                                                </foreach>
-                                        )
-                                ) a
-                        group by
-                            client_id,
-                            member_id,
-                            years
-                    ) cc
-                using
-                    (member_id)
-            where
-                cc.years &lt;= last_year
-        ) test02
-    group by
-        member_id,
-        &quot;C00002&quot;,
-        years,
-        event
-    ) test03
-    group by
-        years,
-        event,
-
-     &quot;c_C00002&quot;,
-
-    <foreach item="item" collection="clientList">
-    &quot;${item.clientId}&quot;,
-    </foreach>
-    &quot;KXXXXX&quot;
-
-    order by
-        years, event
-
-
-  </select>
-    <select id="selectMemberHistYearCovariatesInfoClientMap" resultMap="memberHistYearCovariatesInfoMap">
+  <select id="selectMemberHistYearCovariatesInfoClientMap" resultMap="memberHistYearCovariatesInfoMap">
 
     with member_last_month as(
     SELECT
@@ -430,8 +231,9 @@ member_last_year as(
 select
     years,
     event,
-
+    <if test="sex == true">
     &quot;C00002&quot; as &quot;c_C00002&quot;,
+    </if>
     <foreach item="item" collection="clientList">
      &quot;${item.clientId}&quot; as  &quot;c_${item.clientId}&quot;,
     </foreach>
@@ -444,7 +246,9 @@ from
        select
             member_id,
             years,
+        <if test="sex == true">
         &quot;C00002&quot;,
+        </if>
         <foreach item="item" collection="clientList">
             max(&quot;${item.clientId}&quot;) as &quot;${item.clientId}&quot;,
         </foreach>
@@ -455,7 +259,9 @@ from
             (
 select
     member_id,
+    <if test="sex == true">
        &quot;C00002&quot;,
+    </if>
     years,
     event,
                 <foreach item="item" collection="clientList">
@@ -483,7 +289,9 @@ From
                     member_id,
                     last_year,
                     status,
+                    <if test="sex == true">
                     &quot;C00002&quot;,
+                    </if>
                     count(
                         CASE
                             WHEN months &gt;= join_member_months
@@ -527,8 +335,10 @@ From
                     member_id,
                     years,
                     last_year,
-                    status,
-                    "C00002"
+                    status
+                    <if test="sex == true">
+                    ,&quot;C00002&quot;
+                    </if>
             ) cc
         where
             cc.years &lt;= last_year
@@ -536,7 +346,9 @@ From
 union all
 select
     member_id,
+    <if test="sex == true">
     &quot;C00002&quot;,
+    </if>
     years,
     CASE
         WHEN last_year = years
@@ -555,7 +367,9 @@ from
             member_id,
             last_year,
             status,
+            <if test="sex == true">
             &quot;C00002&quot;,
+            </if>
             count(
                 CASE
                     WHEN months &gt;= join_member_months
@@ -575,8 +389,10 @@ from
                         COALESCE(peh.stop_member_months, mly.last_months) as stop_member_months,
                         mly.last_months,
                         mly.last_year,
-                        mly.status,
-                        mly.&quot;C00002&quot;
+                        mly.status
+                        <if test="sex == true">
+                        ,mly.&quot;C00002&quot;
+                        </if>
                     from
                         project_enrolled_hist_info peh
                         inner join
@@ -599,22 +415,28 @@ from
             member_id,
             years,
             last_year,
-            status,
-            &quot;C00002&quot;
+            status
+            <if test="sex == true">
+            ,&quot;C00002&quot;
+            </if>
     ) cc
 where
     cc.years &lt;= last_year
                 ) test02
         group by
             member_id,
+            <if test="sex == true">
             &quot;C00002&quot;,
+            </if>
             years,
             event
     ) test03
 group by
     years,
     event,
+    <if test="sex == true">
     &quot;c_C00002&quot;,
+    </if>
     <foreach item="item" collection="clientList">
     &quot;c_${item.clientId}&quot;,
     </foreach>

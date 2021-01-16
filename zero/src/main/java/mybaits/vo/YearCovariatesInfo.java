@@ -91,22 +91,26 @@ public class YearCovariatesInfo implements Comparable {
 			return 1;
 		}
 
-		Set<String> keySet = covariatesMap.keySet();
+		if (covariatesMap != null ) {
+			Set<String> keySet = covariatesMap.keySet();
 
-		for (String key :keySet) {
+			for (String key :keySet) {
 
-			if(covariatesMap.get(key) != null && o.getCovariatesMap().get(key)!=null) {
+				if(covariatesMap.get(key) != null && o.getCovariatesMap().get(key)!=null) {
 
-				result = this.covariatesMap.get(key).compareTo(o.getCovariatesMap().get(key));
-				if (result != 0) {
-					return result;
+					result = this.covariatesMap.get(key).compareTo(o.getCovariatesMap().get(key));
+					if (result != 0) {
+						return result;
+					}
+				} else if (covariatesMap.get(key) == null && o.getCovariatesMap().get(key)!=null) {
+					return -1;
+				} else if (covariatesMap.get(key) != null && o.getCovariatesMap().get(key)==null) {
+					return 1;
 				}
-			} else if (covariatesMap.get(key) == null && o.getCovariatesMap().get(key)!=null) {
-				return -1;
-			} else if (covariatesMap.get(key) != null && o.getCovariatesMap().get(key)==null) {
-				return 1;
 			}
+
 		}
+
 
 		if (event != null && o.getEvent() != null) {
 			result = this.event.compareTo(o.getEvent());
@@ -140,14 +144,16 @@ public class YearCovariatesInfo implements Comparable {
     		sb.append("count").append(count.toString());
     	}
 
+    	if (covariatesMap != null ) {
+    		Set<Entry<String, BigDecimal>> entrySet = covariatesMap.entrySet();
 
-		Set<Entry<String, BigDecimal>> entrySet = covariatesMap.entrySet();
+    		for (Entry<String, BigDecimal> entry :entrySet) {
+    			if (entry.getValue() != null) {
+    				sb.append(entry.getKey()).append(entry.getValue().toString());
+    			}
+    		}
+    	}
 
-		for (Entry<String, BigDecimal> entry :entrySet) {
-			if (entry.getValue() != null) {
-				sb.append(entry.getKey()).append(entry.getValue().toString());
-			}
-		}
 
      	return sb.toString().hashCode();
 

@@ -62,7 +62,7 @@ public class GeneSurvDataEstimate2 {
 		this.yearRange = dao.selectMaxLastYear() + 1;
 
 		YearCovariatesInfoParam param = new YearCovariatesInfoParam();
-		param.setSex(true);
+		param.setSex(false);
         // convList = dao.selectMemberHistYearCovariatesInfoMap(param);
 
         ClientInfo cinfo = new ClientInfo();
@@ -71,10 +71,14 @@ public class GeneSurvDataEstimate2 {
 
         List<ClientInfo> list = new ArrayList<ClientInfo>();
 
-        list.add(cinfo);
+       // list.add(cinfo);
         param.setClientList(list);
 
-        convList = dao.selectMemberHistYearCovariatesInfoClientMap(param);
+        if (param.getClientList().size() > 0) {
+        	convList = dao.selectMemberHistYearCovariatesInfoClientMap(param);
+        } else {
+        	convList = dao.selectMemberHistYearCovariatesInfoMap(param);
+        }
 
         logger.debug(convList.size());
 	}

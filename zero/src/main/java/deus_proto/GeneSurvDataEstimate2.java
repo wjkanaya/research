@@ -55,24 +55,28 @@ public class GeneSurvDataEstimate2 {
 
 
 
-	public void getData() {
+	public void getData(List<String> targetCodeList) {
+
+		YearCovariatesInfoParam param = new YearCovariatesInfoParam();
+		param.setClientList(new ArrayList<ClientInfo>());
+
+		// 性別判定コード:"C00002";
+
+
+		for (String code :targetCodeList) {
+			if ("C00002".equals(code)) {
+				param.setSex(true);
+			} else {
+				ClientInfo info = new ClientInfo();
+				info.setClientId(code);
+				param.getClientList().add(info);
+			}
+		}
+
 		MemberHistInfoDAO dao = new MemberHistInfoDAO();
 
 		// 何か年か？
 		this.yearRange = dao.selectMaxLastYear() + 1;
-
-		YearCovariatesInfoParam param = new YearCovariatesInfoParam();
-		param.setSex(false);
-        // convList = dao.selectMemberHistYearCovariatesInfoMap(param);
-
-        ClientInfo cinfo = new ClientInfo();
-
-        cinfo.setClientId("K01812");
-
-        List<ClientInfo> list = new ArrayList<ClientInfo>();
-
-       // list.add(cinfo);
-        param.setClientList(list);
 
         if (param.getClientList().size() > 0) {
         	convList = dao.selectMemberHistYearCovariatesInfoClientMap(param);

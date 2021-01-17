@@ -1,5 +1,12 @@
 package deus_proto;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
@@ -7,12 +14,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import deus_proto.util.CulcUtil;
+import mybaits.vo.ClientInfo;
+import mybaits.vo.YearCovariatesInfoParam;
 import sim.Util;
 
 public class JunNewton2 {
 
 	static Logger logger = LogManager.getLogger(JunNewton2.class);
 
+	RealMatrix lastPMat = null;
 
 	// <<退職圧要因一覧情報>>
 	public static void main(String[] args) throws Exception {
@@ -20,18 +30,205 @@ public class JunNewton2 {
 		Util.startTransaction();
 		try {
 			JunNewton2 jn = new JunNewton2();
-			jn.execute();
-
+			jn.culc();
 		} finally {
 			Util.endTransaction();;
 		}
+
+
+
 	}
 
-	private void execute() {
+	public void culc() {
 
-		GeneSurvDataEstimate2 est = new GeneSurvDataEstimate2();
+		YearCovariatesInfoParam param = new YearCovariatesInfoParam();
 
-		est.getData();
+		String[] clientIdArr = {
+				"C00002",
+				"K01812",
+				"K06144",
+				"K00291",
+				"K05885",
+				"K00530",
+				"K07072",
+				"K05664",
+				"K06179",
+				"K05078",
+				"K01813",
+				"K09887",
+				"K09121",
+				"K07895",
+				"K04262",
+				"K07560",
+				"K09995",
+				"K01190",
+				"K04597",
+				"K02669",
+				"K07511",
+				"K07315",
+				"K09087",
+				"K07452",
+				"K06291",
+				"K02486"
+		};
+
+		List<String> targetList = new LinkedList<String>();
+
+		for (String clientId: clientIdArr) {
+			ClientInfo info = new ClientInfo();
+			info.setClientId(clientId);
+			targetList.add(clientId);
+		}
+
+
+		// AICチェック
+		Set<String> nowMinSet = new TreeSet<String>();
+
+		Map<String, Double> aicMap = new HashMap<String, Double>();
+
+
+		List<String> targetCodeList = new LinkedList<String>();
+
+		// 初回設定値無し
+		double nowMinAIC = execute(targetCodeList);
+		aicMap.put("", Double.valueOf(nowMinAIC)); // 空文字に設定なしのAICを設定
+
+		boolean noAddFlg = false; // 追加してAICが減らない
+		boolean noDelFlg = false; // 削除してAICが減らない
+
+		while (true) {
+
+			if (noAddFlg && noDelFlg) {
+				// AICは今のSetが最小
+				logger.debug("AICは今のSetが最小");
+				break;
+			} else {
+				noAddFlg = false;
+				noDelFlg = false;
+			}
+
+			Set<String> checkSet = new TreeSet<String>();
+			checkSet.addAll(nowMinSet);
+
+			if (!targetList.isEmpty()) {
+				// 今のAIC最小のセットに一つ足したとき、よりAICが少ないものはないか？
+				double oneAddMinAIC = Double.MAX_VALUE;
+				String oneAddMinCode = "";
+				for (String targetCode :targetList) {
+					checkSet.add(targetCode);
+					double culcAIC = 0;
+					String key = "";
+					for (String cd :checkSet) {
+						key = key + cd + "_";
+					}
+
+					if (aicMap.containsKey(key)) {
+						culcAIC = aicMap.get(key).doubleValue();
+					} else {
+						targetCodeList.clear();
+						targetCodeList.addAll(checkSet);
+						culcAIC = execute(targetCodeList);
+						aicMap.put(key, Double.valueOf(culcAIC));
+					}
+
+					if (culcAIC < oneAddMinAIC) {
+						oneAddMinAIC = culcAIC;
+						oneAddMinCode = targetCode;
+					}
+
+					checkSet.remove(targetCode);
+				}
+
+				if (nowMinAIC > oneAddMinAIC) {
+					// 最小AICを更新
+					nowMinAIC = oneAddMinAIC;
+					nowMinSet.add(oneAddMinCode);
+					targetList.remove(oneAddMinCode);
+					logger.debug("最小AIC更新：" + nowMinAIC + " 追加コード=" + oneAddMinCode);
+
+
+
+				} else {
+					// もう追加できない
+					noAddFlg = true;
+				}
+
+
+			} else {
+				// もう追加できない
+				noAddFlg = true;
+			}
+
+			if (!nowMinSet.isEmpty()) {
+				checkSet = new TreeSet<String>();
+				checkSet.addAll(nowMinSet);
+				// 今のAIC最小のセットから一つ減らしたとき、よりAICが少ないものはないか？
+				double oneDelMinAIC = Double.MAX_VALUE;
+				String oneDelMinCode = "";
+				for (String targetCode :nowMinSet) {
+					checkSet.remove(targetCode);
+					double culcAIC = 0;
+					String key = "";
+					for (String cd :checkSet) {
+						key = key + cd + "_";
+					}
+
+					if (aicMap.containsKey(key)) {
+						culcAIC = aicMap.get(key).doubleValue();
+					} else {
+						targetCodeList.clear();
+						targetCodeList.addAll(checkSet);
+						culcAIC = execute(targetCodeList);
+						aicMap.put(key, Double.valueOf(culcAIC));
+					}
+
+					if (culcAIC < oneDelMinAIC) {
+						oneDelMinAIC = culcAIC;
+						oneDelMinCode = targetCode;
+					}
+
+					checkSet.add(targetCode);
+
+				}
+
+				if (nowMinAIC > oneDelMinAIC) {
+					// 最小AICを更新
+					nowMinAIC = oneDelMinAIC;
+					nowMinSet.remove(oneDelMinCode);
+
+					logger.debug("最小AIC更新：" + nowMinAIC + " 削除コード=" + oneDelMinAIC);
+
+
+					targetList.add(oneDelMinCode);
+				} else {
+					// もう削除できない
+					noDelFlg = true;
+				}
+
+			} else {
+				noDelFlg = true;
+			}
+		}
+
+
+		// 最適化結果をDBに登録
+		targetCodeList.clear();
+		targetCodeList.addAll(nowMinSet);
+		logger.debug("AIC最小セット：" + nowMinSet);
+
+
+		execute(targetCodeList);
+		setCovariatesValue();
+	}
+
+
+
+	GeneSurvDataEstimate2 est = null;
+	public double execute(List<String> targetCodeList) {
+
+		est = new GeneSurvDataEstimate2();
+
+		est.getData(targetCodeList);
 		est.makeData();
 
 
@@ -241,11 +438,18 @@ public class JunNewton2 {
 		logger.debug("最終点：" + nowPMat + " 対数尤度値:"  + -est.L(nowPMat.getData())+
 				" AIC:" + CulcUtil.culcAIC( -est.L(nowPMat.getData()), est.getBetaSize())) ;
 
-		est.setCovariatesValue(nowPMat);
+		this.lastPMat = nowPMat;
+
+		return CulcUtil.culcAIC( -est.L(nowPMat.getData()), est.getBetaSize());
+		/// est.setCovariatesValue(nowPMat);
 
 	}
 
 
+
+	public void setCovariatesValue() {
+		est.setCovariatesValue(lastPMat);
+	}
 
 //
 

@@ -219,6 +219,10 @@ public class JunNewton2 {
 
 		execute(targetCodeList);
 		setCovariatesValue();
+
+		logger.debug("計算が完了しました。");
+
+
 	}
 
 

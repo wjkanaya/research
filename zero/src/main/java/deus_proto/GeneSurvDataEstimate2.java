@@ -270,7 +270,7 @@ public class GeneSurvDataEstimate2 {
 		ceInfo.setEffectFlg(Boolean.valueOf(true));
 		covariatesEffectiveInfoDAO.insertCovariatesEffectiveInfo(ceInfo);
 
-		covariatesInfoDAO.deleteCovariatesInfo(DeusConst.CT0001, DeusConst.C00001);
+		covariatesInfoDAO.deleteCovariatesInfo(DeusConst.CT0001, null);
 
 		List<CovariatesInfo> list = new ArrayList<CovariatesInfo>();
 
@@ -280,7 +280,13 @@ public class GeneSurvDataEstimate2 {
 			covInfo.setCulcTargetCode(DeusConst.CT0001);
 			covInfo.setCovariatesCode(DeusConst.C00001);
 			covInfo.setEffectStartTime(nowDate);
-			covInfo.setCovariatesLabelNum(Integer.valueOf(i));
+
+			if (searchYearsList != null) {
+				covInfo.setCovariatesLabelNum(searchYearsList.get(i));
+			} else {
+				covInfo.setCovariatesLabelNum(Integer.valueOf(i));
+			}
+
 			covInfo.setCovariatesValue(BigDecimal.valueOf(lastBetaMat.getEntry(i, 0)));
 
 			covariatesInfoDAO.insertCovariatesInfo(covInfo);

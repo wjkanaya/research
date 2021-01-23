@@ -15,8 +15,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import deus_proto.util.CulcUtil;
-import mybaits.vo.ClientInfo;
 import mybaits.vo.YearCovariatesInfoParam;
+import mybatis.dao.MemberHistInfoDAO;
 import sim.Util;
 
 public class JunNewton2 {
@@ -41,6 +41,12 @@ public class JunNewton2 {
 	}
 
 	public void culc() {
+
+		MemberHistInfoDAO mhiDao = new MemberHistInfoDAO();
+
+		int lastYear = mhiDao.selectMaxLastYear();
+
+
 
 		YearCovariatesInfoParam param = new YearCovariatesInfoParam();
 
@@ -77,26 +83,34 @@ public class JunNewton2 {
 
 		List<Integer> yearList = new ArrayList<Integer>();
 		yearList.add(0);
+		yearList.add(5);
 
 		List<String> targetList = new LinkedList<String>();
 
+		if (lastYear > 0) {
+			for (int year = 1; year <= lastYear; year++) {
+				targetList.add("C00001_" + year);
+			}
+		}
+
+
 		for (String clientId: clientIdArr) {
-			ClientInfo info = new ClientInfo();
-			info.setClientId(clientId);
 			targetList.add(clientId);
 		}
 
 
 		// AICチェック
 		Set<String> nowMinSet = new TreeSet<String>();
+		nowMinSet.add("C00001_0"); // 年0以上は必須
 
 		Map<String, Double> aicMap = new HashMap<String, Double>();
 
 
 		List<String> targetCodeList = new LinkedList<String>();
+		targetCodeList.addAll(nowMinSet);
 
-		// 初回設定値無し
-		double nowMinAIC = execute(yearList, targetCodeList);
+		// 初回設定値年0以上のみ
+		double nowMinAIC = execute(targetCodeList);
 		aicMap.put("", Double.valueOf(nowMinAIC)); // 空文字に設定なしのAICを設定
 
 		boolean noAddFlg = false; // 追加してAICが減らない
@@ -133,7 +147,7 @@ public class JunNewton2 {
 					} else {
 						targetCodeList.clear();
 						targetCodeList.addAll(checkSet);
-						culcAIC = execute(yearList, targetCodeList);
+						culcAIC = execute(targetCodeList);
 						aicMap.put(key, Double.valueOf(culcAIC));
 					}
 
@@ -152,8 +166,6 @@ public class JunNewton2 {
 					targetList.remove(oneAddMinCode);
 					logger.debug("最小AIC更新：" + nowMinAIC + " 追加コード=" + oneAddMinCode);
 
-
-
 				} else {
 					// もう追加できない
 					noAddFlg = true;
@@ -165,13 +177,18 @@ public class JunNewton2 {
 				noAddFlg = true;
 			}
 
-			if (!nowMinSet.isEmpty()) {
+			if (nowMinSet.size() > 1) {
 				checkSet = new TreeSet<String>();
 				checkSet.addAll(nowMinSet);
 				// 今のAIC最小のセットから一つ減らしたとき、よりAICが少ないものはないか？
 				double oneDelMinAIC = Double.MAX_VALUE;
 				String oneDelMinCode = "";
 				for (String targetCode :nowMinSet) {
+
+					if ("C00001_0".equals(targetCode)) {
+						continue; // 年0以上は必須
+					}
+
 					checkSet.remove(targetCode);
 					double culcAIC = 0;
 					String key = "";
@@ -184,7 +201,7 @@ public class JunNewton2 {
 					} else {
 						targetCodeList.clear();
 						targetCodeList.addAll(checkSet);
-						culcAIC = execute(yearList, targetCodeList);
+						culcAIC = execute(targetCodeList);
 						aicMap.put(key, Double.valueOf(culcAIC));
 					}
 
@@ -221,7 +238,7 @@ public class JunNewton2 {
 		targetCodeList.clear();
 		targetCodeList.addAll(nowMinSet);
 
-		execute(yearList, targetCodeList);
+		execute(targetCodeList);
 		setCovariatesValue();
 		logger.debug("AIC最小セット：" + nowMinSet);
 		logger.debug("計算が完了しました。");
@@ -232,11 +249,22 @@ public class JunNewton2 {
 
 
 	GeneSurvDataEstimate2 est = null;
-	public double execute(List<Integer> yearList, List<String> targetCodeList) {
+	public double execute(List<String> paramList) {
 
 		est = new GeneSurvDataEstimate2();
 
+		List<Integer> yearList = new ArrayList<Integer>();
+		List<String> targetCodeList = new ArrayList<String>();
 
+		for (String code :paramList) {
+			if (code.startsWith("C00001_")) {
+				String[] tempArr = code.split("_");
+				Integer v = Integer.valueOf(tempArr[1]);
+				yearList.add(v);
+			} else {
+				targetCodeList.add(code);
+			}
+		}
 
 		// est.getData(targetCodeList);
 		est.getData(yearList,targetCodeList);

@@ -10,7 +10,9 @@
   <delete id="deleteCovariatesInfo">
    delete from &quot;public&quot;.&quot;covariates_info&quot;
    where culc_target_code = #{culcTargetCode}
+   <if test="covariatesCode != null">
     and covariates_code = #{covariatesCode}
+ 	</if>
   </delete>
 
   <insert id="insertCovariatesInfo" keyProperty="culcTargetCode,covariatesCode,covariatesLabelNum">

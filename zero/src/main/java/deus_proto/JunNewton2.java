@@ -1,5 +1,6 @@
 package deus_proto;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -72,6 +73,11 @@ public class JunNewton2 {
 				"K02486"
 		};
 
+
+
+		List<Integer> yearList = new ArrayList<Integer>();
+		yearList.add(0);
+
 		List<String> targetList = new LinkedList<String>();
 
 		for (String clientId: clientIdArr) {
@@ -90,7 +96,7 @@ public class JunNewton2 {
 		List<String> targetCodeList = new LinkedList<String>();
 
 		// 初回設定値無し
-		double nowMinAIC = execute(targetCodeList);
+		double nowMinAIC = execute(yearList, targetCodeList);
 		aicMap.put("", Double.valueOf(nowMinAIC)); // 空文字に設定なしのAICを設定
 
 		boolean noAddFlg = false; // 追加してAICが減らない
@@ -127,7 +133,7 @@ public class JunNewton2 {
 					} else {
 						targetCodeList.clear();
 						targetCodeList.addAll(checkSet);
-						culcAIC = execute(targetCodeList);
+						culcAIC = execute(yearList, targetCodeList);
 						aicMap.put(key, Double.valueOf(culcAIC));
 					}
 
@@ -178,7 +184,7 @@ public class JunNewton2 {
 					} else {
 						targetCodeList.clear();
 						targetCodeList.addAll(checkSet);
-						culcAIC = execute(targetCodeList);
+						culcAIC = execute(yearList, targetCodeList);
 						aicMap.put(key, Double.valueOf(culcAIC));
 					}
 
@@ -214,12 +220,10 @@ public class JunNewton2 {
 		// 最適化結果をDBに登録
 		targetCodeList.clear();
 		targetCodeList.addAll(nowMinSet);
-		logger.debug("AIC最小セット：" + nowMinSet);
 
-
-		execute(targetCodeList);
+		execute(yearList, targetCodeList);
 		setCovariatesValue();
-
+		logger.debug("AIC最小セット：" + nowMinSet);
 		logger.debug("計算が完了しました。");
 
 
@@ -228,11 +232,15 @@ public class JunNewton2 {
 
 
 	GeneSurvDataEstimate2 est = null;
-	public double execute(List<String> targetCodeList) {
+	public double execute(List<Integer> yearList, List<String> targetCodeList) {
 
 		est = new GeneSurvDataEstimate2();
 
-		est.getData(targetCodeList);
+
+
+		// est.getData(targetCodeList);
+		est.getData(yearList,targetCodeList);
+
 		est.makeData();
 
 

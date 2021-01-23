@@ -53,7 +53,7 @@ public class GeneSurvDataEstimate2 {
     Map<YearCovariatesInfo,Map<String,ConvariateData>> convariateDataListMap = null;
 
 
-
+    List<Integer> searchYearsList = null;
 
 	public void getData(List<String> targetCodeList) {
 
@@ -87,6 +87,31 @@ public class GeneSurvDataEstimate2 {
         logger.debug(convList.size());
 	}
 
+	public void getData(List<Integer> searchYearsList,List<String> targetCodeList) {
+		this.searchYearsList = searchYearsList;
+		getData(targetCodeList);
+
+		if (searchYearsList != null) {
+
+			this.yearRange = searchYearsList.size();
+
+		} // searchYearsListがnull： 1年づつ共変量に
+
+	}
+
+	private int getyearConvListIdx(int year) {
+		if (searchYearsList == null) {
+			return year;
+		} else {
+			for (int i = searchYearsList.size() - 1 ; i >= 0; i--) {
+				if (searchYearsList.get(i).intValue() <= year) {
+					return i;
+				}
+			}
+		}
+		return 0;
+	}
+
 	public void makeData() {
 
 		// 何か年か？
@@ -109,7 +134,7 @@ public class GeneSurvDataEstimate2 {
 
 		for (YearCovariatesInfo info :convList) {
 
-			yearConvList.get(info.getYears().intValue()).add(info);
+			yearConvList.get(getyearConvListIdx(info.getYears().intValue())).add(info);
 
 			 if (convariateDataListMap.get(info) == null) {
 			 // 共変量リスト
@@ -313,7 +338,7 @@ public class GeneSurvDataEstimate2 {
 			Map<String, ConvariateData> map = convariateDataListMap.get(info);
 			ConvariateData[] dataArr = map.values().toArray(new ConvariateData[0]);
 
-			int year = info.getYears().intValue();
+			int year = getyearConvListIdx(info.getYears().intValue());
 
 			TotalCounter tc = new TotalCounter();
 			tc.set(betaArr[year]);

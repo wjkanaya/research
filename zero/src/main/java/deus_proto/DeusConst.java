@@ -34,6 +34,9 @@ public class DeusConst {
 	public static final String CT0203 = "CT0203";
 
 	// 共変量コード
+	// beta0
+	public static final String C00000 = "C00000";
+
 	// 経過年数
 	public static final String C00001 = "C00001";
 	//	性別

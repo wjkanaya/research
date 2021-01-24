@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.logging.log4j.LogManager;
@@ -111,7 +110,10 @@ public class JunNewton2 {
 
 		// 初回設定値年0以上のみ
 		double nowMinAIC = execute(targetCodeList);
-		aicMap.put("", Double.valueOf(nowMinAIC)); // 空文字に設定なしのAICを設定
+
+		setCovariatesValueBeta0();
+
+		aicMap.put("C00001_0", Double.valueOf(nowMinAIC)); // 空文字に設定なしのAICを設定
 
 		boolean noAddFlg = false; // 追加してAICが減らない
 		boolean noDelFlg = false; // 削除してAICが減らない
@@ -251,7 +253,11 @@ public class JunNewton2 {
 	GeneSurvDataEstimate2 est = null;
 	public double execute(List<String> paramList) {
 
-		est = new GeneSurvDataEstimate2();
+		if (est == null) {
+			est = new GeneSurvDataEstimate2();
+		} else {
+			est.clear();
+		}
 
 		List<Integer> yearList = new ArrayList<Integer>();
 		List<String> targetCodeList = new ArrayList<String>();
@@ -287,16 +293,6 @@ public class JunNewton2 {
 
 //		    print("現点：" + str(nowp))
 			logger.debug("現点：" + nowPMat);
-			//			//
-//			    w, v = LA.eig(H)
-			EigenDecomposition hMatEd = new EigenDecomposition(hMat);
-
-			//			    print("固有値:" + str(w))
-			double[] eigens = hMatEd.getRealEigenvalues();
-			for(int i=0; i<eigens.length; i++) {
-				logger.debug("固有値: " + str(eigens[i]));
-				//	logger.debug("固有ベクトル: " + ed.getEigenvector(i));
-			}
 
 			//
 //			    vectr = - H @ delta(nowp)
@@ -485,6 +481,9 @@ public class JunNewton2 {
 
 	}
 
+	public void setCovariatesValueBeta0() {
+		est.setCovariatesValueBeta0(lastPMat);
+	}
 
 
 	public void setCovariatesValue() {

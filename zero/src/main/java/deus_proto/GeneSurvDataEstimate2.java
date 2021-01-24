@@ -32,13 +32,7 @@ public class GeneSurvDataEstimate2 {
 
 	static Logger logger = LogManager.getLogger(GeneSurvDataEstimate2.class);
 
-	public int getBetaSize() {
-		return betaSize;
-	}
 
-	public void setBetaSize(int betaSize) {
-		this.betaSize = betaSize;
-	}
 
 	List<YearCovariatesInfo> convList = null;
 
@@ -54,6 +48,33 @@ public class GeneSurvDataEstimate2 {
 
 
     List<Integer> searchYearsList = null;
+
+
+	Map<YearCovariatesInfo, Double> zCacheMap = new HashMap<YearCovariatesInfo, Double>();
+
+	// β0
+	double beta0 = 0;
+
+	public void clear() {
+		// β0以外初期化
+		this.convList = null;
+		this.yearRange= 0;
+		this.betaSize = 0;
+		this.yearConvList = null;
+		this.convTreeMap = null;
+		this.convariateDataListMap = null;
+		this.searchYearsList = null;
+		this.zCacheMap = new HashMap<YearCovariatesInfo, Double>();
+	}
+
+	public int getBetaSize() {
+		return betaSize;
+	}
+
+	public void setBetaSize(int betaSize) {
+		this.betaSize = betaSize;
+	}
+
 
 	public void getData(List<String> targetCodeList) {
 
@@ -159,7 +180,6 @@ public class GeneSurvDataEstimate2 {
 
 	}
 
-	Map<YearCovariatesInfo, Double> zCacheMap = new HashMap<YearCovariatesInfo, Double>();
 
 	public void clearCache() {
 		zCacheMap.clear();
@@ -250,6 +270,14 @@ public class GeneSurvDataEstimate2 {
 		return -tc.getTotal();
 	}
 
+
+
+	public void setCovariatesValueBeta0(RealMatrix lastBetaMat) {
+		beta0 = lastBetaMat.getEntry(0, 0);
+	}
+
+
+
 	public void setCovariatesValue(RealMatrix lastBetaMat) {
 
 		CovariatesEffectiveInfoDAO covariatesEffectiveInfoDAO = new CovariatesEffectiveInfoDAO();
@@ -272,11 +300,22 @@ public class GeneSurvDataEstimate2 {
 
 		covariatesInfoDAO.deleteCovariatesInfo(DeusConst.CT0001, null);
 
+
+		CovariatesInfo covInfo = new CovariatesInfo();
+		covInfo.setCulcTargetCode(DeusConst.CT0001);
+		covInfo.setCovariatesCode(DeusConst.C00000);
+		covInfo.setEffectStartTime(nowDate);
+		covInfo.setCovariatesLabelNum(0);
+		covInfo.setCovariatesValue(BigDecimal.valueOf(beta0));
+		covariatesInfoDAO.insertCovariatesInfo(covInfo);
+
+
+
 		List<CovariatesInfo> list = new ArrayList<CovariatesInfo>();
 
 
 		for (int i =0; i < yearRange;i++) {
-			CovariatesInfo covInfo = new CovariatesInfo();
+			covInfo = new CovariatesInfo();
 			covInfo.setCulcTargetCode(DeusConst.CT0001);
 			covInfo.setCovariatesCode(DeusConst.C00001);
 			covInfo.setEffectStartTime(nowDate);
@@ -320,7 +359,7 @@ public class GeneSurvDataEstimate2 {
 
 			}
 
-			CovariatesInfo covInfo = new CovariatesInfo();
+			covInfo = new CovariatesInfo();
 			covInfo.setCulcTargetCode(DeusConst.CT0001);
 			covInfo.setCovariatesCode(convData.getConvariateCode());
 			covInfo.setEffectStartTime(nowDate);
@@ -347,6 +386,7 @@ public class GeneSurvDataEstimate2 {
 			int year = getyearConvListIdx(info.getYears().intValue());
 
 			TotalCounter tc = new TotalCounter();
+			tc.set(beta0);
 			tc.set(betaArr[year]);
 			for (int i = 0; i < dataArr.length; i++) {
 				double v = betaArr[yearRange + i] * dataArr[i].getValue().intValue();

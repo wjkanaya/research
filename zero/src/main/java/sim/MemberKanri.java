@@ -106,7 +106,7 @@ public class MemberKanri {
 						if (pro != null) {
 							logger.debug(mem.name + "退職でプロジェクト終了!! ：" + pro.name + ":退職時期:" + jiki +"+" + ituowaru);
 
-							yoteikanri.lnyoteiHimozukiNow(akiMember,pro,ituowaru,StopType.KOJIN, true);
+							yoteikanri.lnyoteiHimozukiNow(akiMember,pro,ituowaru,StopType.KOJIN_RT, true);
 
 						}
 

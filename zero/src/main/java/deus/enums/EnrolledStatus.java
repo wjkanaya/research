@@ -5,7 +5,7 @@ public enum EnrolledStatus {
 	SANNAI(Integer.valueOf(0)), // 0:参画内定
 	TYU(Integer.valueOf(1)),    // 1:運営中
 	DATNAI(Integer.valueOf(2)), // 2:脱退内定
-	DAT(Integer.valueOf(2)),    // 3:脱退内定
+	DAT(Integer.valueOf(3)),    // 3:脱退
 
 	NA(null); // 設定値無し
 

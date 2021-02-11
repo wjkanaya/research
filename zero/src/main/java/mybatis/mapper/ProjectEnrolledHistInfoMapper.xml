@@ -115,6 +115,125 @@
   </select>
 
 
+  <resultMap id="projectEnrolledHistQuarterCovariatesInfoMap" type="YearCovariatesInfo">
+   <id column="tbl_id"/>
+   <result property="years" column="quarters"/>
+   <result property="event" column="event"/>
+   <result property="count" column="count"/>
+   <association property="covariatesMap" columnPrefix="c_"  resultMap="covariatesMap"/>
+  </resultMap>
+
+  <select id="selectProjectEnrolledHistQuarterCovariatesInfoMap" resultMap="projectEnrolledHistQuarterCovariatesInfoMap">
+
+
+       select
+    quarters,
+    event,
+    COUNT(*) as count
+    from
+    (
+        select
+            enrolled_hist_id,
+            quarters,
+            CASE
+                WHEN last_quarter = quarters
+            		AND stop_type = '2'
+            		AND enrolled_status = '3' THEN 1
+                ELSE 0
+            END AS event
+        from
+            (
+                SELECT
+                	quarters,
+                    enrolled_hist_id,
+                    cast(EXTRACT(
+                            year
+                            from
+                                AGE(COALESCE(stop_date, CAST(DATE_TRUNC('month', now()) as DATE)), join_date)
+                        ) * 12 + EXTRACT(
+                            month
+                            from
+                                AGE(COALESCE(stop_date, CAST(DATE_TRUNC('month', now()) as DATE)), join_date)
+                        ) as integer) / 3 as last_quarter,
+                    stop_type,
+                    enrolled_status
+                from
+                    project_enrolled_hist_info cross
+                    join
+                        generate_series(0, 400) As quarters
+            ) aa
+        where
+            quarters &lt;= last_quarter
+    ) bb
+    group by
+    quarters,
+    event
+    order by
+    quarters,
+    event
+
+    select
+    years,
+     <if test="sex == true">
+    &quot;C00002&quot; as &quot;c_C00002&quot;,
+    </if>
+    event,
+    COUNT(*) as count
+    from
+    (
+        select
+            member_id,
+            years,
+            CASE
+                WHEN last_year = years
+            AND status = '1' THEN 1
+                ELSE 0
+            END AS event
+             <if test="sex == true">
+            ,&quot;C00002&quot;
+            </if>
+        from
+            (
+                SELECT
+                    member_id,
+                    <if test="sex == true">
+                    sex as &quot;C00002&quot;,
+                    </if>
+                    cast(EXTRACT(
+                            year
+                            from
+                                AGE(COALESCE(retirement_date, CAST(DATE_TRUNC('month', now()) as DATE)), enter_date)
+                        ) * 12 + EXTRACT(
+                            month
+                            from
+                                AGE(COALESCE(retirement_date, CAST(DATE_TRUNC('month', now()) as DATE)), enter_date)
+                        ) as integer) / 12 as last_year,
+                    status,
+                    years
+                from
+                    member_hist_info cross
+                    join
+                        generate_series(0, 100) As years
+            ) aa
+        where
+            years &lt;= last_year
+    ) bb
+    group by
+    years,
+    event
+     <if test="sex == true">
+    ,&quot;c_C00002&quot;
+    </if>
+    order by
+    years,
+    event
+     <if test="sex == true">
+    ,&quot;c_C00002&quot;
+    </if>
+
+  </select>
+
+
   <select id="selectAllProjectEnrolledHistInfo" resultType="ProjectEnrolledHistInfo">
     select * from project_enrolled_hist_info
     where member_id = #{memberId}  and project_id = #{projectId}

@@ -5,8 +5,10 @@ import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
 
+import mybaits.vo.CovariatesInfoParam;
 import mybaits.vo.ProjectEnrolledHistInfo;
 import mybaits.vo.ProjectEnrolledHistYearMonthsInfo;
+import mybaits.vo.QuarterCovariatesInfo;
 import mybaits.vo.YearMonthsCensorCount;
 import sim.Util;
 
@@ -31,6 +33,17 @@ public class ProjectEnrolledHistInfoDAO {
 	public static final String SELECT_ALL_PROJECT_ENROLLED_HIST_INFO_COUNT = "selectAllProjectEnrolledHistInfoCount";
 
 	public static final String SELECT_ALL_PROJECT_ENROLLED_HIST_YEAR_MONTHS_COUNT_INFO = "selectAllProjectEnrolledHistYearMonthsCountInfo";
+
+	public static final String SELECT_PROJECT_ENROLLED_HIST_QUARTER_COVARIATES_INFO_MAP  = "selectProjectEnrolledHistQuarterCovariatesInfoMap";
+
+
+	public List<QuarterCovariatesInfo> selectProjectEnrolledHistQuarterCovariatesInfoMap(CovariatesInfoParam target) {
+		SqlSession session = Util.getSqlSession();
+		List<QuarterCovariatesInfo> list = session.selectList(SELECT_PROJECT_ENROLLED_HIST_QUARTER_COVARIATES_INFO_MAP, target);
+		return list;
+	}
+
+
 
 
 	public List<YearMonthsCensorCount> selectAllProjectEnrolledHistYearMonthsCountInfo() {

@@ -2,7 +2,7 @@ package mybaits.vo;
 
 import java.util.List;
 
-public class YearCovariatesInfoParam {
+public class CovariatesInfoParam {
 
 
 	public boolean isSex() {

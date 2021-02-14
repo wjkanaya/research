@@ -21,8 +21,8 @@ import mybaits.vo.ClientInfo;
 import mybaits.vo.ConvariateData;
 import mybaits.vo.CovariatesEffectiveInfo;
 import mybaits.vo.CovariatesInfo;
+import mybaits.vo.CovariatesInfoParam;
 import mybaits.vo.YearCovariatesInfo;
-import mybaits.vo.YearCovariatesInfoParam;
 import mybatis.dao.CovariatesEffectiveInfoDAO;
 import mybatis.dao.CovariatesInfoDAO;
 //import mybaits.vo.YearEstimateInfoPre;
@@ -78,7 +78,7 @@ public class GeneSurvDataEstimate2 {
 
 	public void getData(List<String> targetCodeList) {
 
-		YearCovariatesInfoParam param = new YearCovariatesInfoParam();
+		CovariatesInfoParam param = new CovariatesInfoParam();
 		param.setClientList(new ArrayList<ClientInfo>());
 
 		// 性別判定コード:"C00002";

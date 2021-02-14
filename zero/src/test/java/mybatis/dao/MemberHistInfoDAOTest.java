@@ -5,8 +5,8 @@ import java.util.List;
 
 import junit.framework.TestCase;
 import mybaits.vo.ClientInfo;
+import mybaits.vo.CovariatesInfoParam;
 import mybaits.vo.YearCovariatesInfo;
-import mybaits.vo.YearCovariatesInfoParam;
 import sim.Util;
 
 public class MemberHistInfoDAOTest extends TestCase {
@@ -23,7 +23,7 @@ public class MemberHistInfoDAOTest extends TestCase {
 		super.tearDown();
 	}
 	public void testSelectMemberHistYearCovariatesInfoMap() {
-		YearCovariatesInfoParam param = new YearCovariatesInfoParam();
+		CovariatesInfoParam param = new CovariatesInfoParam();
 		param.setSex(true);
 
 		MemberHistInfoDAO mhiDao =new MemberHistInfoDAO();
@@ -35,7 +35,7 @@ public class MemberHistInfoDAOTest extends TestCase {
 	}
 
 	public void testSelectMemberHistYearCovariatesInfoClientMap() {
-		YearCovariatesInfoParam param = new YearCovariatesInfoParam();
+		CovariatesInfoParam param = new CovariatesInfoParam();
 
 		ClientInfo info = new ClientInfo();
 		info.setClientId("K08031");

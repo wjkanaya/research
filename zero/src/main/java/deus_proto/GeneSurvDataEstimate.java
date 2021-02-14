@@ -19,8 +19,8 @@ import deus_proto.util.OneHotMaker;
 import mybaits.vo.ConvariateData;
 import mybaits.vo.CovariatesEffectiveInfo;
 import mybaits.vo.CovariatesInfo;
+import mybaits.vo.CovariatesInfoParam;
 import mybaits.vo.YearCovariatesInfo;
-import mybaits.vo.YearCovariatesInfoParam;
 import mybaits.vo.YearEstimateInfo;
 import mybatis.dao.CovariatesEffectiveInfoDAO;
 import mybatis.dao.CovariatesInfoDAO;
@@ -107,7 +107,7 @@ public class GeneSurvDataEstimate {
 		list = dao.selectMemberHistYearEstimateInfoMap();
 		list2 = dao.selectMemberHistYearEstimateInfoMap2();
 
-		YearCovariatesInfoParam param = new YearCovariatesInfoParam();
+		CovariatesInfoParam param = new CovariatesInfoParam();
 		param.setSex(true);
 
         convList = dao.selectMemberHistYearCovariatesInfoMap(param);

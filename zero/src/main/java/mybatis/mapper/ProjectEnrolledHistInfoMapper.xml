@@ -115,37 +115,114 @@
   </select>
 
 
-  <resultMap id="projectEnrolledHistQuarterCovariatesInfoMap" type="YearCovariatesInfo">
+  <resultMap id="projectEnrolledHistQuarterCovariatesInfoMap" type="QuarterCovariatesInfo">
    <id column="tbl_id"/>
-   <result property="years" column="quarters"/>
+   <result property="quarters" column="quarters"/>
    <result property="event" column="event"/>
    <result property="count" column="count"/>
    <association property="covariatesMap" columnPrefix="c_"  resultMap="covariatesMap"/>
   </resultMap>
 
   <select id="selectProjectEnrolledHistQuarterCovariatesInfoMap" resultMap="projectEnrolledHistQuarterCovariatesInfoMap">
+select
+ quarters,
+ event,
 
+     <foreach item="item" collection="memberList">
+     CASE
+     WHEN member_id = '${item.memberId}'
+     THEN 1
+     ELSE 0
+     END AS &quot;c_${item.memberId}&quot;,
+    </foreach>
+    <if test="memberList!=null &amp;&amp; !memberList.isEmpty()">
+          CASE
+     WHEN member_id = 'MXXXX'
+     THEN 1
+     ELSE 0
+     END AS &quot;c_MXXXX&quot;,
 
-       select
+     </if>
+    <foreach item="item" collection="clientList">
+     CASE
+     WHEN member_id = '${item.clientId}'
+     THEN 1
+     ELSE 0
+     END AS &quot;c_${item.clientId}&quot;,
+    </foreach>
+     <if test="clientList!=null &amp;&amp; !clientList.isEmpty()">
+     CASE
+     WHEN client_id = 'KXXXXX'
+     THEN 1
+     ELSE 0
+     END AS "c_KXXXXX",
+    </if>
+
+     count
+
+from
+   (    select
     quarters,
     event,
+    <if test="memberList!=null &amp;&amp; !memberList.isEmpty()">
+    member_id,
+    </if>
+    <if test="clientList!=null &amp;&amp; !clientList.isEmpty()">
+    client_id,
+    </if>
+
+
     COUNT(*) as count
     from
     (
         select
             enrolled_hist_id,
+            <if test="memberList!=null &amp;&amp; !memberList.isEmpty()">
+            member_id,
+            </if>
+            <if test="clientList!=null &amp;&amp; !clientList.isEmpty()">
+            client_id,
+            </if>
             quarters,
             CASE
                 WHEN last_quarter = quarters
-            		AND stop_type = '2'
-            		AND enrolled_status = '3' THEN 1
+            		AND stop_type = '0' -- 0:顧客起因、1:自社起因、2:個人起因、3:個人起因(退職)
+            		AND enrolled_status = '3' THEN 1 -- 3:脱退
                 ELSE 0
             END AS event
         from
             (
                 SELECT
                 	quarters,
-                    enrolled_hist_id,
+                    pe.enrolled_hist_id,
+                      <if test="memberList!=null &amp;&amp; !memberList.isEmpty()">
+                    CASE
+                    	WHEN  pe.member_id IN
+                     </if>
+                    	  <foreach item="item" index="index" collection="memberList"
+  						    open="(" separator="," close=")">
+      						  {item.memberId}
+ 						  </foreach>
+ 				     <if test="memberList!=null &amp;&amp; !memberList.isEmpty()">
+                    	THEN pe.member_id
+                    	ELSE 'MXXXX'
+                    END AS member_id,
+                    </if>
+                    <if test="clientList!=null &amp;&amp; !clientList.isEmpty()">
+                    CASE
+                    	WHEN  pro.client_id IN
+                    </if>
+                         <foreach item="item" index="index" collection="clientList"
+  						    open="(" separator="," close=")">
+      						  {item.clientId}
+ 						 </foreach>
+ 					<if test="clientList!=null &amp;&amp; !clientList.isEmpty()">
+                    	THEN pro.client_id
+                    	ELSE 'KXXXXX'
+                    END AS client_id,
+                    </if>
+                    -- pe.member_id,
+                    -- pro.client_id,
                     cast(EXTRACT(
                             year
                             from
@@ -155,12 +232,15 @@
                             from
                                 AGE(COALESCE(stop_date, CAST(DATE_TRUNC('month', now()) as DATE)), join_date)
                         ) as integer) / 3 as last_quarter,
-                    stop_type,
-                    enrolled_status
+                    pe.stop_type,
+                    pe.enrolled_status
                 from
-                    project_enrolled_hist_info cross
-                    join
+                    project_enrolled_hist_info pe
+                    cross join
                         generate_series(0, 400) As quarters
+                    inner join project_info pro
+                    using (project_id)
+
             ) aa
         where
             quarters &lt;= last_quarter
@@ -168,68 +248,17 @@
     group by
     quarters,
     event
+    <if test="memberList!=null &amp;&amp; !memberList.isEmpty()">
+    ,member_id
+    </if>
+    <if test="clientList!=null &amp;&amp; !clientList.isEmpty()">
+    ,client_id
+    </if>
+    ) cc
+
     order by
     quarters,
     event
-
-    select
-    years,
-     <if test="sex == true">
-    &quot;C00002&quot; as &quot;c_C00002&quot;,
-    </if>
-    event,
-    COUNT(*) as count
-    from
-    (
-        select
-            member_id,
-            years,
-            CASE
-                WHEN last_year = years
-            AND status = '1' THEN 1
-                ELSE 0
-            END AS event
-             <if test="sex == true">
-            ,&quot;C00002&quot;
-            </if>
-        from
-            (
-                SELECT
-                    member_id,
-                    <if test="sex == true">
-                    sex as &quot;C00002&quot;,
-                    </if>
-                    cast(EXTRACT(
-                            year
-                            from
-                                AGE(COALESCE(retirement_date, CAST(DATE_TRUNC('month', now()) as DATE)), enter_date)
-                        ) * 12 + EXTRACT(
-                            month
-                            from
-                                AGE(COALESCE(retirement_date, CAST(DATE_TRUNC('month', now()) as DATE)), enter_date)
-                        ) as integer) / 12 as last_year,
-                    status,
-                    years
-                from
-                    member_hist_info cross
-                    join
-                        generate_series(0, 100) As years
-            ) aa
-        where
-            years &lt;= last_year
-    ) bb
-    group by
-    years,
-    event
-     <if test="sex == true">
-    ,&quot;c_C00002&quot;
-    </if>
-    order by
-    years,
-    event
-     <if test="sex == true">
-    ,&quot;c_C00002&quot;
-    </if>
 
   </select>
 

@@ -6,11 +6,11 @@ import java.util.List;
 import org.apache.ibatis.session.SqlSession;
 
 import deus.enums.RetirementType;
+import mybaits.vo.CovariatesInfoParam;
 import mybaits.vo.MemberHistInfo;
 import mybaits.vo.MemberHistPriceInfo;
 import mybaits.vo.YearCount;
 import mybaits.vo.YearCovariatesInfo;
-import mybaits.vo.YearCovariatesInfoParam;
 import mybaits.vo.YearEstimateInfo;
 import mybaits.vo.YearEstimateInfoPre;
 import mybaits.vo.YearMonthsCensorCount;
@@ -76,13 +76,13 @@ public class MemberHistInfoDAO {
 		return list;
 	}
 
-	public List<YearCovariatesInfo> selectMemberHistYearCovariatesInfoMap(YearCovariatesInfoParam target) {
+	public List<YearCovariatesInfo> selectMemberHistYearCovariatesInfoMap(CovariatesInfoParam target) {
 		SqlSession session = Util.getSqlSession();
 		List<YearCovariatesInfo> list = session.selectList(SELECT_MEMBER_HIST_YEAR_COVARIATES_INFO_MAP, target);
 		return list;
 	}
 
-	public List<YearCovariatesInfo> selectMemberHistYearCovariatesInfoClientMap(YearCovariatesInfoParam target) {
+	public List<YearCovariatesInfo> selectMemberHistYearCovariatesInfoClientMap(CovariatesInfoParam target) {
 		SqlSession session = Util.getSqlSession();
 		List<YearCovariatesInfo> list = session.selectList(SELECT_MEMBER_HIST_YEAR_COVARIATES_INFO_CLIENT_MAP, target);
 		return list;

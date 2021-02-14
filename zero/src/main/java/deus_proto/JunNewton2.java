@@ -14,7 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import deus_proto.util.CulcUtil;
-import mybaits.vo.YearCovariatesInfoParam;
+import mybaits.vo.CovariatesInfoParam;
 import mybatis.dao.MemberHistInfoDAO;
 import sim.Util;
 
@@ -47,7 +47,7 @@ public class JunNewton2 {
 
 
 
-		YearCovariatesInfoParam param = new YearCovariatesInfoParam();
+		CovariatesInfoParam param = new CovariatesInfoParam();
 
 		String[] clientIdArr = {
 				"C00002",

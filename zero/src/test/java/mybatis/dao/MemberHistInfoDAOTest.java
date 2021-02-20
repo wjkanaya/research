@@ -6,6 +6,7 @@ import java.util.List;
 import junit.framework.TestCase;
 import mybaits.vo.ClientInfo;
 import mybaits.vo.CovariatesInfoParam;
+import mybaits.vo.MemberHistInfo;
 import mybaits.vo.YearCovariatesInfo;
 import sim.Util;
 
@@ -42,7 +43,8 @@ public class MemberHistInfoDAOTest extends TestCase {
 		List<ClientInfo>  clist = new ArrayList<ClientInfo>();
 		clist.add(info);
 		param.setClientList(clist);
-
+		List<MemberHistInfo> mlist = new ArrayList<MemberHistInfo>();
+		param.setMemberList(mlist);
 
 		MemberHistInfoDAO mhiDao =new MemberHistInfoDAO();
 		List<YearCovariatesInfo> list = mhiDao.selectMemberHistYearCovariatesInfoClientMap(param);

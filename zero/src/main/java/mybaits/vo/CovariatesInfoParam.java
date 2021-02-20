@@ -25,6 +25,18 @@ public class CovariatesInfoParam {
 	}
 
 
+
+	public List<MemberHistInfo> getMemberList() {
+		return memberList;
+	}
+
+	public void setMemberList(List<MemberHistInfo> memberList) {
+		this.memberList = memberList;
+	}
+
+
+	List<MemberHistInfo> memberList;
+
 	List<ClientInfo> clientList;
 
 }

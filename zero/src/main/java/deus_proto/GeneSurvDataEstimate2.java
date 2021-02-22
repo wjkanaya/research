@@ -28,7 +28,9 @@ import mybatis.dao.CovariatesInfoDAO;
 //import mybaits.vo.YearEstimateInfoPre;
 import mybatis.dao.MemberHistInfoDAO;
 
-public class GeneSurvDataEstimate2 {
+
+// <<退職圧要因一覧情報>>
+public class GeneSurvDataEstimate2 implements Estimate {
 
 	static Logger logger = LogManager.getLogger(GeneSurvDataEstimate2.class);
 
@@ -181,7 +183,7 @@ public class GeneSurvDataEstimate2 {
 	}
 
 
-	public void clearCache() {
+	private void clearCache() {
 		zCacheMap.clear();
 	}
 

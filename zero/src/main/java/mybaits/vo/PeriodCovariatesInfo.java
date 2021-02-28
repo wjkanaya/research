@@ -8,25 +8,33 @@ import java.util.TreeMap;
 
 import deus_proto.util.CovariatesCodeComparator;
 
-public class QuarterCovariatesInfo implements Comparable {
+public class PeriodCovariatesInfo implements Comparable {
 
 
-	Integer quarters;
-
-	public Integer getQuarters() {
-		return quarters;
+	public Integer getPeriodMonths() {
+		return periodMonths;
 	}
 
-	public void setQuarters(Integer quarters) {
-		this.quarters = quarters;
+	public void setPeriodMonths(Integer periodMonths) {
+		this.periodMonths = periodMonths;
+	}
+
+	Integer periodMonths;
+
+	Integer periods;
+
+	public Integer getPeriods() {
+		return periods;
+	}
+
+	public void setPeriods(Integer periods) {
+		this.periods = periods;
 	}
 
 	Integer event;
 	Integer count;
 
 	Map<String, BigDecimal>  covariatesMap;
-
-
 
 	public Integer getEvent() {
 		return event;
@@ -80,17 +88,28 @@ public class QuarterCovariatesInfo implements Comparable {
 
 
 	public int compareTo(Object inO) {
-		QuarterCovariatesInfo o = (QuarterCovariatesInfo) inO;
+		PeriodCovariatesInfo o = (PeriodCovariatesInfo) inO;
 		int result = 0;
 
-		if (quarters != null && o.getQuarters()!= null) {
-			result = this.quarters.compareTo(o.getQuarters());
+		if (periodMonths != null && o.getPeriodMonths()!= null) {
+			result = this.periodMonths.compareTo(o.getPeriodMonths());
 			if (result != 0) {
 				return result;
 			}
-		} else if (quarters == null && o.getQuarters()!= null) {
+		} else if (periodMonths == null && o.getPeriodMonths()!= null) {
 			return -1;
-		} else if (quarters != null && o.getQuarters()== null) {
+		} else if (periodMonths != null && o.getPeriodMonths()== null) {
+			return 1;
+		}
+
+		if (periods != null && o.getPeriods()!= null) {
+			result = this.periods.compareTo(o.getPeriods());
+			if (result != 0) {
+				return result;
+			}
+		} else if (periods == null && o.getPeriods()!= null) {
+			return -1;
+		} else if (periods != null && o.getPeriods()== null) {
 			return 1;
 		}
 
@@ -114,7 +133,6 @@ public class QuarterCovariatesInfo implements Comparable {
 
 		}
 
-
 		if (event != null && o.getEvent() != null) {
 			result = this.event.compareTo(o.getEvent());
 			if (result != 0) {
@@ -135,8 +153,12 @@ public class QuarterCovariatesInfo implements Comparable {
 
     	StringBuilder sb = new StringBuilder();
 
-    	if (quarters != null) {
-    		sb.append("quarters").append(quarters.toString());
+    	if (periodMonths != null) {
+    		sb.append("periodMonths").append(periodMonths.toString());
+    	}
+
+    	if (periods != null) {
+    		sb.append("periods").append(periods.toString());
     	}
 
     	if (event != null) {
@@ -164,7 +186,7 @@ public class QuarterCovariatesInfo implements Comparable {
 
     @Override
     public boolean equals(Object obj) {
-    	return compareTo((QuarterCovariatesInfo)obj)  == 0;
+    	return compareTo((PeriodCovariatesInfo)obj)  == 0;
 	}
 
 }

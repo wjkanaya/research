@@ -38,11 +38,23 @@ public class DeusConst {
 	public static final String C00000 = "C00000";
 
 	// 経過年数
-	public static final String C00001 = "C00001";
+	// public static final String C00001 = "C00001";
 	//	性別
 	public static final String C00002 = "C00002";
 	// 経過月数
-	public static final String C00003	 = "C00003";
+	// public static final String C00003	 = "C00003";
+	// 経過四半期数
+	// public static final String C00005	 = "C00005";
+
+
+	// 顧客共変量接頭辞
+	public static final String CLIENT_PREFIX = "K";
+
+	// 社員共変量接頭辞
+	public static final String MEMBER_PREFIX = "M";
+
+	// 期間共変量接頭辞
+	public static final String PERIOD_PREFIX = "P";
 
 
 

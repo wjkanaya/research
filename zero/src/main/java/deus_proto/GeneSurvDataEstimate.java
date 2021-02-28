@@ -329,20 +329,23 @@ public class GeneSurvDataEstimate {
 
 		Date nowDate = new Date();
 
+		// 期間共変量設定
+		String periodCovariatesCode = DeusConst.PERIOD_PREFIX + String.format("%03d", 12);
+
 		// 経過年
 		// 共変量有効情報
-		covariatesEffectiveInfoDAO.deleteCovariatesEffectiveInfo(DeusConst.CT0001, DeusConst.C00001);
+		covariatesEffectiveInfoDAO.deleteCovariatesEffectiveInfo(DeusConst.CT0001, periodCovariatesCode);
 
 		CovariatesEffectiveInfo ceInfo = new CovariatesEffectiveInfo();
 		// 退職
 		ceInfo.setCulcTargetCode(DeusConst.CT0001);
 		// 経過年数
-		ceInfo.setCovariatesCode(DeusConst.C00001);
+		ceInfo.setCovariatesCode(periodCovariatesCode);
 		ceInfo.setEffectStartTime(nowDate);
 		ceInfo.setEffectFlg(Boolean.valueOf(true));
 		covariatesEffectiveInfoDAO.insertCovariatesEffectiveInfo(ceInfo);
 
-		covariatesInfoDAO.deleteCovariatesInfo(DeusConst.CT0001, DeusConst.C00001);
+		covariatesInfoDAO.deleteCovariatesInfo(DeusConst.CT0001, periodCovariatesCode);
 
 		List<CovariatesInfo> list = new ArrayList<CovariatesInfo>();
 
@@ -350,7 +353,7 @@ public class GeneSurvDataEstimate {
 		for (int i =0; i < yearRange;i++) {
 			CovariatesInfo covInfo = new CovariatesInfo();
 			covInfo.setCulcTargetCode(DeusConst.CT0001);
-			covInfo.setCovariatesCode(DeusConst.C00001);
+			covInfo.setCovariatesCode(periodCovariatesCode);
 			covInfo.setEffectStartTime(nowDate);
 			covInfo.setCovariatesLabelNum(Integer.valueOf(i));
 			covInfo.setCovariatesValue(BigDecimal.valueOf(lastBetaMat.getEntry(i, 0)));

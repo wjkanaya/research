@@ -115,17 +115,38 @@
   </select>
 
 
-  <resultMap id="projectEnrolledHistQuarterCovariatesInfoMap" type="QuarterCovariatesInfo">
+  <resultMap id="projectEnrolledHistQuarterCovariatesInfoMap" type="PeriodCovariatesInfo">
    <id column="tbl_id"/>
-   <result property="quarters" column="quarters"/>
+   <result property="periodMonths" column="period_months"/>
+   <result property="periods" column="periods"/>
    <result property="event" column="event"/>
    <result property="count" column="count"/>
    <association property="covariatesMap" columnPrefix="c_"  resultMap="covariatesMap"/>
   </resultMap>
 
+
+  <select id="selectMaxLastPeriod" resultType="Integer">
+    SELECT
+        max(
+            cast(
+                EXTRACT(
+                    year
+                    from
+                    AGE(COALESCE(stop_date, CAST(DATE_TRUNC('month', now()) as DATE)), join_date)
+                ) * 12 +
+                EXTRACT(
+                    month
+                    from
+                    AGE(COALESCE(stop_date, CAST(DATE_TRUNC('month', now()) as DATE)), join_date)
+                ) as integer) / ${periodMonths}) as max_last_period
+    from
+        project_enrolled_hist_info
+  </select>
+
   <select id="selectProjectEnrolledHistQuarterCovariatesInfoMap" resultMap="projectEnrolledHistQuarterCovariatesInfoMap">
 select
- quarters,
+ '${periodMonths}' as period_months,
+ periods,
  event,
 
      <foreach item="item" collection="memberList">
@@ -162,7 +183,7 @@ select
 
 from
    (    select
-    quarters,
+    periods,
     event,
     <if test="memberList!=null &amp;&amp; !memberList.isEmpty()">
     member_id,
@@ -183,9 +204,9 @@ from
             <if test="clientList!=null &amp;&amp; !clientList.isEmpty()">
             client_id,
             </if>
-            quarters,
+            periods,
             CASE
-                WHEN last_quarter = quarters
+                WHEN last_period = periods
             		AND stop_type = '0'
             		AND enrolled_status = '3' THEN 1
                 ELSE 0
@@ -193,7 +214,7 @@ from
         from
             (
                 SELECT
-                	quarters,
+                	periods,
                     pe.enrolled_hist_id,
                       <if test="memberList!=null &amp;&amp; !memberList.isEmpty()">
                     CASE
@@ -229,19 +250,19 @@ from
                             month
                             from
                                 AGE(COALESCE(stop_date, CAST(DATE_TRUNC('month', now()) as DATE)), join_date)
-                        ) as integer) / 3 as last_quarter,
+                        ) as integer) / ${periodMonths} as last_period,
                     pe.stop_type,
                     pe.enrolled_status
                 from
                     project_enrolled_hist_info pe
                     cross join
-                        generate_series(0, 400) As quarters
+                        generate_series(0, 400) As periods
                     inner join project_info pro
                     using (project_id)
 
             ) aa
         where
-            quarters &lt;= last_quarter
+            periods &lt;= last_period
     ) bb
     group by
     quarters,
@@ -255,7 +276,7 @@ from
     ) cc
 
     order by
-    quarters,
+    periods,
     event
 
   </select>

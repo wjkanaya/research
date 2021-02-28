@@ -6,9 +6,9 @@ import java.util.List;
 import org.apache.ibatis.session.SqlSession;
 
 import mybaits.vo.CovariatesInfoParam;
+import mybaits.vo.PeriodCovariatesInfo;
 import mybaits.vo.ProjectEnrolledHistInfo;
 import mybaits.vo.ProjectEnrolledHistYearMonthsInfo;
-import mybaits.vo.QuarterCovariatesInfo;
 import mybaits.vo.YearMonthsCensorCount;
 import sim.Util;
 
@@ -36,15 +36,21 @@ public class ProjectEnrolledHistInfoDAO {
 
 	public static final String SELECT_PROJECT_ENROLLED_HIST_QUARTER_COVARIATES_INFO_MAP  = "selectProjectEnrolledHistQuarterCovariatesInfoMap";
 
+	public static final String  SELECT_MAX_LAST_PERIOD = "selectMaxLastPeriod";
 
-	public List<QuarterCovariatesInfo> selectProjectEnrolledHistQuarterCovariatesInfoMap(CovariatesInfoParam target) {
+
+	public int selectMaxLastPeriod(CovariatesInfoParam target) {
 		SqlSession session = Util.getSqlSession();
-		List<QuarterCovariatesInfo> list = session.selectList(SELECT_PROJECT_ENROLLED_HIST_QUARTER_COVARIATES_INFO_MAP, target);
-		return list;
+		Integer year = session.selectOne(SELECT_MAX_LAST_PERIOD, target);
+		return year.intValue();
 	}
 
 
-
+	public List<PeriodCovariatesInfo> selectProjectEnrolledHistQuarterCovariatesInfoMap(CovariatesInfoParam target) {
+		SqlSession session = Util.getSqlSession();
+		List<PeriodCovariatesInfo> list = session.selectList(SELECT_PROJECT_ENROLLED_HIST_QUARTER_COVARIATES_INFO_MAP, target);
+		return list;
+	}
 
 	public List<YearMonthsCensorCount> selectAllProjectEnrolledHistYearMonthsCountInfo() {
 		SqlSession session = Util.getSqlSession();

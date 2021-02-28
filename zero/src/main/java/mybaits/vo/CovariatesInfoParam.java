@@ -4,6 +4,18 @@ import java.util.List;
 
 public class CovariatesInfoParam {
 
+	// 1期間あたりの月数
+	int periodMonths = 1;
+
+	public int getPeriodMonths() {
+		return periodMonths;
+	}
+
+	public void setPeriodMonths(int periodMonths) {
+		this.periodMonths = periodMonths;
+	}
+
+
 
 	public boolean isSex() {
 		return sex;
@@ -12,7 +24,6 @@ public class CovariatesInfoParam {
 	public void setSex(boolean sex) {
 		this.sex = sex;
 	}
-
 
 	boolean sex;
 

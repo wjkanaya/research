@@ -17,42 +17,42 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import deus_proto.util.OneHotMaker;
-import mybaits.vo.ClientInfo;
 import mybaits.vo.ConvariateData;
 import mybaits.vo.CovariatesEffectiveInfo;
 import mybaits.vo.CovariatesInfo;
-import mybaits.vo.CovariatesInfoParam;
-import mybaits.vo.YearCovariatesInfo;
+import mybaits.vo.PeriodCovariatesInfo;
 import mybatis.dao.CovariatesEffectiveInfoDAO;
 import mybatis.dao.CovariatesInfoDAO;
-//import mybaits.vo.YearEstimateInfoPre;
-import mybatis.dao.MemberHistInfoDAO;
 
 
-// <<退職圧要因一覧情報>>
-public class GeneSurvDataEstimate2 implements Estimate {
+// 期間生存情報
+public class GeneProjectSurvDataEstimate implements Estimate {
 
-	static Logger logger = LogManager.getLogger(GeneSurvDataEstimate2.class);
+	static Logger logger = LogManager.getLogger(GeneProjectSurvDataEstimate.class);
 
 
+	// 取得対象生存データ
+	GetSurvData targetSurvData = null;
 
-	List<YearCovariatesInfo> convList = null;
+	public GeneProjectSurvDataEstimate(GetSurvData targetSurveData ) {
+		this.targetSurvData = targetSurveData;
+	}
 
-	int yearRange = 0;
+	List<PeriodCovariatesInfo> convList = null;
+
+	int periodsRange = 0;
 
     int betaSize = 0;
 
-    List<List<YearCovariatesInfo>> yearConvList = null;
+    List<List<PeriodCovariatesInfo>> quarterConvList = null;
 
-    TreeMap<String, List<YearCovariatesInfo>> convTreeMap = null;
+    TreeMap<String, List<PeriodCovariatesInfo>> convTreeMap = null;
 
-    Map<YearCovariatesInfo,Map<String,ConvariateData>> convariateDataListMap = null;
+    Map<PeriodCovariatesInfo,Map<String,ConvariateData>> convariateDataListMap = null;
 
+    List<Integer> searchPeriodsList = null;
 
-    List<Integer> searchYearsList = null;
-
-
-	Map<YearCovariatesInfo, Double> zCacheMap = new HashMap<YearCovariatesInfo, Double>();
+	Map<PeriodCovariatesInfo, Double> zCacheMap = new HashMap<PeriodCovariatesInfo, Double>();
 
 	// β0
 	double beta0 = 0;
@@ -60,13 +60,13 @@ public class GeneSurvDataEstimate2 implements Estimate {
 	public void clear() {
 		// β0以外初期化
 		this.convList = null;
-		this.yearRange= 0;
+		this.periodsRange= 0;
 		this.betaSize = 0;
-		this.yearConvList = null;
+		this.quarterConvList = null;
 		this.convTreeMap = null;
 		this.convariateDataListMap = null;
-		this.searchYearsList = null;
-		this.zCacheMap = new HashMap<YearCovariatesInfo, Double>();
+		this.searchPeriodsList = null;
+		this.zCacheMap = new HashMap<PeriodCovariatesInfo, Double>();
 	}
 
 	public int getBetaSize() {
@@ -77,57 +77,25 @@ public class GeneSurvDataEstimate2 implements Estimate {
 		this.betaSize = betaSize;
 	}
 
+	public void getData(List<Integer> searchPeriodsList,List<String> targetCodeList) {
+		this.searchPeriodsList = searchPeriodsList;
+		convList = targetSurvData.getData(targetCodeList);
 
-    void getData(List<String> targetCodeList) {
+		this.periodsRange = targetSurvData.selectMaxLastPeriod() + 1;
 
-		CovariatesInfoParam param = new CovariatesInfoParam();
-		param.setClientList(new ArrayList<ClientInfo>());
+		if (searchPeriodsList != null) {
 
-		// 性別判定コード:"C00002";
+			this.periodsRange = searchPeriodsList.size();
 
-
-		for (String code :targetCodeList) {
-			if ("C00002".equals(code)) {
-				param.setSex(true);
-			} else {
-				ClientInfo info = new ClientInfo();
-				info.setClientId(code);
-				param.getClientList().add(info);
-			}
-		}
-
-		MemberHistInfoDAO dao = new MemberHistInfoDAO();
-
-		// 何か年か？
-		this.yearRange = dao.selectMaxLastYear() + 1;
-
-        if (param.getClientList().size() > 0) {
-        	convList = dao.selectMemberHistYearCovariatesInfoClientMap(param);
-        } else {
-        	convList = dao.selectMemberHistYearCovariatesInfoMap(param);
-        }
-
-        logger.debug(convList.size());
+		} 
 	}
 
-	public void getData(List<Integer> searchYearsList,List<String> targetCodeList) {
-		this.searchYearsList = searchYearsList;
-		getData(targetCodeList);
-
-		if (searchYearsList != null) {
-
-			this.yearRange = searchYearsList.size();
-
-		} // searchYearsListがnull： 1年づつ共変量に
-
-	}
-
-	private int getyearConvListIdx(int year) {
-		if (searchYearsList == null) {
-			return year;
+	private int getPeriodConvListIdx(int quarter) {
+		if (searchPeriodsList == null) {
+			return quarter;
 		} else {
-			for (int i = searchYearsList.size() - 1 ; i >= 0; i--) {
-				if (searchYearsList.get(i).intValue() <= year) {
+			for (int i = searchPeriodsList.size() - 1 ; i >= 0; i--) {
+				if (searchPeriodsList.get(i).intValue() <= quarter) {
 					return i;
 				}
 			}
@@ -140,24 +108,24 @@ public class GeneSurvDataEstimate2 implements Estimate {
 		// 何か年か？
 		int convariateDataListSize =
 				OneHotMaker.getConvariateDataListMap(convList.get(0).getCovariatesMap()).size();
-		convariateDataListMap = new TreeMap<YearCovariatesInfo,Map<String, ConvariateData>>();
+		convariateDataListMap = new TreeMap<PeriodCovariatesInfo,Map<String, ConvariateData>>();
 
 
 		// beta0は0と仮定
 		//int betaSize = 1 + retireCountList.size() + getXList(list.get(0)).size();
-		this.betaSize = this.yearRange  + convariateDataListSize;
+		this.betaSize = this.periodsRange  + convariateDataListSize;
 
 		//  年毎にデータを分ける
-		yearConvList = new ArrayList<List<YearCovariatesInfo>>();
-		for (int i = 0;i < yearRange; i++) {
-			yearConvList.add(new ArrayList<YearCovariatesInfo>());
+		quarterConvList = new ArrayList<List<PeriodCovariatesInfo>>();
+		for (int i = 0;i < periodsRange; i++) {
+			quarterConvList.add(new ArrayList<PeriodCovariatesInfo>());
 		}
 
-	    convTreeMap =  new TreeMap<String, List<YearCovariatesInfo>>();
+	    convTreeMap =  new TreeMap<String, List<PeriodCovariatesInfo>>();
 
-		for (YearCovariatesInfo info :convList) {
+		for (PeriodCovariatesInfo info :convList) {
 
-			yearConvList.get(getyearConvListIdx(info.getYears().intValue())).add(info);
+			quarterConvList.get(getPeriodConvListIdx(info.getPeriods().intValue())).add(info);
 
 			 if (convariateDataListMap.get(info) == null) {
 			 // 共変量リスト
@@ -172,14 +140,12 @@ public class GeneSurvDataEstimate2 implements Estimate {
 				 if (!BigDecimal.valueOf(0).equals(cdata.getValue())) {
 					 String key = cdata.getConvariateCode() + "_" + cdata.getConvariateLabel();
 					 if (convTreeMap.get(key) == null) {
-						 convTreeMap.put(key, new ArrayList<YearCovariatesInfo>());
+						 convTreeMap.put(key, new ArrayList<PeriodCovariatesInfo>());
 					 }
 					 convTreeMap.get(key).add(info);
 				 }
 			 }
 		}
-
-
 	}
 
 
@@ -202,30 +168,30 @@ public class GeneSurvDataEstimate2 implements Estimate {
 
 		List<Double> deltaBetaList = new ArrayList<Double>(betaArr.length);
 
-		for (int year = 0 ;  year < yearConvList.size(); year++) {
-			List<YearCovariatesInfo> infoList = yearConvList.get(year);
+		for (int year = 0 ;  year < quarterConvList.size(); year++) {
+			List<PeriodCovariatesInfo> infoList = quarterConvList.get(year);
 
 			TotalCounter tc = new TotalCounter();
-			for (YearCovariatesInfo info:infoList) {
+			for (PeriodCovariatesInfo info:infoList) {
 				// キャッシュに値がない
 				// PD計算
-				double pd  = culcPD(betaArr, yearRange, info);
+				double pd  = culcPD(betaArr, periodsRange, info);
 				double v = (pd - info.getEvent())  * info.getCount();
 				tc.set(v);
 			}
 			deltaBetaList.add(tc.getTotal());
 		}
 
-		Set<Entry<String, List<YearCovariatesInfo>>> set = convTreeMap.entrySet();
-		for (Entry<String, List<YearCovariatesInfo>> entry : set) {
+		Set<Entry<String, List<PeriodCovariatesInfo>>> set = convTreeMap.entrySet();
+		for (Entry<String, List<PeriodCovariatesInfo>> entry : set) {
 
-			List<YearCovariatesInfo> infoList = entry.getValue();
+			List<PeriodCovariatesInfo> infoList = entry.getValue();
 
 			TotalCounter tc = new TotalCounter();
-			for (YearCovariatesInfo info:infoList) {
+			for (PeriodCovariatesInfo info:infoList) {
 				// キャッシュに値がない
 				// PD計算
-				double pd  = culcPD(betaArr, yearRange, info);
+				double pd  = culcPD(betaArr, periodsRange, info);
 				double v = (pd - info.getEvent()) * convariateDataListMap.get(info).get(entry.getKey()).getValue().intValue()* info.getCount();
 				tc.set(v);
 			}
@@ -254,16 +220,16 @@ public class GeneSurvDataEstimate2 implements Estimate {
 
 		TotalCounter tc = new TotalCounter();
 
-		for (int year = 0 ;  year < yearConvList.size(); year++) {
-			List<YearCovariatesInfo> infoList = yearConvList.get(year);
+		for (int year = 0 ;  year < quarterConvList.size(); year++) {
+			List<PeriodCovariatesInfo> infoList = quarterConvList.get(year);
 
-			for (YearCovariatesInfo info:infoList) {
+			for (PeriodCovariatesInfo info:infoList) {
 				// キャッシュに値がない
 				// PD計算
-				double pd  = culcPD(betaArr, yearRange, info);
+				double pd  = culcPD(betaArr, periodsRange, info);
 				//				double v = (pd - info.getEvent())  * info.getCount();
 				//=∑i=1N(log(PDi)+(1−Yi)・(−β0−∑p=1KβpXi,p)
-				double v = (Math.log(pd) - (1 - info.getEvent()) * culcZ(betaArr, yearRange, info)) * info.getCount() ;
+				double v = (Math.log(pd) - (1 - info.getEvent()) * culcZ(betaArr, periodsRange, info)) * info.getCount() ;
 				tc.set(v);
 			}
 		}
@@ -288,45 +254,42 @@ public class GeneSurvDataEstimate2 implements Estimate {
 		Date nowDate = new Date();
 
 		// 期間共変量設定
-		String periodCovariatesCode = DeusConst.PERIOD_PREFIX + String.format("%03d", 12);
+		String periodCovariatesCode =
+			DeusConst.PERIOD_PREFIX + String.format("%03d", targetSurvData.getPeriodMonths());
 
 		// 経過年
 		// 共変量有効情報
-		covariatesEffectiveInfoDAO.deleteCovariatesEffectiveInfo(DeusConst.CT0001, periodCovariatesCode);
+		covariatesEffectiveInfoDAO.deleteCovariatesEffectiveInfo(targetSurvData.getCulcTargetCode(), periodCovariatesCode);
 
 		CovariatesEffectiveInfo ceInfo = new CovariatesEffectiveInfo();
-		// 退職
-		ceInfo.setCulcTargetCode(DeusConst.CT0001);
+		// 計算対象コード
+		ceInfo.setCulcTargetCode(targetSurvData.getCulcTargetCode());
 		// 経過年数
 		ceInfo.setCovariatesCode(periodCovariatesCode);
 		ceInfo.setEffectStartTime(nowDate);
 		ceInfo.setEffectFlg(Boolean.valueOf(true));
 		covariatesEffectiveInfoDAO.insertCovariatesEffectiveInfo(ceInfo);
 
-		covariatesInfoDAO.deleteCovariatesInfo(DeusConst.CT0001, null);
-
+		covariatesInfoDAO.deleteCovariatesInfo(targetSurvData.getCulcTargetCode(), null);
 
 		CovariatesInfo covInfo = new CovariatesInfo();
-		covInfo.setCulcTargetCode(DeusConst.CT0001);
+		covInfo.setCulcTargetCode(targetSurvData.getCulcTargetCode());
 		covInfo.setCovariatesCode(DeusConst.C00000);
 		covInfo.setEffectStartTime(nowDate);
 		covInfo.setCovariatesLabelNum(0);
 		covInfo.setCovariatesValue(BigDecimal.valueOf(beta0));
 		covariatesInfoDAO.insertCovariatesInfo(covInfo);
 
-
-
 		List<CovariatesInfo> list = new ArrayList<CovariatesInfo>();
 
-
-		for (int i =0; i < yearRange;i++) {
+		for (int i =0; i < periodsRange;i++) {
 			covInfo = new CovariatesInfo();
-			covInfo.setCulcTargetCode(DeusConst.CT0001);
+			covInfo.setCulcTargetCode(targetSurvData.getCulcTargetCode());
 			covInfo.setCovariatesCode(periodCovariatesCode);
 			covInfo.setEffectStartTime(nowDate);
 
-			if (searchYearsList != null) {
-				covInfo.setCovariatesLabelNum(searchYearsList.get(i));
+			if (searchPeriodsList != null) {
+				covInfo.setCovariatesLabelNum(searchPeriodsList.get(i));
 			} else {
 				covInfo.setCovariatesLabelNum(Integer.valueOf(i));
 			}
@@ -344,28 +307,28 @@ public class GeneSurvDataEstimate2 implements Estimate {
 
 		Collection<ConvariateData> col =  convariateDataListMap.values();
 
-		int i = yearRange;
+		int i = periodsRange;
 		// 共変量情報
 		for (ConvariateData convData :col) {
 			if (!nowCovariatesCode.equals(convData.getConvariateCode())) {
 				nowCovariatesCode = convData.getConvariateCode();
-				covariatesEffectiveInfoDAO.deleteCovariatesEffectiveInfo(DeusConst.CT0001, nowCovariatesCode);
+				covariatesEffectiveInfoDAO.deleteCovariatesEffectiveInfo(targetSurvData.getCulcTargetCode(), nowCovariatesCode);
 				ceInfo = new CovariatesEffectiveInfo();
 
 				// 退職
-				ceInfo.setCulcTargetCode(DeusConst.CT0001);
+				ceInfo.setCulcTargetCode(targetSurvData.getCulcTargetCode());
 				// 経過年数
 				ceInfo.setCovariatesCode(nowCovariatesCode);
 				ceInfo.setEffectStartTime(nowDate);
 				ceInfo.setEffectFlg(Boolean.valueOf(true));
 				covariatesEffectiveInfoDAO.insertCovariatesEffectiveInfo(ceInfo);
 
-				covariatesInfoDAO.deleteCovariatesInfo(DeusConst.CT0001, nowCovariatesCode);
+				covariatesInfoDAO.deleteCovariatesInfo(targetSurvData.getCulcTargetCode(), nowCovariatesCode);
 
 			}
 
 			covInfo = new CovariatesInfo();
-			covInfo.setCulcTargetCode(DeusConst.CT0001);
+			covInfo.setCulcTargetCode(targetSurvData.getCulcTargetCode());
 			covInfo.setCovariatesCode(convData.getConvariateCode());
 			covInfo.setEffectStartTime(nowDate);
 			covInfo.setCovariatesLabelNum(Integer.valueOf(convData.getConvariateLabel()));
@@ -376,19 +339,19 @@ public class GeneSurvDataEstimate2 implements Estimate {
 		}
 	}
 
-	private double culcPD(double[] betaArr, int yearRange, YearCovariatesInfo info) {
+	private double culcPD(double[] betaArr, int yearRange, PeriodCovariatesInfo info) {
 		return 1.0 / ( 1.0  +  Math.exp(-culcZ(betaArr, yearRange, info)));
 
 	}
 
 
-	private double culcZ(double[] betaArr, int yearRange, YearCovariatesInfo info) {
+	private double culcZ(double[] betaArr, int yearRange, PeriodCovariatesInfo info) {
 		if (!zCacheMap.containsKey(info)) {
 
 			Map<String, ConvariateData> map = convariateDataListMap.get(info);
 			ConvariateData[] dataArr = map.values().toArray(new ConvariateData[0]);
 
-			int year = getyearConvListIdx(info.getYears().intValue());
+			int year = getPeriodConvListIdx(info.getPeriods().intValue());
 
 			TotalCounter tc = new TotalCounter();
 			tc.set(beta0);

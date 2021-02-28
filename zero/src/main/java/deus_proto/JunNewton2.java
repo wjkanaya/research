@@ -501,7 +501,7 @@ public class JunNewton2 {
 //  return H
 //
 
-	private static RealMatrix bfgs(Estimate est, RealMatrix nowPMat,RealMatrix prepMat,RealMatrix preHMat) {
+	private static RealMatrix bfgs(Culcurator est, RealMatrix nowPMat,RealMatrix prepMat,RealMatrix preHMat) {
 		RealMatrix s = nowPMat.subtract(prepMat);
 		RealMatrix y = est.delta(nowPMat).subtract(est.delta(prepMat));
 

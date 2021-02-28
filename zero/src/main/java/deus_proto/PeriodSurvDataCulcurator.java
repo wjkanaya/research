@@ -26,15 +26,15 @@ import mybatis.dao.CovariatesInfoDAO;
 
 
 // 期間生存情報
-public class GeneProjectSurvDataEstimate implements Estimate {
+public class PeriodSurvDataCulcurator implements Culcurator {
 
-	static Logger logger = LogManager.getLogger(GeneProjectSurvDataEstimate.class);
+	static Logger logger = LogManager.getLogger(PeriodSurvDataCulcurator.class);
 
 
 	// 取得対象生存データ
 	GetSurvData targetSurvData = null;
 
-	public GeneProjectSurvDataEstimate(GetSurvData targetSurveData ) {
+	public PeriodSurvDataCulcurator(GetSurvData targetSurveData ) {
 		this.targetSurvData = targetSurveData;
 	}
 

@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.apache.commons.math3.linear.RealMatrix;
 
-public interface Estimate {
+public interface Culcurator {
 
 	public void clear();
 	public void getData(List<Integer> searchYearsList,List<String> targetCodeList);

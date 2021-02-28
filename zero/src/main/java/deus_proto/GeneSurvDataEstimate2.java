@@ -30,7 +30,7 @@ import mybatis.dao.MemberHistInfoDAO;
 
 
 // <<退職圧要因一覧情報>>
-public class GeneSurvDataEstimate2 implements Estimate {
+public class GeneSurvDataEstimate2 implements Culcurator {
 
 	static Logger logger = LogManager.getLogger(GeneSurvDataEstimate2.class);
 
